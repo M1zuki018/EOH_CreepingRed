@@ -1,6 +1,7 @@
 using UnityEditor;
 using UnityEngine;
 using System.IO;
+using System.Linq;
 
 /// <summary>
 /// テンプレートを選択しスクリプトを作成するウィンドウを提供するエディター拡張
@@ -9,7 +10,10 @@ public class ScriptCreationWindow : EditorWindow
 {
     private string _scriptName = "NewScript"; // スクリプトの名前
     private string _savePath = "Assets"; // 保存パス
-    private string _template = "Default";
+    private int _templateIndex = 0; // テンプレートのインデックス
+    private string[] _templates = new string[0]; // テンプレートの配列
+    private string _templateFolderPath = "Assets/Script/ScriptTemplates"; // スクリプトテンプレートが置かれているフォルダ
+    
 
     [MenuItem("Tools/Script Creation Window")]
     public static void ShowWindow()
@@ -17,6 +21,11 @@ public class ScriptCreationWindow : EditorWindow
         // ウィンドウを表示。エディタウィンドウのレイアウトに組み込めるようにする。
         ScriptCreationWindow window = EditorWindow.GetWindow<ScriptCreationWindow>("Script Creation");
         window.Show();
+    }
+
+    private void OnEnable()
+    {
+        LoadTemplates(); // スクリプトのテンプレートをロード
     }
 
     private void OnGUI()
@@ -27,8 +36,17 @@ public class ScriptCreationWindow : EditorWindow
         _scriptName = EditorGUILayout.TextField("Script Name", _scriptName);
 
         // テンプレートを選ぶドロップダウンメニュー
-        _template = EditorGUILayout.Popup("Template", _template == "Default" ? 0 : 1, new string[] { "Default", "MonoBehaviour" }) == 0 ? "Default" : "MonoBehaviour";
-
+        if (_templates != null && _templates.Length > 0)
+        {
+            // テンプレートが存在したらポップアップに含めて表示する
+            _templateIndex = EditorGUILayout.Popup("Template", _templateIndex, _templates);
+        }
+        else
+        {
+            // テンプレートが存在しなかったらメッセージを出す
+            EditorGUILayout.HelpBox("No templates found in the 'ScriptTemplates' folder.", MessageType.Warning);
+        }
+        
         // フォルダパスを選択するフィールド
         GUILayout.Label("Select Save Folder", EditorStyles.boldLabel);
         _savePath = EditorGUILayout.TextField("Folder Path", _savePath);
@@ -55,6 +73,30 @@ public class ScriptCreationWindow : EditorWindow
         }
     }
 
+    /// <summary>
+    /// テンプレートの格納フォルダからテンプレートからリストを作成する
+    /// </summary>
+    private void LoadTemplates()
+    {
+        if (Directory.Exists(_templateFolderPath))
+        {
+            // フォルダ内のtxtファイルをすべて取得
+            string[] templateFiles = Directory.GetFiles(_templateFolderPath, "*.txt");
+            
+            // テンプレート名をファイル名（拡張子なし）でリスト化
+            _templates = templateFiles
+                .Select(file => Path.GetFileNameWithoutExtension(file))
+                .ToArray();
+        }
+        else
+        {
+            _templates = new string[] { }; // フォルダがない場合は空のリスト
+        }
+    }
+    
+    /// <summary>
+    /// 作成
+    /// </summary>
     private void CreateScript()
     {
         // フォルダパスが空でないかチェック
@@ -66,17 +108,29 @@ public class ScriptCreationWindow : EditorWindow
         
         // スクリプト名を確保
         string path = Path.Combine(_savePath, $"{_scriptName}.cs");
+        
+        // スクリプトが既に存在するか確認
+        if (File.Exists(path))
+        {
+            Debug.LogError($"Script {_scriptName} already exists!");
+            return;
+        }
+        
+        // 選ばれたテンプレートを読み込む
+        string selectedTemplate = _templates[_templateIndex];
+        string templatePath = $"{_templateFolderPath}/{selectedTemplate}.txt";
 
-        // テンプレートによって内容を決める
-        string scriptContent = "";
-        if (_template == "MonoBehaviour")
+        if (!File.Exists(templatePath))
         {
-            scriptContent = "using UnityEngine;\n\npublic class " + _scriptName + " : MonoBehaviour\n{\n    void Start()\n    {\n        \n    }\n\n    void Update()\n    {\n        \n    }\n}";
+            Debug.LogError($"Template file {selectedTemplate}.txt not found!");
+            return;
         }
-        else
-        {
-            scriptContent = "public class " + _scriptName + "\n{\n    \n}";
-        }
+
+        // テンプレートファイルの内容を読み込む
+        string templateContent = File.ReadAllText(templatePath);
+
+        // スクリプト内容をファイルに書き込む
+        string scriptContent = templateContent.Replace("{ClassName}", _scriptName); // テンプレート内の {ClassName} を置き換え
 
         // スクリプトファイルを作成
         File.WriteAllText(path, scriptContent);
