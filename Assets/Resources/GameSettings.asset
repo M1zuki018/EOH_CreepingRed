@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2b627617c1a9e9241b4be891603cab22, type: 3}
+  m_Name: GameSettings
+  m_EditorClassIdentifier: 
+  _mouseHoverHelp: 1
+  _mouseSensitivity: 1
+  _zoomSensitivity: 1
+  _masterVolume: 1
+  _bgmVolume: 0.879
+  _seVolume: 0.862
+  _ambientVolume: 0.817
+  _voiceVolume: 0.723
+  _screenResolution: 0
+  _fpsLimit: 0
