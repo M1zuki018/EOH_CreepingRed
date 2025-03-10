@@ -45,3 +45,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _mixer: {fileID: 24100000, guid: a76a4534216a38b4291c87a0089d4bd0, type: 2}
+  _gameSettings: {fileID: 11400000, guid: ed41d69b8950e8946b15471f0ece44f8, type: 2}

@@ -16,7 +16,7 @@ MonoBehaviour:
   _mouseSensitivity: 1
   _zoomSensitivity: 1
   _masterVolume: 0.732
-  _bgmVolume: 0.879
+  _bgmVolume: 0.424
   _seVolume: 0.862
   _ambientVolume: 0.817
   _voiceVolume: 0.723

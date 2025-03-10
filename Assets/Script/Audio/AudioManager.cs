@@ -16,10 +16,10 @@ public class AudioManager : MonoBehaviour
     [SerializeField, HighlightIfNull] private GameSettings _gameSettings;
     
     [Header("AudioData")]
-    private Dictionary<BGMEnum, AudioClip> _bgmClip = AudioLoader.LoadAudioClips<BGMEnum>("Audio/BGM");
-    private Dictionary<SEEnum, AudioClip> _seClip = AudioLoader.LoadAudioClips<SEEnum>("Audio/SE");
-    private Dictionary<AmbienceEnum, AudioClip> _ambienceClip = AudioLoader.LoadAudioClips<AmbienceEnum>("Audio/Ambience");
-    private Dictionary<VoiceEnum, AudioClip> _voiceClip = AudioLoader.LoadAudioClips<VoiceEnum>("Audio/Voice");
+    private Dictionary<BGMEnum, AudioClip> _bgmClip = new Dictionary<BGMEnum, AudioClip>();
+    private Dictionary<SEEnum, AudioClip> _seClip = new Dictionary<SEEnum, AudioClip>();
+    private Dictionary<AmbienceEnum, AudioClip> _ambienceClip = new Dictionary<AmbienceEnum, AudioClip>();
+    private Dictionary<VoiceEnum, AudioClip> _voiceClip = new Dictionary<VoiceEnum, AudioClip>();
     
     [Header("AudioSource")]
     private AudioSource _bgmSource; // BGM用
@@ -34,6 +34,11 @@ public class AudioManager : MonoBehaviour
             Destroy(gameObject);
             return;
         }
+
+        _bgmClip = AudioLoader.LoadAudioClips<BGMEnum>("Audio/BGM");
+        _seClip = AudioLoader.LoadAudioClips<SEEnum>("Audio/SE");
+        _ambienceClip = AudioLoader.LoadAudioClips<AmbienceEnum>("Audio/Ambience");
+        _voiceClip = AudioLoader.LoadAudioClips<VoiceEnum>("Audio/Voice");
         
         Instance = this;
         DontDestroyOnLoad(gameObject);
@@ -63,6 +68,10 @@ public class AudioManager : MonoBehaviour
     {
         float volumeInDb = volume > 0 ? Mathf.Log10(volume) * 20 : -80;
         _mixer.SetFloat($"{type}Volume", volumeInDb);
+        
+        // Debug用
+        _mixer.GetFloat($"{type}Volume", out volume);
+        Debug.Log($"{type}Volume: {volume}");
     }
     
     /// <summary>
@@ -120,8 +129,9 @@ public class AudioManager : MonoBehaviour
     {
         if (_bgmClip.TryGetValue(bgm, out AudioClip clip))
         {
+            _bgmSource.gameObject.SetActive(true);
             _bgmSource.clip = clip;
-            _bgmSource.Play();
+            _bgmSource.Play();   
         }
     }
 
