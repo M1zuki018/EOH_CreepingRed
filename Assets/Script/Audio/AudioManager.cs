@@ -34,6 +34,8 @@ public class AudioManager : MonoBehaviour
             return;
         }
         
+        AudioMixerManager.SetupMixer(_mixer);
+        
         Instance = this;
         DontDestroyOnLoad(gameObject);
         
@@ -47,11 +49,6 @@ public class AudioManager : MonoBehaviour
             _seSourcePool.Get();
             _voiceSourcePool.Get();
         }
-        
-        SetVolume(AudioType.BGM, GameSettingsManager.BGMVolume);
-        SetVolume(AudioType.SE, GameSettingsManager.SEVolume);
-        SetVolume(AudioType.Ambience, GameSettingsManager.AmbientVolume);
-        SetVolume(AudioType.Voice, GameSettingsManager.VoiceVolume);
     }
     
     /// <summary>
@@ -82,23 +79,7 @@ public class AudioManager : MonoBehaviour
         return source;
     }
 
-    /// <summary>
-    /// ゲーム内音量設定を受けとってAudioMixerのVolumeをセットする
-    /// パラメーター名は"BGMVolume"という感じになる
-    /// </summary>
-    public void SetVolume(AudioType type, float volume)
-    {
-        if (volume == 0)
-        {
-            // 0なら完全にミュートする
-            _mixer.SetFloat(type + "Volume", -80);
-        }
-        else
-        {
-            float volumeInDb = Mathf.Log10(volume) * 20; // ゲーム内音量設定を0~1の範囲で受け取ってdBに変換
-            _mixer.SetFloat(type + "Volume", volumeInDb);
-        }
-    }
+    
 
     /// <summary>
     /// SEのオブジェクトプールからAudioSourceを取得する

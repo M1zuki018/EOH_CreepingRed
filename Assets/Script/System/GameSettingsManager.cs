@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Audio;
 
 /// <summary>
 /// GameSettingsをラップする静的クラス
@@ -47,7 +48,11 @@ public static class GameSettingsManager
     public static float MasterVolume
     {
         get => Instance.MasterVolume;
-        set => Instance.MasterVolume = value;
+        set
+        {
+            Instance.MasterVolume = value;
+            AudioMixerManager.SetVolume(AudioType.Master, Instance.MasterVolume);
+        }
     }
 
     /// <summary>
@@ -56,7 +61,11 @@ public static class GameSettingsManager
     public static float BGMVolume
     {
         get => Instance.BGMVolume;
-        set => Instance.BGMVolume = value;
+        set
+        {
+            Instance.BGMVolume = value;
+            AudioMixerManager.SetVolume(AudioType.BGM, Instance.BGMVolume);
+        }
     }
 
     /// <summary>
@@ -65,7 +74,11 @@ public static class GameSettingsManager
     public static float SEVolume
     {
         get => Instance.SEVolume;
-        set => Instance.SEVolume = value;
+        set
+        {
+            Instance.SEVolume = value;
+            AudioMixerManager.SetVolume(AudioType.SE, Instance.SEVolume);
+        }
     }
 
     /// <summary>
@@ -74,7 +87,11 @@ public static class GameSettingsManager
     public static float AmbientVolume
     {
         get => Instance.AmbientVolume;
-        set => Instance.AmbientVolume = value;
+        set
+        {
+            Instance.AmbientVolume = value;
+            AudioMixerManager.SetVolume(AudioType.Ambience, Instance.AmbientVolume);
+        }
     }
 
     /// <summary>
@@ -83,6 +100,10 @@ public static class GameSettingsManager
     public static float VoiceVolume
     {
         get => Instance.VoiceVolume;
-        set => Instance.VoiceVolume = value;
+        set
+        {
+            Instance.VoiceVolume = value;
+            AudioMixerManager.SetVolume(AudioType.Voice, Instance.VoiceVolume);
+        }
     }
 }
