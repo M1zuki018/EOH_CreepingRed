@@ -37,10 +37,12 @@ public class AudioManager : MonoBehaviour
         Instance = this;
         DontDestroyOnLoad(gameObject);
         
-        _seSourcePool = CreateAudioSourcePool("SESource", 5, 100); // SE用のオブジェクトプール初期化
-        _voiceSourcePool = CreateAudioSourcePool("VoiceSource", 5, 20); // Voice用のオブジェクトプール初期化
+        _bgmSource = CreateAudioSource(AudioType.BGM);
+        _ambienceSource = CreateAudioSource(AudioType.Ambience);
+        _seSourcePool = CreateAudioSourcePool(AudioType.SE, 3, 100); // SE用のオブジェクトプール初期化
+        _voiceSourcePool = CreateAudioSourcePool(AudioType.Voice, 3, 20); // Voice用のオブジェクトプール初期化
 
-        for (int i = 0; i < 5; i++)
+        for (int i = 0; i < 3; i++)
         {
             _seSourcePool.Get();
             _voiceSourcePool.Get();
@@ -50,10 +52,10 @@ public class AudioManager : MonoBehaviour
     /// <summary>
     /// AudioSourceのオブジェクトプールを作成
     /// </summary>
-    private IObjectPool<AudioSource> CreateAudioSourcePool(string objectName, int defaultCapacity, int maxSize)
+    private IObjectPool<AudioSource> CreateAudioSourcePool(AudioType type, int defaultCapacity, int maxSize)
     {
         return new ObjectPool<AudioSource>(
-            createFunc: () => CreateAudioSource(objectName),
+            createFunc: () => CreateAudioSource(type),
             actionOnGet: source => source.gameObject.SetActive(true),
             actionOnRelease: source => source.gameObject.SetActive(false),
             actionOnDestroy: Destroy,
@@ -65,12 +67,12 @@ public class AudioManager : MonoBehaviour
     /// <summary>
     /// 新しくGameObjectとAudioSourceを生成する
     /// </summary>
-    private AudioSource CreateAudioSource(string type)
+    private AudioSource CreateAudioSource(AudioType type)
     {
-        GameObject obj = new GameObject(type);
+        GameObject obj = new GameObject(type.ToString());
         obj.transform.SetParent(transform);
         AudioSource source = obj.AddComponent<AudioSource>();
-        source.outputAudioMixerGroup = _mixer.FindMatchingGroups(type)[0];
+        source.outputAudioMixerGroup = _mixer.FindMatchingGroups(type.ToString())[0];
         obj.SetActive(false);
         return source;
     }
