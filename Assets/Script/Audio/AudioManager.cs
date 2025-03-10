@@ -47,6 +47,11 @@ public class AudioManager : MonoBehaviour
             _seSourcePool.Get();
             _voiceSourcePool.Get();
         }
+        
+        SetVolume(AudioType.BGM, GameSettingsManager.BGMVolume);
+        SetVolume(AudioType.SE, GameSettingsManager.SEVolume);
+        SetVolume(AudioType.Ambience, GameSettingsManager.AmbientVolume);
+        SetVolume(AudioType.Voice, GameSettingsManager.VoiceVolume);
     }
     
     /// <summary>
@@ -73,9 +78,26 @@ public class AudioManager : MonoBehaviour
         obj.transform.SetParent(transform);
         AudioSource source = obj.AddComponent<AudioSource>();
         source.outputAudioMixerGroup = _mixer.FindMatchingGroups(type.ToString())[0];
-        source.volume = GameSettingsManager.Instance.BGMVolume;
         obj.SetActive(false);
         return source;
+    }
+
+    /// <summary>
+    /// ゲーム内音量設定を受けとってAudioMixerのVolumeをセットする
+    /// パラメーター名は"BGMVolume"という感じになる
+    /// </summary>
+    public void SetVolume(AudioType type, float volume)
+    {
+        if (volume == 0)
+        {
+            // 0なら完全にミュートする
+            _mixer.SetFloat(type + "Volume", -80);
+        }
+        else
+        {
+            float volumeInDb = Mathf.Log10(volume) * 20; // ゲーム内音量設定を0~1の範囲で受け取ってdBに変換
+            _mixer.SetFloat(type + "Volume", volumeInDb);
+        }
     }
 
     /// <summary>
@@ -107,7 +129,6 @@ public class AudioManager : MonoBehaviour
         if (_bgmClip.TryGetValue(bgm, out AudioClip clip))
         {
             _bgmSource.clip = clip;
-            _bgmSource.volume = GameSettingsManager.Instance.BGMVolume;
             _bgmSource.Play();
         }
     }
@@ -120,7 +141,6 @@ public class AudioManager : MonoBehaviour
         if (_seClip.TryGetValue(se, out AudioClip clip))
         {
             AudioSource source = _seSourcePool.Get();
-            source.volume = GameSettingsManager.Instance.SEVolume;
             source.PlayOneShot(clip);
 
             await UniTask.WaitForSeconds(clip.length);
@@ -137,7 +157,6 @@ public class AudioManager : MonoBehaviour
         if (_ambienceClip.TryGetValue(ambience, out AudioClip clip))
         {
             _ambienceSource.clip = clip;
-            _ambienceSource.volume = GameSettingsManager.Instance.AmbientVolume;
             _ambienceSource.Play();
         }
     }
@@ -150,7 +169,6 @@ public class AudioManager : MonoBehaviour
         if (_voiceClip.TryGetValue(voice, out AudioClip clip))
         {
             AudioSource source = _voiceSourcePool.Get();
-            source.volume = GameSettingsManager.Instance.VoiceVolume;
             source.PlayOneShot(clip);
         
             await UniTask.WaitForSeconds(clip.length);

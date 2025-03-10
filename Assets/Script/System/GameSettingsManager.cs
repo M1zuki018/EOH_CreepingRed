@@ -7,7 +7,7 @@ public static class GameSettingsManager
 {
     private static GameSettings _instance;
 
-    public static GameSettings Instance
+    private static GameSettings Instance
     {
         get
         {

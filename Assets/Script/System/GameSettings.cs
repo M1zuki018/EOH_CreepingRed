@@ -10,24 +10,32 @@ public class GameSettings : ScriptableObject
     [SerializeField, Range(0,1)] private float _mouseSensitivity = 1.0f;
     [SerializeField, Range(0,1)] private float _zoomSensitivity = 1.0f;
     [SerializeField, Range(0,1)] private float _masterVolume = 1.0f;
-    [SerializeField, Range(0,1)] private float _bgmVolume = 1.0f; // BGMの音量
-    [SerializeField, Range(0,1)] private float _seVolume = 1.0f; // 効果音の音量
-    [SerializeField, Range(0,1)] private float _ambientVolume = 1.0f; // 環境音の音量
-    [SerializeField, Range(0,1)] private float _voiceVolume = 1.0f; // ボイスの音量
+    [SerializeField, Range(0,1)] private float _bgmVolume = 1.0f;
+    [SerializeField, Range(0,1)] private float _seVolume = 1.0f;
+    [SerializeField, Range(0,1)] private float _ambientVolume = 1.0f;
+    [SerializeField, Range(0,1)] private float _voiceVolume = 1.0f;
     [SerializeField] private ScreenResolution _screenResolution = ScreenResolution._1920_1080; // 画面解像度を変更
     [SerializeField] private bool _fpsLimit; // フレームレートの上限
+
+    /// <summary>
+    /// PlayerPrefsのセットとゲットを統一するための汎用メソッド
+    /// </summary>
+    private float GetFloat(string key, float defaultValue) =>
+        PlayerPrefs.GetFloat(key, defaultValue);
+
+    private void SetFloat(string key, float value)
+    {
+        PlayerPrefs.SetFloat(key, value);
+        PlayerPrefs.Save();
+    }
 
     /// <summary>
     /// カーソルの動く速さ
     /// </summary>
     public float MouseSensitivity
     {
-        get => PlayerPrefs.GetFloat("MouseSensitivity", _mouseSensitivity);
-        set
-        {
-            PlayerPrefs.SetFloat("MouseSensitivity", value);
-            PlayerPrefs.Save();
-        }
+        get => GetFloat("MouseSensitivity", _mouseSensitivity);
+        set => SetFloat("MouseSensitivity", value);
     }
 
     /// <summary>
@@ -35,12 +43,8 @@ public class GameSettings : ScriptableObject
     /// </summary>
     public float ZoomSensitivity
     {
-        get => PlayerPrefs.GetFloat("ZoomSensitivity", 1.0f);
-        set
-        {
-            PlayerPrefs.SetFloat("ZoomSensitivity", value);
-            PlayerPrefs.Save();
-        }
+        get => GetFloat("ZoomSensitivity", _zoomSensitivity);
+        set => SetFloat("ZoomSensitivity", value);
     }
 
     /// <summary>
@@ -48,12 +52,8 @@ public class GameSettings : ScriptableObject
     /// </summary>
     public float MasterVolume
     {
-        get => PlayerPrefs.GetFloat("MasterVolume", _masterVolume);
-        set
-        {
-            PlayerPrefs.SetFloat("MasterVolume", value);
-            PlayerPrefs.Save();
-        }
+        get => GetFloat("MasterVolume", _masterVolume);
+        set => SetFloat("MasterVolume", value);
     }
 
     /// <summary>
@@ -61,12 +61,8 @@ public class GameSettings : ScriptableObject
     /// </summary>
     public float BGMVolume
     {
-        get => PlayerPrefs.GetFloat("BGMVolume", _bgmVolume);
-        set
-        {
-            PlayerPrefs.SetFloat("BGMVolume", value);
-            PlayerPrefs.Save();
-        }
+        get => GetFloat("BGMVolume", _bgmVolume);
+        set => SetFloat("BGMVolume", value);
     }
 
     /// <summary>
@@ -74,12 +70,8 @@ public class GameSettings : ScriptableObject
     /// </summary>
     public float SEVolume
     {
-        get => PlayerPrefs.GetFloat("SEVolume", _seVolume);
-        set
-        {
-            PlayerPrefs.SetFloat("SEVolume", value);
-            PlayerPrefs.Save();
-        }
+        get => GetFloat("SEVolume", _seVolume);
+        set => SetFloat("SEVolume", value);
     }
 
     /// <summary>
@@ -87,12 +79,8 @@ public class GameSettings : ScriptableObject
     /// </summary>
     public float AmbientVolume
     {
-        get => PlayerPrefs.GetFloat("AmbientVolume", _ambientVolume);
-        set
-        {
-            PlayerPrefs.SetFloat("AmbientVolume", value);
-            PlayerPrefs.Save();
-        }
+        get => GetFloat("AmbientVolume", _ambientVolume);
+        set => SetFloat("AmbientVolume", value);
     }
 
     /// <summary>
@@ -100,11 +88,7 @@ public class GameSettings : ScriptableObject
     /// </summary>
     public float VoiceVolume
     {
-        get => PlayerPrefs.GetFloat("VoiceVolume", _voiceVolume);
-        set
-        {
-            PlayerPrefs.SetFloat("VoiceVolume", value);
-            PlayerPrefs.Save();
-        }
+        get => GetFloat("VoiceVolume", _voiceVolume);
+        set => SetFloat("VoiceVolume", value);
     }
 }
