@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Audio;
 using UnityEngine.Pool;
@@ -22,11 +23,8 @@ public class AudioManager : MonoBehaviour
     [Header("AudioSource")]
     private AudioSource _bgmSource; // BGM用
     private AudioSource _ambienceSource; // 環境音用
-    private List<AudioSource> _seSource; // SE用
-    private List<AudioSource>  _voiceSource; // ボイス用
-    
-    private IObjectPool<AudioSource> _seSourcePool;
-    private IObjectPool<AudioSource> _voiceSourcePool;
+    private IObjectPool<AudioSource> _seSourcePool; // SE用のAudioSource
+    private IObjectPool<AudioSource> _voiceSourcePool; // Voice用のAudioSource
     
     private void Awake()
     {
@@ -39,34 +37,40 @@ public class AudioManager : MonoBehaviour
         Instance = this;
         DontDestroyOnLoad(gameObject);
         
-        // SE用のオブジェクトプール初期化
-        _seSourcePool = new ObjectPool<AudioSource>(
-            createFunc: CreateAudioSource,
+        _seSourcePool = CreateAudioSourcePool("SESource", 5, 100); // SE用のオブジェクトプール初期化
+        _voiceSourcePool = CreateAudioSourcePool("VoiceSource", 5, 20); // Voice用のオブジェクトプール初期化
+
+        for (int i = 0; i < 5; i++)
+        {
+            _seSourcePool.Get();
+            _voiceSourcePool.Get();
+        }
+    }
+    
+    /// <summary>
+    /// AudioSourceのオブジェクトプールを作成
+    /// </summary>
+    private IObjectPool<AudioSource> CreateAudioSourcePool(string objectName, int defaultCapacity, int maxSize)
+    {
+        return new ObjectPool<AudioSource>(
+            createFunc: () => CreateAudioSource(objectName),
             actionOnGet: source => source.gameObject.SetActive(true),
             actionOnRelease: source => source.gameObject.SetActive(false),
             actionOnDestroy: Destroy,
-            defaultCapacity: 5,
-            maxSize: 100);
-        
-        // Voice用のオブジェクトプールの初期化
-        _voiceSourcePool = new ObjectPool<AudioSource>(
-            createFunc: CreateAudioSource,
-            actionOnGet: source => source.gameObject.SetActive(true),
-            actionOnRelease: source => source.gameObject.SetActive(false),
-            actionOnDestroy: Destroy,
-            defaultCapacity: 5,
-            maxSize: 20);
+            defaultCapacity: defaultCapacity,
+            maxSize: maxSize
+        );
     }
 
     /// <summary>
-    /// オブジェクトプール用
     /// 新しくGameObjectとAudioSourceを生成する
     /// </summary>
-    private AudioSource CreateAudioSource()
+    private AudioSource CreateAudioSource(string type)
     {
-        GameObject obj = new GameObject("PooledAudioSource");
+        GameObject obj = new GameObject(type);
         obj.transform.SetParent(transform);
         AudioSource source = obj.AddComponent<AudioSource>();
+        source.outputAudioMixerGroup = _mixer.FindMatchingGroups(type)[0];
         obj.SetActive(false);
         return source;
     }
@@ -97,16 +101,27 @@ public class AudioManager : MonoBehaviour
     /// </summary>
     public void PlayBGM(BGMEnum bgm)
     {
-        _bgmSource.clip = _bgmClip[bgm];
-        _bgmSource.Play();
+        if (_bgmClip.TryGetValue(bgm, out AudioClip clip))
+        {
+            _bgmSource.clip = clip;
+            _bgmSource.Play();
+        }
     }
 
     /// <summary>
     /// SEを再生する
     /// </summary>
-    public void PlaySE(SEEnum se)
+    public async UniTask PlaySE(SEEnum se)
     {
-        _seSource[0].clip = _seClip[se];
+        if (_seClip.TryGetValue(se, out AudioClip clip))
+        {
+            AudioSource source = _seSourcePool.Get();
+            source.PlayOneShot(clip);
+
+            await UniTask.WaitForSeconds(clip.length);
+        
+            _seSourcePool.Release(source);
+        }
     }
     
     /// <summary>
@@ -114,14 +129,26 @@ public class AudioManager : MonoBehaviour
     /// </summary>
     public void PlayAmbience(AmbienceEnum ambience)
     {
-        _ambienceSource.clip = _ambienceClip[ambience];
+        if (_ambienceClip.TryGetValue(ambience, out AudioClip clip))
+        {
+            _ambienceSource.clip = clip;
+            _ambienceSource.Play();
+        }
     }
 
     /// <summary>
     /// ボイスを再生する
     /// </summary>
-    public void PlayVoice(VoiceEnum voice)
+    public async UniTask PlayVoice(VoiceEnum voice)
     {
-        _voiceSource[0].clip = _voiceClip[voice];
+        if (_voiceClip.TryGetValue(voice, out AudioClip clip))
+        {
+            AudioSource source = _voiceSourcePool.Get();
+            source.PlayOneShot(clip);
+        
+            await UniTask.WaitForSeconds(clip.length);
+        
+            _voiceSourcePool.Release(source);
+        }
     }
 }
