@@ -13,6 +13,7 @@ public class AudioManager : MonoBehaviour
 
     [Header("AudioMixer")] 
     [SerializeField, HighlightIfNull] private AudioMixer _mixer;
+    [SerializeField, HighlightIfNull] private GameSettings _gameSettings;
     
     [Header("AudioData")]
     private Dictionary<BGMEnum, AudioClip> _bgmClip = AudioLoader.LoadAudioClips<BGMEnum>("Audio/BGM");
@@ -34,8 +35,6 @@ public class AudioManager : MonoBehaviour
             return;
         }
         
-        AudioMixerManager.SetupMixer(_mixer);
-        
         Instance = this;
         DontDestroyOnLoad(gameObject);
         
@@ -49,6 +48,21 @@ public class AudioManager : MonoBehaviour
             _seSourcePool.Get();
             _voiceSourcePool.Get();
         }
+        
+        SetVolume("Master", _gameSettings.MasterVolume);
+        SetVolume("BGM", _gameSettings.BGMVolume);
+        SetVolume("SE", _gameSettings.SEVolume);
+        SetVolume("Ambience", _gameSettings.AmbientVolume);
+        SetVolume("Voice", _gameSettings.VoiceVolume);
+    }
+    
+    /// <summary>
+    /// AudioMixerの音量を調整する
+    /// </summary>
+    private void SetVolume(string type, float volume)
+    {
+        float volumeInDb = volume > 0 ? Mathf.Log10(volume) * 20 : -80;
+        _mixer.SetFloat($"{type}Volume", volumeInDb);
     }
     
     /// <summary>
@@ -79,8 +93,6 @@ public class AudioManager : MonoBehaviour
         return source;
     }
 
-    
-
     /// <summary>
     /// SEのオブジェクトプールからAudioSourceを取得する
     /// </summary>
@@ -100,8 +112,7 @@ public class AudioManager : MonoBehaviour
     /// Voiceのオブジェクトプールから引数で渡したAudioSourceを解除する
     /// </summary>
     public void VoiceSourceRelease(AudioSource source) => _voiceSourcePool.Release(source);
-
-
+    
     /// <summary>
     /// BGMを再生する
     /// </summary>
