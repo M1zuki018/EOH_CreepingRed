@@ -25,21 +25,35 @@ public static class GameObjectUtility
             return null;
         }
         
-        viewBase.OnAwake();
-        viewBase.OnStart(); // 初期化処理を実行
+        InitializeViewBase(viewBase);
         
-        // 子オブジェクトをチェックして、ViewBase を継承しているものを探す
-        foreach (Transform child in instance.transform)
+        return viewBase.GetComponent<T>();
+    } 
+    
+    /// <summary>
+    /// 初期化処理
+    /// </summary>
+    public static void InitializeViewBase(ViewBase viewBase)
+    {
+        MethodHandle(viewBase);
+        
+        foreach (Transform child in viewBase.transform)
         {
             var childViewBase = child.GetComponent<ViewBase>();
             if (childViewBase != null)
             {
-                // 見つかった場合、OnAwake()とOnStart()を呼び出す
-                childViewBase.OnAwake();
-                childViewBase.OnStart();
+                MethodHandle(childViewBase);
             }
         }
-        
-        return viewBase.GetComponent<T>();
-    } 
+    }
+
+    /// <summary>
+    /// ViewBaseのMethodを呼び出す
+    /// </summary>
+    private static void MethodHandle(ViewBase viewBase)
+    {
+        viewBase.OnAwake();
+        viewBase.OnUIInitialize();
+        viewBase.OnStart();
+    }
 }

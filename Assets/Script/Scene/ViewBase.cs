@@ -7,5 +7,6 @@ using UnityEngine;
 public abstract class ViewBase : MonoBehaviour
 {
     public virtual void OnAwake(){}
+    public virtual void OnUIInitialize(){}
     public virtual void OnStart(){}
 }

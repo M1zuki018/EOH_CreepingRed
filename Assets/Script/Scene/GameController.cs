@@ -4,6 +4,9 @@ using System.Reflection;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
+/// <summary>
+/// シーン基盤
+/// </summary>
 public class GameController : MonoBehaviour
 {
     [Header("Debug")]
@@ -20,9 +23,10 @@ public class GameController : MonoBehaviour
         }
         else
         {
+            // 本番モードの遷移処理
             if (SceneManager.GetActiveScene().name != "Title")
             {
-                Debug.Log($"本番テストモード：本番用Titleシーンに遷移します");
+                Debug.Log($"本番モード：本番用Titleシーンに遷移します");
                 SceneManager.LoadScene("Title");
                 return;
             }
@@ -31,6 +35,9 @@ public class GameController : MonoBehaviour
         AutoInstantiate();
     }
 
+    /// <summary>
+    /// 登録されたプレハブを順番にインスタンス化する
+    /// </summary>
     private void AutoInstantiate()
     {
         foreach (var prefab in _prefabsToInstantiate)
@@ -39,45 +46,33 @@ public class GameController : MonoBehaviour
 
             // 推測されるコンポーネントの型を取得
             Type inferredType = FindViewBaseType(prefab);
+
+            if (inferredType == null)
+            {
+                Debug.LogWarning($"{prefab.name} のコンポーネントの型が特定できません。スキップします");
+                return;
+            }
+
+            // 既存インスタンスを確認
             var existingInstance = FindObjectOfType(inferredType) as ViewBase;
 
             if (existingInstance != null)
             {
-                Debug.Log($"{prefab.name} の既存インスタンスが見つかったため、再生成しません。");
-                existingInstance.OnAwake();
-                existingInstance.OnStart();
-                
-                // 子オブジェクトをチェックして、ViewBase を継承しているものを探す
-                foreach (Transform child in existingInstance.transform)
-                {
-                    var childViewBase = child.GetComponent<ViewBase>();
-                    if (childViewBase != null)
-                    {
-                        // 見つかった場合、OnAwake()とOnStart()を呼び出す
-                        childViewBase.OnAwake();
-                        childViewBase.OnStart();
-                    }
-                }
-
-                continue;
+                Debug.Log($"{prefab.name} の既存インスタンスが見つかったため、再生成しません");
+                GameObjectUtility.InitializeViewBase(existingInstance); // 初期化処理
             }
-            
-            if (inferredType != null)
+            else
             {
                 // `GameObjectUtility.Instantiate<T>(プレハブ名)` を自動実行
                 MethodInfo instantiateMethod = typeof(GameObjectUtility).GetMethod("Instantiate")
                     .MakeGenericMethod(inferredType);
-                var instance = instantiateMethod.Invoke(null, new object[] { prefab });
+                instantiateMethod.Invoke(null, new object[] { prefab });
 
                 Debug.Log($"{prefab.name} ({inferredType.Name}) を自動生成しました！");
             }
-            else
-            {
-                Debug.LogWarning($"{prefab.name} のコンポーネントの型が特定できません。スキップします。");
-            }
         }
     }
-
+    
     // プレハブの最初の `ViewBase` 派生コンポーネントの型を取得
     private Type FindViewBaseType(GameObject prefab)
     {
