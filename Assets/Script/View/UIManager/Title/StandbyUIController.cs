@@ -35,4 +35,9 @@ public class StandbyUIController : ViewBase, IWindow
     {
         CanvasVisibilityController.Hide(_canvasGroup);
     }
+
+    public void Block()
+    {
+        CanvasVisibilityController.Block(_canvasGroup);
+    }
 }

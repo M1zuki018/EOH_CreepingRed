@@ -39,4 +39,9 @@ public class TitleUIController : ViewBase, IWindow
     {
         CanvasVisibilityController.Hide(_canvasGroup);
     }
+    
+    public void Block()
+    {
+        CanvasVisibilityController.Block(_canvasGroup);
+    }
 }

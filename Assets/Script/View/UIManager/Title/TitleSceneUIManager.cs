@@ -1,4 +1,5 @@
 using Cysharp.Threading.Tasks;
+using Unity.Collections;
 using UnityEngine;
 
 /// <summary>
@@ -6,8 +7,9 @@ using UnityEngine;
 /// </summary>
 public class TitleSceneUIManager : ViewBase
 {
-    [SerializeField] private GameObject[] _windows = new GameObject[3];
-    private IWindow[] _windowsUI = new IWindow[3];
+    [SerializeField, HighlightIfNull] private TitleUIController _title;
+    [SerializeField, HighlightIfNull] private GameSettingsUIController _gameSettings;
+    [SerializeField, HighlightIfNull] private StandbyUIController _standby;
     
     public override UniTask OnAwake()
     {
@@ -16,17 +18,39 @@ public class TitleSceneUIManager : ViewBase
         canvas.renderMode = RenderMode.ScreenSpaceCamera;
         canvas.worldCamera = Camera.main;
         
-        for(int i = 0; i < 3; i++)
-        {
-            _windowsUI[i] = _windows[i].GetComponent<IWindow>();
-        }
+        Debug.Log(_title.name);
+        Debug.Log(_gameSettings.name);
+        Debug.Log(_standby.name);
         
         return base.OnAwake();
     }
 
+    public override UniTask OnBind()
+    {
+        _title.OnGameStart += () => TransitionView<IWindow>(_standby, _title);
+        _title.OnGameSettings += () => OverlayView<IWindow>(_gameSettings, _title);
+        
+        return base.OnBind();
+    }
+
+    /// <summary>
+    /// 画面遷移
+    /// </summary>
+    private void TransitionView<T>(T show, T hide) where T : IWindow
+    {
+        show.Show();
+        hide.Hide();
+    }
+
+    private void OverlayView<T>(T show, T block) where T : IWindow
+    {
+        show.Show();
+        block.Block();
+    }
+
     public override UniTask OnStart()
     {
-        _windowsUI[0].Show();
+        _title.Show();
         return base.OnStart();
     }
 }

@@ -117,10 +117,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2a9ac6456b31236499e4aba7fec6b181, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _windows:
-  - {fileID: 2061168260141543136}
-  - {fileID: 2061168260141543136}
-  - {fileID: 2061168260141543136}
+  _title: {fileID: 3824582760157747843}
+  _gameSettings: {fileID: 643405689939276026}
+  _standby: {fileID: 6132674971301905757}
 --- !u!1001 &6442876065977797339
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -560,7 +559,7 @@ CanvasGroup:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2061168260141543136}
   m_Enabled: 1
-  m_Alpha: 0
+  m_Alpha: 1
   m_Interactable: 1
   m_BlocksRaycasts: 1
   m_IgnoreParentGroups: 0

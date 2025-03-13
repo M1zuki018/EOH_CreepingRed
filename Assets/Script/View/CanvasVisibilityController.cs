@@ -24,4 +24,13 @@ public static class CanvasVisibilityController
         canvasGroup.interactable = false;
         canvasGroup.blocksRaycasts = false;
     }
+
+    /// <summary>
+    /// 反応できないようにする
+    /// </summary>
+    public static void Block(CanvasGroup canvasGroup)
+    {
+        canvasGroup.interactable = false;
+        canvasGroup.blocksRaycasts = false;
+    }
 }
