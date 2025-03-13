@@ -31,6 +31,8 @@ public class LifecycleController : MonoBehaviour
         await ExecuteLifecycleStep(view => view.OnAwake());
         await ExecuteLifecycleStep(view => view.OnUIInitialize());
         await ExecuteLifecycleStep(view => view.OnStart());
+        
+        DebugLogHelper.LogImportant("生成終了");
     }
 
     /// <summary>

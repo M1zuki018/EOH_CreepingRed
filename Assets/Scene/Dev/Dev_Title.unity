@@ -448,7 +448,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d86babd62f922f44b88882d2d268c161, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _debugMode: 0
+  _debugMode: 1
   _prefabsToInstantiate:
   - {fileID: 1928817944}
   - {fileID: 1761813349}
