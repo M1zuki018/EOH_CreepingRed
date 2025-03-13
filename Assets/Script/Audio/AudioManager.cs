@@ -7,7 +7,7 @@ using UnityEngine.Pool;
 /// <summary>
 /// Audioを管理するManagerクラス
 /// </summary>
-public class AudioManager : MonoBehaviour
+public class AudioManager : ViewBase
 {
     public static AudioManager Instance { get; private set; }
 
@@ -27,7 +27,7 @@ public class AudioManager : MonoBehaviour
     private IObjectPool<AudioSource> _seSourcePool; // SE用のAudioSource
     private IObjectPool<AudioSource> _voiceSourcePool; // Voice用のAudioSource
     
-    private void Awake()
+    public override void OnAwake()
     {
         if (Instance != null)
         {

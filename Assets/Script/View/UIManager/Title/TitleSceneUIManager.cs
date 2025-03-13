@@ -12,9 +12,4 @@ public class TitleSceneUIManager : ViewBase
         canvas.renderMode = RenderMode.ScreenSpaceCamera;
         canvas.worldCamera = Camera.main;
     }
-
-    public override void OnStart()
-    {
-        Debug.Log("TitleSceneUIManager::OnStart");
-    }
 }

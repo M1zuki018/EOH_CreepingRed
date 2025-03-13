@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 /// <summary>
@@ -5,6 +6,6 @@ using UnityEngine;
 /// </summary>
 public abstract class ViewBase : MonoBehaviour
 {
-    public abstract void OnAwake();
-    public abstract void OnStart();
+    public virtual void OnAwake(){}
+    public virtual void OnStart(){}
 }

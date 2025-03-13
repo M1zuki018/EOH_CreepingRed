@@ -28,6 +28,18 @@ public static class GameObjectUtility
         viewBase.OnAwake();
         viewBase.OnStart(); // 初期化処理を実行
         
+        // 子オブジェクトをチェックして、ViewBase を継承しているものを探す
+        foreach (Transform child in instance.transform)
+        {
+            var childViewBase = child.GetComponent<ViewBase>();
+            if (childViewBase != null)
+            {
+                // 見つかった場合、OnAwake()とOnStart()を呼び出す
+                childViewBase.OnAwake();
+                childViewBase.OnStart();
+            }
+        }
+        
         return viewBase.GetComponent<T>();
     } 
 }

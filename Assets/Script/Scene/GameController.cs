@@ -20,16 +20,15 @@ public class GameController : MonoBehaviour
         }
         else
         {
-            if (SceneManager.GetActiveScene().name == "Title")
-            {
-                AutoInstantiate();
-            }
-            else
+            if (SceneManager.GetActiveScene().name != "Title")
             {
                 Debug.Log($"本番テストモード：本番用Titleシーンに遷移します");
                 SceneManager.LoadScene("Title");
+                return;
             }
         }
+        
+        AutoInstantiate();
     }
 
     private void AutoInstantiate()
@@ -40,6 +39,29 @@ public class GameController : MonoBehaviour
 
             // 推測されるコンポーネントの型を取得
             Type inferredType = FindViewBaseType(prefab);
+            var existingInstance = FindObjectOfType(inferredType) as ViewBase;
+
+            if (existingInstance != null)
+            {
+                Debug.Log($"{prefab.name} の既存インスタンスが見つかったため、再生成しません。");
+                existingInstance.OnAwake();
+                existingInstance.OnStart();
+                
+                // 子オブジェクトをチェックして、ViewBase を継承しているものを探す
+                foreach (Transform child in existingInstance.transform)
+                {
+                    var childViewBase = child.GetComponent<ViewBase>();
+                    if (childViewBase != null)
+                    {
+                        // 見つかった場合、OnAwake()とOnStart()を呼び出す
+                        childViewBase.OnAwake();
+                        childViewBase.OnStart();
+                    }
+                }
+
+                continue;
+            }
+            
             if (inferredType != null)
             {
                 // `GameObjectUtility.Instantiate<T>(プレハブ名)` を自動実行
