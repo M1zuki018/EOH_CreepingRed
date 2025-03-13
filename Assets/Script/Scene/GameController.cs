@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GameController : MonoBehaviour
 {
@@ -13,7 +14,22 @@ public class GameController : MonoBehaviour
     
     private void Start()
     {
-        AutoInstantiate();
+        if (_debugMode)
+        {
+            Debug.Log($"デバッグモード：現状のシーンを維持します");
+        }
+        else
+        {
+            if (SceneManager.GetActiveScene().name == "Title")
+            {
+                AutoInstantiate();
+            }
+            else
+            {
+                Debug.Log($"本番テストモード：本番用Titleシーンに遷移します");
+                SceneManager.LoadScene("Title");
+            }
+        }
     }
 
     private void AutoInstantiate()

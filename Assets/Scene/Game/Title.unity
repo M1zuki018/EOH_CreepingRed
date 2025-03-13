@@ -403,7 +403,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d86babd62f922f44b88882d2d268c161, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _debugMode: 1
+  _debugMode: 0
   _prefabsToInstantiate:
   - {fileID: 7029236860064881689, guid: 1d77b6d6b20400a4ebb22cb0fc974b76, type: 3}
   - {fileID: 2471526842576457680, guid: 1f1a31b63d9b55c4f9edcdebaedc4f5e, type: 3}
