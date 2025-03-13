@@ -1,6 +1,6 @@
 using Cysharp.Threading.Tasks;
-using Unity.Collections;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 /// <summary>
 /// TitleシーンのUI全体を管理するManager
@@ -32,6 +32,8 @@ public class TitleSceneUIManager : ViewBase
         
         _startBonusSelection.OnSelect += () => TransitionView<IWindow>(_baseSelection, _startBonusSelection);
         
+        _baseSelection.OnGameStart += TransitionScene;
+        
         return base.OnBind();
     }
 
@@ -44,10 +46,21 @@ public class TitleSceneUIManager : ViewBase
         hide.Hide();
     }
 
+    /// <summary>
+    /// オーバーレイとしての画面表示
+    /// </summary>
     private void OverlayView<T>(T show, T block) where T : IWindow
     {
         show.Show();
         block.Block();
+    }
+
+    /// <summary>
+    /// シーン遷移
+    /// </summary>
+    private void TransitionScene()
+    {
+        SceneManager.LoadScene("Dev_InGame");
     }
 
     public override UniTask OnStart()
