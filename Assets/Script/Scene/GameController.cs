@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -14,8 +15,9 @@ public class GameController : MonoBehaviour
     
     [Header("設定")]
     [SerializeField] private List<GameObject> _prefabsToInstantiate = new List<GameObject>();
+    private List<ViewBase> _instantiatedViews = new List<ViewBase>();
     
-    private void Start()
+    private async void Start()
     {
         if (_debugMode)
         {
@@ -32,13 +34,17 @@ public class GameController : MonoBehaviour
             }
         }
         
-        AutoInstantiate();
+        await AutoInstantiate();
+        
+        await ExecuteAwake();
+        await ExecuteUIInitialize();
+        await ExecuteStart();
     }
 
     /// <summary>
     /// 登録されたプレハブを順番にインスタンス化する
     /// </summary>
-    private void AutoInstantiate()
+    private async UniTask AutoInstantiate()
     {
         foreach (var prefab in _prefabsToInstantiate)
         {
@@ -59,18 +65,43 @@ public class GameController : MonoBehaviour
             if (existingInstance != null)
             {
                 Debug.Log($"{prefab.name} の既存インスタンスが見つかったため、再生成しません");
-                GameObjectUtility.InitializeViewBase(existingInstance); // 初期化処理
+                _instantiatedViews.Add(existingInstance);
+                foreach (Transform child in existingInstance.transform)
+                {
+                    var childViewBase = child.GetComponent<ViewBase>();
+                    if (childViewBase != null)
+                    {
+                        _instantiatedViews.Add(childViewBase);
+                    }
+                }
             }
             else
             {
                 // `GameObjectUtility.Instantiate<T>(プレハブ名)` を自動実行
                 MethodInfo instantiateMethod = typeof(GameObjectUtility).GetMethod("Instantiate")
                     .MakeGenericMethod(inferredType);
-                instantiateMethod.Invoke(null, new object[] { prefab });
+                var newInstance = instantiateMethod.Invoke(null, new object[] { prefab }) as ViewBase;
+                
+                if (newInstance != null)
+                {
+                    _instantiatedViews.Add(newInstance);
+                    
+                    foreach (Transform child in newInstance.transform)
+                    {
+                        var childViewBase = child.GetComponent<ViewBase>();
+                        if (childViewBase != null)
+                        {
+                            Debug.Log("取得");
+                            _instantiatedViews.Add(childViewBase);
+                        }
+                    }
+                }
 
                 Debug.Log($"{prefab.name} ({inferredType.Name}) を自動生成しました！");
             }
         }
+        
+        await UniTask.CompletedTask;
     }
     
     // プレハブの最初の `ViewBase` 派生コンポーネントの型を取得
@@ -85,5 +116,35 @@ public class GameController : MonoBehaviour
             }
         }
         return null;
+    }
+    
+    private async UniTask ExecuteAwake()
+    {
+        List<UniTask> awakeTasks = new List<UniTask>();
+        foreach (var view in _instantiatedViews)
+        {
+            awakeTasks.Add(view.OnAwake()); 
+        }
+        await UniTask.WhenAll(awakeTasks);
+    }
+
+    private async UniTask ExecuteUIInitialize()
+    {
+        List<UniTask> awakeTasks = new List<UniTask>();
+        foreach (var view in _instantiatedViews)
+        {
+            awakeTasks.Add(view.OnUIInitialize());
+        }
+        await UniTask.WhenAll(awakeTasks);
+    }
+
+    private async UniTask ExecuteStart()
+    {
+        List<UniTask> awakeTasks = new List<UniTask>();
+        foreach (var view in _instantiatedViews)
+        {
+            awakeTasks.Add(view.OnStart());
+        }
+        await UniTask.WhenAll(awakeTasks);
     }
 }

@@ -25,8 +25,6 @@ public static class GameObjectUtility
             return null;
         }
         
-        InitializeViewBase(viewBase);
-        
         return viewBase.GetComponent<T>();
     } 
     
@@ -42,6 +40,7 @@ public static class GameObjectUtility
             var childViewBase = child.GetComponent<ViewBase>();
             if (childViewBase != null)
             {
+                Debug.Log(childViewBase.GetType().Name);
                 MethodHandle(childViewBase);
             }
         }
@@ -52,8 +51,8 @@ public static class GameObjectUtility
     /// </summary>
     private static void MethodHandle(ViewBase viewBase)
     {
-        viewBase.OnAwake();
-        viewBase.OnUIInitialize();
-        viewBase.OnStart();
+        // viewBase.OnAwake();
+        // viewBase.OnUIInitialize();
+        // viewBase.OnStart();
     }
 }

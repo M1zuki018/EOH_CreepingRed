@@ -1,4 +1,5 @@
 using System;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -20,12 +21,15 @@ public class TitleUIController : ViewBase, IWindow
     public event Action OnGameStart; // 準備画面に遷移するイベント
     public event Action OnGameSettings; // 設定画面に遷移するイベント
 
-    public override void OnUIInitialize()
+    public override UniTask OnAwake()
     {
+        Debug.Log($"タイトルUIManagerOnAwake");
         _canvasGroup = GetComponent<CanvasGroup>();
         
         _gameStartButton.onClick.AddListener(() => OnGameStart?.Invoke());
         _gameSettingsButton.onClick.AddListener(() => OnGameSettings?.Invoke());
+        
+        return base.OnAwake();
     }
 
     public void Show()

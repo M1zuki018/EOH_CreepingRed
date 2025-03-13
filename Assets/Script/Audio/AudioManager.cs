@@ -27,12 +27,12 @@ public class AudioManager : ViewBase
     private IObjectPool<AudioSource> _seSourcePool; // SE用のAudioSource
     private IObjectPool<AudioSource> _voiceSourcePool; // Voice用のAudioSource
     
-    public override void OnAwake()
+    public override UniTask OnAwake()
     {
         if (Instance != null)
         {
             Destroy(gameObject);
-            return;
+            return UniTask.CompletedTask;
         }
 
         _bgmClip = AudioLoader.LoadAudioClips<BGMEnum>("Audio/BGM");
@@ -59,6 +59,8 @@ public class AudioManager : ViewBase
         SetVolume("SE", _gameSettings.SEVolume);
         SetVolume("Ambience", _gameSettings.AmbientVolume);
         SetVolume("Voice", _gameSettings.VoiceVolume);
+        
+        return base.OnAwake();
     }
     
     /// <summary>
