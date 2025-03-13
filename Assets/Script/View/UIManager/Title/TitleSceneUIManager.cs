@@ -66,6 +66,11 @@ public class TitleSceneUIManager : ViewBase
     public override UniTask OnStart()
     {
         _title.Show();
+        _gameSettings.Hide();
+        _difficultySelection.Hide();
+        _startBonusSelection.Hide();
+        _baseSelection.Hide();
+        
         return base.OnStart();
     }
 }
