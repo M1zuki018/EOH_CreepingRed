@@ -448,7 +448,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d86babd62f922f44b88882d2d268c161, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _debugMode: 1
+  _debugMode: 0
   _prefabsToInstantiate:
   - {fileID: 1928817944}
   - {fileID: 1761813349}
@@ -546,10 +546,6 @@ PrefabInstance:
       propertyPath: m_Camera
       value: 
       objectReference: {fileID: 519420031}
-    - target: {fileID: 912569965560819707, guid: 1d77b6d6b20400a4ebb22cb0fc974b76, type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 2727892394929590006, guid: 1d77b6d6b20400a4ebb22cb0fc974b76, type: 3}
       propertyPath: m_Camera
       value: 
@@ -638,10 +634,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 6190320809297618428, guid: 1d77b6d6b20400a4ebb22cb0fc974b76, type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 7029236860064881689, guid: 1d77b6d6b20400a4ebb22cb0fc974b76, type: 3}
       propertyPath: m_Name
       value: MainCanvas
@@ -653,28 +645,8 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 2061168260141543136, guid: 1d77b6d6b20400a4ebb22cb0fc974b76, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 6260151142757716475}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 1d77b6d6b20400a4ebb22cb0fc974b76, type: 3}
---- !u!1 &6260151142757716474 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 2061168260141543136, guid: 1d77b6d6b20400a4ebb22cb0fc974b76, type: 3}
-  m_PrefabInstance: {fileID: 6260151142757716473}
-  m_PrefabAsset: {fileID: 0}
---- !u!225 &6260151142757716475
-CanvasGroup:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6260151142757716474}
-  m_Enabled: 1
-  m_Alpha: 1
-  m_Interactable: 1
-  m_BlocksRaycasts: 1
-  m_IgnoreParentGroups: 0
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

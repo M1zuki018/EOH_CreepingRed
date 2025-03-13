@@ -3,7 +3,7 @@ using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 /// <summary>
-/// シーン基盤
+/// 独自のライフサイクルを定義した基底クラス
 /// </summary>
 public abstract class ViewBase : MonoBehaviour
 {

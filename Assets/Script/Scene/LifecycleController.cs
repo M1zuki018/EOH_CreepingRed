@@ -8,7 +8,7 @@ using UnityEngine.SceneManagement;
 /// <summary>
 /// シーン基盤
 /// </summary>
-public class GameController : MonoBehaviour
+public class LifecycleController : MonoBehaviour
 {
     [Header("Debug")]
     [SerializeField] private bool _debugMode = true;
@@ -19,26 +19,18 @@ public class GameController : MonoBehaviour
     
     private async void Start()
     {
-        if (_debugMode)
+        if (!_debugMode && SceneManager.GetActiveScene().name != "Title")
         {
-            Debug.Log($"デバッグモード：現状のシーンを維持します");
-        }
-        else
-        {
-            // 本番モードの遷移処理
-            if (SceneManager.GetActiveScene().name != "Title")
-            {
-                Debug.Log($"本番モード：本番用Titleシーンに遷移します");
-                SceneManager.LoadScene("Title");
-                return;
-            }
+            Debug.Log($"本番モード：本番用Titleシーンに遷移します");
+            SceneManager.LoadScene("Title");
+            return;
         }
         
-        await AutoInstantiate();
+        await AutoInstantiate(); // インスタンス化
         
-        await ExecuteAwake();
-        await ExecuteUIInitialize();
-        await ExecuteStart();
+        await ExecuteLifecycleStep(view => view.OnAwake());
+        await ExecuteLifecycleStep(view => view.OnUIInitialize());
+        await ExecuteLifecycleStep(view => view.OnStart());
     }
 
     /// <summary>
@@ -61,39 +53,26 @@ public class GameController : MonoBehaviour
 
             // 既存インスタンスを確認
             var existingInstance = FindObjectOfType(inferredType) as ViewBase;
-
             if (existingInstance != null)
             {
                 Debug.Log($"{prefab.name} の既存インスタンスが見つかったため、再生成しません");
                 _instantiatedViews.Add(existingInstance);
-                foreach (Transform child in existingInstance.transform)
-                {
-                    var childViewBase = child.GetComponent<ViewBase>();
-                    if (childViewBase != null)
-                    {
-                        _instantiatedViews.Add(childViewBase);
-                    }
-                }
+                FindChildViewBase(existingInstance);
             }
-            else
+            else // 既存インスタンスがなかったら作成する
             {
                 // `GameObjectUtility.Instantiate<T>(プレハブ名)` を自動実行
                 MethodInfo instantiateMethod = typeof(GameObjectUtility).GetMethod("Instantiate")
-                    .MakeGenericMethod(inferredType);
-                var newInstance = instantiateMethod.Invoke(null, new object[] { prefab }) as ViewBase;
+                    ?.MakeGenericMethod(inferredType);
                 
-                if (newInstance != null)
+                if (instantiateMethod != null)
                 {
-                    _instantiatedViews.Add(newInstance);
-                    
-                    foreach (Transform child in newInstance.transform)
+                    var newInstance = instantiateMethod.Invoke(null, new object[] { prefab }) as ViewBase;
+                
+                    if (newInstance != null)
                     {
-                        var childViewBase = child.GetComponent<ViewBase>();
-                        if (childViewBase != null)
-                        {
-                            Debug.Log("取得");
-                            _instantiatedViews.Add(childViewBase);
-                        }
+                        _instantiatedViews.Add(newInstance);
+                        FindChildViewBase(newInstance);
                     }
                 }
 
@@ -118,33 +97,26 @@ public class GameController : MonoBehaviour
         return null;
     }
     
-    private async UniTask ExecuteAwake()
+    /// <summary>
+    /// 生成したインスタンスの子オブジェクトのViewBaseを取得する
+    /// </summary>
+    private void FindChildViewBase(ViewBase existingInstance)
     {
-        List<UniTask> awakeTasks = new List<UniTask>();
-        foreach (var view in _instantiatedViews)
+        foreach (Transform child in existingInstance.transform)
         {
-            awakeTasks.Add(view.OnAwake()); 
+            var childViewBase = child.GetComponent<ViewBase>();
+            if (childViewBase != null)
+            {
+                _instantiatedViews.Add(childViewBase);
+            }
         }
-        await UniTask.WhenAll(awakeTasks);
     }
-
-    private async UniTask ExecuteUIInitialize()
+    
+    /// <summary>
+    /// 取得したviewに対して、Awake、Startなどのそれぞれの処理を実行する
+    /// </summary>
+    private async UniTask ExecuteLifecycleStep(Func<ViewBase, UniTask> lifecycleMethod)
     {
-        List<UniTask> awakeTasks = new List<UniTask>();
-        foreach (var view in _instantiatedViews)
-        {
-            awakeTasks.Add(view.OnUIInitialize());
-        }
-        await UniTask.WhenAll(awakeTasks);
-    }
-
-    private async UniTask ExecuteStart()
-    {
-        List<UniTask> awakeTasks = new List<UniTask>();
-        foreach (var view in _instantiatedViews)
-        {
-            awakeTasks.Add(view.OnStart());
-        }
-        await UniTask.WhenAll(awakeTasks);
+        await UniTask.WhenAll(_instantiatedViews.Select(lifecycleMethod));
     }
 }
