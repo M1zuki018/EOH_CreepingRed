@@ -30,6 +30,8 @@ public class TitleSceneUIManager : ViewBase
         
         _difficultySelection.OnSelect += () => TransitionView<IWindow>(_startBonusSelection, _difficultySelection);
         
+        _startBonusSelection.OnSelect += () => TransitionView<IWindow>(_baseSelection, _startBonusSelection);
+        
         return base.OnBind();
     }
 
