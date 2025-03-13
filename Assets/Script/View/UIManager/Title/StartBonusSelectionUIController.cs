@@ -13,16 +13,16 @@ using UnityEngine.UI;
 [RequireComponent(typeof(CanvasGroup))]
 public class StartBonusSelectionUIController : ViewBase, IWindow
 {
-    [SerializeField, HighlightIfNull] private Button _gameStartButton;
+    //[SerializeField, HighlightIfNull] private Button _gameStartButton;
     
     private CanvasGroup _canvasGroup;
-    public event Action OnGameStart;
+    //public event Action OnGameStart;
         
     public override UniTask OnUIInitialize()
     {
         _canvasGroup = GetComponent<CanvasGroup>();
     
-        _gameStartButton.onClick.AddListener(() => OnGameStart?.Invoke());
+        //_gameStartButton.onClick.AddListener(() => OnGameStart?.Invoke());
         return base.OnUIInitialize();
     }
     

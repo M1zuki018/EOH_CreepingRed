@@ -7,6 +7,8 @@ using UnityEngine.Audio;
 public static class GameSettingsManager
 {
     private static GameSettings _instance;
+    
+    private static int _difficulty;
 
     private static GameSettings Instance
     {
@@ -22,6 +24,15 @@ public static class GameSettingsManager
             }
             return _instance;
         }
+    }
+
+    /// <summary>
+    /// 難易度
+    /// </summary>
+    public static int Difficulty
+    {
+        get => _difficulty;
+        set => _difficulty = value;
     }
     
     /// <summary>

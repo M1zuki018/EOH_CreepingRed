@@ -13,17 +13,32 @@ using UnityEngine.UI;
 [RequireComponent(typeof(CanvasGroup))]
 public class DifficultySelectionUIController : ViewBase, IWindow
 {
-    [SerializeField, HighlightIfNull] private Button _gameStartButton;
+    [SerializeField, HighlightIfNull] private Button _breeze;
+    [SerializeField, HighlightIfNull] private Button _storm;
+    [SerializeField, HighlightIfNull] private Button _catastrophe;
+    [SerializeField, HighlightIfNull] private Button _unknown;
+    [SerializeField, HighlightIfNull] private Button _custom;
     
     private CanvasGroup _canvasGroup;
-    public event Action OnGameStart;
+    public event Action OnSelect;
         
     public override UniTask OnUIInitialize()
     {
         _canvasGroup = GetComponent<CanvasGroup>();
     
-        _gameStartButton.onClick.AddListener(() => OnGameStart?.Invoke());
+        _breeze.onClick.AddListener(() => Registration(0));
+        _storm.onClick.AddListener(() => Registration(1));
+        _catastrophe.onClick.AddListener(() => Registration(2));
+        _unknown.onClick.AddListener(() => Registration(3));
+        _custom.onClick.AddListener(() => Registration(4));
+        
         return base.OnUIInitialize();
+    }
+
+    private void Registration(int index)
+    {
+        GameSettingsManager.Difficulty = index; // 難易度をセット
+        OnSelect?.Invoke();
     }
     
     public void Show()

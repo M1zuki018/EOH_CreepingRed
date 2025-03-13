@@ -16,7 +16,7 @@ public class GameSettings : ScriptableObject
     [SerializeField, Range(0,1)] private float _voiceVolume = 1.0f;
     [SerializeField] private ScreenResolution _screenResolution = ScreenResolution._1920_1080; // 画面解像度を変更
     [SerializeField] private bool _fpsLimit; // フレームレートの上限
-
+    
     /// <summary>
     /// PlayerPrefsのセットとゲットを統一するための汎用メソッド
     /// </summary>
@@ -28,7 +28,7 @@ public class GameSettings : ScriptableObject
         PlayerPrefs.SetFloat(key, value);
         PlayerPrefs.Save();
     }
-
+    
     /// <summary>
     /// カーソルの動く速さ
     /// </summary>

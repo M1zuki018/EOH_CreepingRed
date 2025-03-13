@@ -28,6 +28,8 @@ public class TitleSceneUIManager : ViewBase
         _title.OnGameStart += () => TransitionView<IWindow>(_difficultySelection, _title);
         _title.OnGameSettings += () => OverlayView<IWindow>(_gameSettings, _title);
         
+        _difficultySelection.OnSelect += () => TransitionView<IWindow>(_startBonusSelection, _difficultySelection);
+        
         return base.OnBind();
     }
 
