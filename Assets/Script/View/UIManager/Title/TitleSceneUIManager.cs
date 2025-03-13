@@ -9,7 +9,9 @@ public class TitleSceneUIManager : ViewBase
 {
     [SerializeField, HighlightIfNull] private TitleUIController _title;
     [SerializeField, HighlightIfNull] private GameSettingsUIController _gameSettings;
-    [SerializeField, HighlightIfNull] private StandbyUIController _standby;
+    [SerializeField, HighlightIfNull] private DifficultySelectionUIController _difficultySelection;
+    [SerializeField, HighlightIfNull] private StartBonusSelectionUIController _startBonusSelection;
+    [SerializeField, HighlightIfNull] private BaseSelectionUIController _baseSelection;
     
     public override UniTask OnAwake()
     {
@@ -18,16 +20,12 @@ public class TitleSceneUIManager : ViewBase
         canvas.renderMode = RenderMode.ScreenSpaceCamera;
         canvas.worldCamera = Camera.main;
         
-        Debug.Log(_title.name);
-        Debug.Log(_gameSettings.name);
-        Debug.Log(_standby.name);
-        
         return base.OnAwake();
     }
 
     public override UniTask OnBind()
     {
-        _title.OnGameStart += () => TransitionView<IWindow>(_standby, _title);
+        _title.OnGameStart += () => TransitionView<IWindow>(_difficultySelection, _title);
         _title.OnGameSettings += () => OverlayView<IWindow>(_gameSettings, _title);
         
         return base.OnBind();

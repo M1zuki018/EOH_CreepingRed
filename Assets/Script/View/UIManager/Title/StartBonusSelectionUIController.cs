@@ -4,14 +4,14 @@ using UnityEngine;
 using UnityEngine.UI;
 
 /// <summary>
-/// ○○シーン○○画面のUIController
+/// Titleシーンスタートボーナス選択画面のUIController
 /// ルール：
 /// ①Prefabを越えた参照はとらない
 /// ②Unityとの連結を担当
 /// ③具体的な処理は上位のManagerクラスに任せる
 /// </summary>
 [RequireComponent(typeof(CanvasGroup))]
-public class {ClassName} : ViewBase, IWindow
+public class StartBonusSelectionUIController : ViewBase, IWindow
 {
     [SerializeField, HighlightIfNull] private Button _gameStartButton;
     

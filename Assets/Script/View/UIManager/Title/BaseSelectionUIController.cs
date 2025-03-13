@@ -4,25 +4,25 @@ using UnityEngine;
 using UnityEngine.UI;
 
 /// <summary>
-/// Titleシーン準備画面のUIController
+/// Titleシーン拠点選択画面のUIController
 /// ルール：
 /// ①Prefabを越えた参照はとらない
 /// ②Unityとの連結を担当
 /// ③具体的な処理は上位のManagerクラスに任せる
 /// </summary>
 [RequireComponent(typeof(CanvasGroup))]
-public class StandbyUIController : ViewBase, IWindow
+public class BaseSelectionUIController : ViewBase, IWindow
 {
-    //[SerializeField, HighlightIfNull] private Button _gameStartButton;
+    [SerializeField, HighlightIfNull] private Button _gameStartButton;
     
     private CanvasGroup _canvasGroup;
-    //public event Action OnGameStart;
+    public event Action OnGameStart;
         
     public override UniTask OnUIInitialize()
     {
         _canvasGroup = GetComponent<CanvasGroup>();
     
-        //_gameStartButton.onClick.AddListener(() => OnGameStart?.Invoke());
+        _gameStartButton.onClick.AddListener(() => OnGameStart?.Invoke());
         return base.OnUIInitialize();
     }
     
@@ -35,7 +35,7 @@ public class StandbyUIController : ViewBase, IWindow
     {
         CanvasVisibilityController.Hide(_canvasGroup);
     }
-
+    
     public void Block()
     {
         CanvasVisibilityController.Block(_canvasGroup);
