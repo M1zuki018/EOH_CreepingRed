@@ -25,6 +25,7 @@ public static class GameObjectUtility
             return null;
         }
         
+        viewBase.OnAwake();
         viewBase.OnStart(); // 初期化処理を実行
         
         return viewBase.GetComponent<T>();
