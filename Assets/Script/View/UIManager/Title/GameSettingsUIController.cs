@@ -4,25 +4,25 @@ using UnityEngine;
 using UnityEngine.UI;
 
 /// <summary>
-/// ○○シーン○○画面のUIController
+/// Titleシーン設定画面のUIController
 /// ルール：
 /// ①Prefabを越えた参照はとらない
 /// ②Unityとの連結を担当
 /// ③具体的な処理は上位のManagerクラスに任せる
 /// </summary>
 [RequireComponent(typeof(CanvasGroup))]
-public class {ClassName} : ViewBase, IWindow
+public class GameSettingsUIController : ViewBase, IWindow
 {
-    [SerializeField, HighlightIfNull] private Button _gameStartButton;
+    //[SerializeField, HighlightIfNull] private Button _gameStartButton;
     
     private CanvasGroup _canvasGroup;
-    public event Action OnGameStart;
+    //public event Action OnGameStart;
         
     public override UniTask OnUIInitialize()
     {
         _canvasGroup = GetComponent<CanvasGroup>();
     
-        _gameStartButton.onClick.AddListener(() => OnGameStart?.Invoke());
+        //_gameStartButton.onClick.AddListener(() => OnGameStart?.Invoke());
         return base.OnUIInitialize();
     }
     

@@ -17,19 +17,17 @@ public class TitleUIController : ViewBase, IWindow
     [SerializeField, HighlightIfNull] private Button _gameSettingsButton;
     
     private CanvasGroup _canvasGroup;
-
     public event Action OnGameStart; // 準備画面に遷移するイベント
     public event Action OnGameSettings; // 設定画面に遷移するイベント
 
-    public override UniTask OnAwake()
+    public override UniTask OnUIInitialize()
     {
-        Debug.Log($"タイトルUIManagerOnAwake");
         _canvasGroup = GetComponent<CanvasGroup>();
         
         _gameStartButton.onClick.AddListener(() => OnGameStart?.Invoke());
         _gameSettingsButton.onClick.AddListener(() => OnGameSettings?.Invoke());
         
-        return base.OnAwake();
+        return base.OnUIInitialize();
     }
 
     public void Show()
