@@ -7,9 +7,9 @@ public class Agent
 {
     public int Id { get; }
     public AgentType Type { get; }
-    public NormalAgentState State { get; set; }
     public int X { get; private set; }
     public int Y { get; private set; }
+    public AgentState State { get; set; }
 
     public Agent(int id, AgentType type, int x, int y)
     {
@@ -17,7 +17,7 @@ public class Agent
         Type = type;
         X = x;
         Y = y;
-        State = NormalAgentState.Healthy;
+        State = AgentState.Healthy;
     }
 
     public void Move(Grid grid)
@@ -35,12 +35,12 @@ public class Agent
     {
         // 感染拡大・停止の処理
         Area currentCell = grid.GetArea(X, Y);
-        if (State == NormalAgentState.Healthy && currentCell.InfectionRisk > 0.5)
+        if (State == AgentState.Healthy && currentCell.InfectionRisk > 0.5)
         {
             Random random = new Random();
             if (random.NextDouble() < currentCell.InfectionRisk)
             {
-               State = NormalAgentState.Infected;
+               State = AgentState.Infected;
             }
         }
     }
