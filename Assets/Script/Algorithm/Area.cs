@@ -42,7 +42,7 @@ public class Area
     #endregion
     
     private List<Cell> _cells = new List<Cell>();
-    public double InfectionRisk { get; set; }  // 感染リスク
+    public AgentStateCount AreaStateCount { get; private set; }
 
     /// <summary>
     /// エリアのコンストラクタ
@@ -71,8 +71,11 @@ public class Area
         Ghost = 0;
         Perished = 0;
         
+        AreaStateCount = new AgentStateCount();
+        
         InitializeCells(settings);
     }
+    
 
     /// <summary>
     /// 初期化処理：セルを生成する
@@ -116,54 +119,24 @@ public class Area
         List<Task> tasks = new List<Task>();
         foreach (var cell in _cells)
         {
-            tasks.Add(Task.Run(() => cell.SimulateInfection(5f, InfectionRate)));
+            tasks.Add(Task.Run(() => cell.SimulateInfection(100f, InfectionRate)));
         }
-
+        
+        await Task.WhenAll(tasks);
+        
+        tasks.Add(Task.Run(UpdateStateCount));
+        
         await Task.WhenAll(tasks);
     }
-
-    /// <summary>
-    /// 感染状況を更新する
-    /// </summary>
-    public void UpdateEnvironment(int newInfected, int newGhost, int newDeaths)
-    {
-        Infected += newInfected;
-        Ghost += newGhost;
-        Perished += newDeaths;
-        Healthy -= (newInfected + newDeaths);
-
-        // データ整合性チェック
-        if (Healthy < 0) Healthy = 0;
-        if (Infected < 0) Infected = 0;
-        if (Ghost < 0) Ghost = 0;
-        if (Perished < 0) Perished = 0;
-    }
     
-    /// <summary>
-    /// 治安・統制力を変化させる
-    /// </summary>
-    public void ModifySecurity(int securityChange, int controlChange)
+    private void UpdateStateCount()
     {
-        Security = Math.Clamp(Security + securityChange, 0, 100);
-        Control = Math.Clamp(Control + controlChange, 0, 100);
-    }
-
-    /// <summary>
-    /// 特殊フラグを追加
-    /// </summary>
-    public void AddSpecialFlag(string flag)
-    {
-        if (!SpecialFlags.Contains(flag))
+        AreaStateCount.ResetStateCount();
+        foreach (var cell in _cells)
         {
-            SpecialFlags.Add(flag);
+            AreaStateCount.UpdateStateCount(
+                cell.StateCount.Healthy, cell.StateCount.Infected, cell.StateCount.NearDeath,
+                cell.StateCount.Ghost, cell.StateCount.Perished, cell.StateCount.MagicSoldiers);
         }
-    }
-
-    /// <summary>
-    /// 特殊フラグを削除
-    /// </summary>
-    public void RemoveSpecialFlag(string flag)
-    {
-        SpecialFlags.Remove(flag);
     }
 }

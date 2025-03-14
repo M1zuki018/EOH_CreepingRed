@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
 using Unity.Burst;
 using Unity.Collections;
@@ -15,11 +16,14 @@ public class Cell
     private int _id; // セル自体のID
     private int _maxX = 1000; // セル内の座標の横幅の上限
     private List<Agent> _agents { get; } = new List<Agent>();
+    public AgentStateCount StateCount { get; private set; }
     
     public Cell(int id, int citizen, int magicSoldier)
     {
         _id = id;
         _agents = new List<Agent>(citizen + magicSoldier);
+        StateCount = new AgentStateCount();
+        
         InitializeAgents(citizen, magicSoldier).Forget();
     }
 
@@ -39,14 +43,28 @@ public class Cell
         // 市民と魔法士のエージェントをバッチ処理で生成
         tasks.AddRange(CreateAgentBatchTasks(citizen, AgentType.Citizen, batchSize));
         tasks.AddRange(CreateAgentBatchTasks(magicSoldier, AgentType.MagicSoldier, batchSize));
-
+        
         await UniTask.WhenAll(tasks);  // 全てのタスクが完了するまで待機
+        
+        tasks.Add(UniTask.RunOnThreadPool(() => UpdateStateCount(magicSoldier)));
+        
+        await UniTask.WhenAll(tasks);
         
         stopwatch.Stop();
         
         Debug.Log($"{_id} : 一般市民{citizen} 魔法士{magicSoldier} 実行時間: {stopwatch.ElapsedMilliseconds} ミリ秒");
     }
-    
+
+    private void UpdateStateCount(int magicSoldier)
+    {
+        StateCount.ResetStateCount();
+        foreach (var agent in _agents)
+        {
+            StateCount.AddState(agent.State); // 各ステート
+            StateCount.AddState(magicSoldier); // 魔法士の数
+        }
+    }
+
     /// <summary>
     /// エージェントバッチ生成タスクを作成
     /// </summary>
