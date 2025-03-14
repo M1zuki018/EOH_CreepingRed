@@ -16,6 +16,7 @@ public class Simulation
     {
         grid = new Grid(width, height);
         agents = new List<Agent>();
+        
         Random random = new Random();
 
         // エージェントをランダム配置
@@ -47,7 +48,7 @@ public class Simulation
     private void UpdateSimulation()
     {
         // 環境更新
-        foreach (var row in grid.Cells)
+        foreach (var row in grid.Areas)
         {
             row.UpdateEnvironment();
         }
