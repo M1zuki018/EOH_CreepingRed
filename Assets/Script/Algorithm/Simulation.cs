@@ -7,25 +7,15 @@ using System.Collections.Generic;
 public class Simulation
 {
     private Grid grid;
+    public Grid Grid => grid;
     private List<Agent> agents = new List<Agent>();
     private int day = 0;
     private int timeStep = 0;
     private int maxDays = 30;  // 1ヶ月
 
-    public Simulation(int width, int height, int agentCount)
+    public Simulation(List<AreaSettingsSO> areaSettings)
     {
-        grid = new Grid(width, height);
-        
-        Random random = new Random();
-
-        // エージェントをランダム配置
-        for (int i = 0; i < agentCount; i++)
-        {
-            int x = random.Next(width);
-            int y = random.Next(height);
-            AgentType type = (i % 10 == 0) ? AgentType.MagicSoldier : AgentType.Citizen;
-            agents.Add(new Agent(i, type, x, y));
-        }
+        grid = new Grid(areaSettings);
     }
 
     public void Run()

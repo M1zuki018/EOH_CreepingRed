@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 /// <summary>
 /// 各区域を管理するクラス
@@ -37,6 +38,7 @@ public class Area
 
     #endregion
     
+    private List<Cell> cells = new List<Cell>();
     public List<Agent> Agents { get; } = new List<Agent>();
     public bool HasGhost { get; set; }  // 亡霊がいるか
     public double InfectionRisk { get; set; }  // 感染リスク
@@ -44,31 +46,45 @@ public class Area
     /// <summary>
     /// エリアのコンストラクタ
     /// </summary>
-    public Area(int x, int y, SectionEnum name, AreaCategoryEnum category, int population, int citizenPopulation, int magicSoldierPopulation, 
-        float areaSize, int populationDensity, int security, int mobilityRate, 
-        int infectionRate, int control, List<string> specialFlags = null)
+    public Area(AreaSettingsSO settings)
     {
-        X = x;
-        Y = y;
-        Name = name;
-        Category = category;
-        Population = population;
-        CitizenPopulation = citizenPopulation;
-        MagicSoldierPopulation = magicSoldierPopulation;
-        AreaSize = areaSize;
-        PopulationDensity = populationDensity;
-        Security = security;
-        MobilityRate = mobilityRate;
-        InfectionRate = infectionRate;
-        Control = control;
-        SpecialFlags = specialFlags ?? new List<string>();
+        X = settings.x;
+        Y = settings.y;
+        Name = settings.name;
+        Category = settings.category;
+        Population = settings.population;
+        CitizenPopulation = settings.citizenPopulation;
+        MagicSoldierPopulation = settings.magicSoldierPopulation;
+        AreaSize = settings.areaSize;
+        PopulationDensity = settings.populationDensity;
+        Security = settings.security;
+        MobilityRate = settings.mobilityRate;
+        InfectionRate = settings.infectionRate;
+        Control = settings.control;
+        SpecialFlags = settings.specialFlags ?? new List<string>();
 
         // 初期状態
-        Healthy = population * 10000;  // 10万人単位から実際の人数に換算
+        Healthy = Population * 10000;  // 10万人単位から実際の人数に換算
         Infected = 0;
         NearDeath = 0;
         Ghost = 0;
         Perished = 0;
+        
+        // 人口10万人単位に分割してセルを生成
+        int cellCount = Population / 100000;  // 10万人単位で分割
+        for (int i = 0; i < cellCount; i++)
+        {
+            cells.Add(new Cell(i));
+        }
+    }
+    
+    // エージェント配置処理（並列化可能）
+    public void InitializeAgents()
+    {
+        Parallel.ForEach(cells, cell =>
+        {
+            cell.InitializeAgents(this); // セルごとにエージェントを配置
+        });
     }
 
     /// <summary>
