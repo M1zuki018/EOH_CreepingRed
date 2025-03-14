@@ -22,6 +22,5 @@ public class TestSimulator : ViewBase
 
     public void Update()
     {
-        //_simulation.Run();
     }
 }
