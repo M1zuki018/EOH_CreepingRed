@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
@@ -6,23 +7,22 @@ using UnityEngine;
 public class Cell
 {
     private int _id;
-
-    public Cell(int id)
+    
+    public List<Agent> Agents { get; } = new List<Agent>();
+    
+    public Cell(int id, int population)
     {
         _id = id;
+        InitializeAgents(population);
     }
     
-    public void InitializeAgents(Area area)
+    public void InitializeAgents(int population)
     {
-        // ここでエージェントをランダム配置
-        int agentsPerCell = area.Population / 100000; // 10万人単位
-        for (int i = 0; i < agentsPerCell; i++)
+        for (int i = 0; i < population; i++)
         {
-            // エージェントを配置（ランダム）
-            //var agent = new Agent(i, AgentType.Citizen, X, Y);
             var agent = new Agent(i, AgentType.Citizen, 0, 0);
-            area.Agents.Add(agent);
+            Agents.Add(agent);
         }
-        Debug.Log($"{area.Name.ToString()}Cell Initialize Finish");
+        Debug.Log($"{_id} : {Agents.Count}");
     }
 }

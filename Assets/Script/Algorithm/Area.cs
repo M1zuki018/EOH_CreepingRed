@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using UnityEngine;
 
 /// <summary>
 /// 各区域を管理するクラス
@@ -39,8 +40,6 @@ public class Area
     #endregion
     
     private List<Cell> cells = new List<Cell>();
-    public List<Agent> Agents { get; } = new List<Agent>();
-    public bool HasGhost { get; set; }  // 亡霊がいるか
     public double InfectionRisk { get; set; }  // 感染リスク
 
     /// <summary>
@@ -52,7 +51,7 @@ public class Area
         Y = settings.y;
         Name = settings.name;
         Category = settings.category;
-        Population = settings.population;
+        Population = settings.population * 10000;
         CitizenPopulation = settings.citizenPopulation;
         MagicSoldierPopulation = settings.magicSoldierPopulation;
         AreaSize = settings.areaSize;
@@ -74,17 +73,16 @@ public class Area
         int cellCount = Population / 100000;  // 10万人単位で分割
         for (int i = 0; i < cellCount; i++)
         {
-            cells.Add(new Cell(i));
+            cells.Add(new Cell(i, 100000));
         }
-    }
-    
-    // エージェント配置処理（並列化可能）
-    public void InitializeAgents()
-    {
-        Parallel.ForEach(cells, cell =>
+
+        // あまりがあった場合
+        if (Population - (cellCount * 100000) != 0)
         {
-            cell.InitializeAgents(this); // セルごとにエージェントを配置
-        });
+            cells.Add(new Cell(cellCount, Population - (cellCount * 100000)));
+        }
+        
+        Debug.Log($"{settings.name.ToString()}エリアのセルの数：{cells.Count}");
     }
 
     /// <summary>
