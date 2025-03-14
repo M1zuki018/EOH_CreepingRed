@@ -16,6 +16,7 @@ public class Cell
     private int _id; // セル自体のID
     private int _maxX = 1000; // セル内の座標の横幅の上限
     private List<Agent> _agents { get; } = new List<Agent>();
+    private Quadtree _quadtree;
     public AgentStateCount StateCount { get; private set; }
     
     public Cell(int id, int citizen, int magicSoldier)
@@ -138,18 +139,21 @@ public class Cell
     /// </summary>
     public void SimulateInfection(float baseInfectionRate, float infectionMultiplier)
     {
-        int count = _agents.Count;
-        if(count == 0) return; // エージェントがセル内に一人も居なければ処理は行わない
+        if(_agents.Count == 0) return; // エージェントがセル内に一人もいない場合スキップ
         
-        NativeArray<Agent> agentArray = new NativeArray<Agent>(count, Allocator.TempJob);
-        NativeArray<bool> infectionResults = new NativeArray<bool>(count, Allocator.TempJob);
+        var infectedAreas = _quadtree.GetInfectedAreas();
+        if(infectedAreas.Count == 0) return; // 感染者がいない場合スキップ
+        
+        NativeArray<Agent> agentArray = new NativeArray<Agent>(infectedAreas.Count, Allocator.TempJob);
+        NativeArray<bool> infectionResults = new NativeArray<bool>(infectedAreas.Count, Allocator.TempJob);
         
         // リストから NativeArray へコピー
-        for (int i = 0; i < count; i++)
+        for (int i = 0; i < infectedAreas.Count; i++)
         {
-            agentArray[i] = _agents[i];
+            agentArray[i] = infectedAreas[i];
         }
 
+        // Job作成
         InfectionJob job = new InfectionJob
         {
             agents = agentArray,
@@ -158,11 +162,11 @@ public class Cell
             infectionMultiplier = infectionMultiplier,
         };
         
-        JobHandle jobHandle = job.Schedule(count, 64); // 64スレッド単位で並列処理
+        JobHandle jobHandle = job.Schedule(infectedAreas.Count, 64); // 64スレッド単位で並列処理
         jobHandle.Complete(); // 終了を待つ
         
         // 感染結果を反映
-        for (int i = 0; i < count; i++)
+        for (int i = 0; i < infectedAreas.Count; i++)
         {
             if (infectionResults[i])
             {
