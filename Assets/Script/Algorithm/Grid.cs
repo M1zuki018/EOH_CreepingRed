@@ -11,19 +11,18 @@ public class Grid
     private readonly int _height; // タテ
     public int Height => _height;
 
-    public Area[,] Areas { get; } // エリアを動的に変更する予定がないので二次元配列でやってみる
+    public Area[,] Areas { get; } = new Area[5 ,4]; // エリアを動的に変更する予定がないので二次元配列でやってみる
 
     public Grid(List<AreaSettingsSO> areaSettings)
     {
-        // AreaSettingsSO の X, Y に基づいてエリアを配置
         foreach (var areaSetting in areaSettings)
         {
             int x = areaSetting.x;
             int y = areaSetting.y;
 
-            // エリアを配置
+            // SOで設定した座標に基づいてエリアを配置
             Areas[x, y] = new Area(areaSetting);
-            Debug.Log($"Area placed at ({x}, {y}) : {areaSetting.name.ToString()}");
+            Debug.Log($"座標 ({x}, {y}) : {areaSetting.name.ToString()}");
         }
         
         Debug.Log($"Grid Initialize Finish");
