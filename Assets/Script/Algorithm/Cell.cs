@@ -7,8 +7,8 @@ using UnityEngine;
 public class Cell
 {
     private int _id;
-    
-    public List<Agent> Agents { get; } = new List<Agent>();
+
+    private List<Agent> _agents { get; } = new List<Agent>();
     
     public Cell(int id, int population)
     {
@@ -24,8 +24,8 @@ public class Cell
         for (int i = 0; i < population; i++)
         {
             var agent = new Agent(i, AgentType.Citizen, 0, 0);
-            Agents.Add(agent);
+            _agents.Add(agent);
         }
-        Debug.Log($"{_id} : {Agents.Count}");
+        Debug.Log($"{_id} : {_agents.Count}");
     }
 }

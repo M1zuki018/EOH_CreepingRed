@@ -39,7 +39,7 @@ public class Area
 
     #endregion
     
-    private List<Cell> cells = new List<Cell>();
+    private List<Cell> _cells = new List<Cell>();
     public double InfectionRisk { get; set; }  // 感染リスク
 
     /// <summary>
@@ -81,16 +81,16 @@ public class Area
         int cellCount = Population / 100000;  // 10万人単位で分割
         for (int i = 0; i < cellCount; i++)
         {
-            cells.Add(new Cell(i, 100000));
+            _cells.Add(new Cell(i, 100000));
         }
 
         // あまりがあった場合
         if (Population - (cellCount * 100000) != 0)
         {
-            cells.Add(new Cell(cellCount, Population - (cellCount * 100000)));
+            _cells.Add(new Cell(cellCount, Population - (cellCount * 100000)));
         }
         
-        Debug.Log($"{settings.name.ToString()}エリアのセルの数：{cells.Count}");
+        Debug.Log($"{settings.name.ToString()}エリアのセルの数：{_cells.Count}");
     }
 
     /// <summary>

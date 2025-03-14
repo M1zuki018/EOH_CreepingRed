@@ -6,11 +6,6 @@ using UnityEngine;
 /// </summary>
 public class Grid
 {
-    private readonly int _width; // ヨコ
-    public int Width => _width;
-    private readonly int _height; // タテ
-    public int Height => _height;
-
     public Area[,] Areas { get; } = new Area[5 ,4]; // エリアを動的に変更する予定がないので二次元配列でやってみる
 
     public Grid(List<AreaSettingsSO> areaSettings)
@@ -27,10 +22,18 @@ public class Grid
         {
             int x = areaSetting.x;
             int y = areaSetting.y;
-
-            // SOで設定した座標に基づいてエリアを配置
-            Areas[x, y] = new Area(areaSetting);
-            Debug.Log($"座標 ({x}, {y}) : {areaSetting.name.ToString()}");
+            
+            // Areasの範囲を超えないかチェック
+            if (x >= 0 && x < Areas.GetLength(0) && y >= 0 && y < Areas.GetLength(1))
+            {
+                // SOで設定した座標に基づいてエリアを配置
+                Areas[x, y] = new Area(areaSetting);
+                Debug.Log($"Area placed at ({x}, {y}) : {areaSetting.name.ToString()}");
+            }
+            else
+            {
+                Debug.LogWarning($"Invalid area coordinates ({x}, {y}) for area: {areaSetting.name}");
+            }
         }
 
         Debug.Log($"Grid Initialize Finish");
@@ -41,7 +44,7 @@ public class Grid
     /// </summary>
     public Area? GetArea(int x, int y)
     {
-        if (x < 0 || x >= _width || y < 0 || y >= _height)
+        if (x < 0 || x >= Areas.GetLength(0) || y < 0 || y >= Areas.GetLength(1))
         {
             return null; // 範囲外なら null を返す
         }
