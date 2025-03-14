@@ -1,8 +1,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
-using JetBrains.Annotations;
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Jobs;
@@ -15,9 +13,8 @@ using Debug = UnityEngine.Debug;
 public class Cell
 {
     private int _id; // セル自体のID
-    private int maxX = 1000; // セル内の座標の横幅の上限
+    private int _maxX = 1000; // セル内の座標の横幅の上限
     private List<Agent> _agents { get; } = new List<Agent>();
-    
     
     public Cell(int id, int citizen, int magicSoldier)
     {
@@ -76,7 +73,7 @@ public class Cell
         CreateAgentJob job = new CreateAgentJob
         {
             start = start,
-            maxX = maxX,
+            maxX = _maxX,
             type = type,
             agents = agentArray
         };
@@ -110,7 +107,7 @@ public class Cell
             int y = agentIndex / maxX;
 
             // エージェントを追加
-            agents[index] = new Agent(agentIndex, type, x, y);  // AgentType.Citizenは例として設定
+            agents[index] = new Agent(agentIndex, type, x, y);
         }
     }
 }
