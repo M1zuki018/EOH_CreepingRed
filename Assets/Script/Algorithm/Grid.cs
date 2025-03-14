@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 /// <summary>
@@ -6,7 +8,7 @@ using UnityEngine;
 /// </summary>
 public class Grid
 {
-    public Area[,] Areas { get; } = new Area[5 ,4]; // エリアを動的に変更する予定がないので二次元配列でやってみる
+    public Area[,] Areas { get; } = new Area[1 ,1]; // エリアを動的に変更する予定がないので二次元配列でやってみる
 
     public Grid(List<AreaSettingsSO> areaSettings)
     {
@@ -37,6 +39,20 @@ public class Grid
         }
 
         Debug.Log($"Grid Initialize Finish");
+    }
+
+    /// <summary>
+    /// 各エリアに対して更新処理を行う指示を出す
+    /// </summary>
+    public async UniTask SimulateInfectionAsync()
+    {
+        List<Task> tasks = new List<Task>();
+        foreach (var area in Areas)
+        {
+            tasks.Add(Task.Run(() => area.SimulateInfectionAsync()));
+        }
+
+        await Task.WhenAll(tasks);  // すべてのタスクが完了するまで待機
     }
 
     /// <summary>

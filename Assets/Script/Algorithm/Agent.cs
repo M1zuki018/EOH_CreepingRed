@@ -33,16 +33,13 @@ public struct Agent
         Y = Math.Max(0, Math.Min(grid.Areas.GetLength(1) - 1, Y + dy));
     }
 
-    public void UpdateState(Grid grid)
+    public int CountInfectedNeighbors()
     {
-        // 感染拡大・停止の処理
-        Area currentCell = grid.GetArea(X, Y);
-        if (State == AgentState.Healthy && currentCell.InfectionRisk > 0.5)
-        {
-            if (random.NextDouble() < currentCell.InfectionRisk)
-            {
-                State = AgentState.Infected;
-            }
-        }
+        return 5;
+    }
+
+    public void Infect()
+    {
+        State = AgentState.Infected;
     }
 }

@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using Cysharp.Threading.Tasks;
 using R3;
-using UnityEngine;
+using Debug = UnityEngine.Debug;
 
 /// <summary>
 /// 1日のサイクルを管理する
@@ -27,7 +29,12 @@ public class Simulation : IDisposable
     /// </summary>
     private void UpdateSimulation(int time)
     {
-        Debug.Log($"ゲーム内時間: {_timeManager.GameTimeProp} 時間経過");
+        Stopwatch stopwatch = new Stopwatch();
+        stopwatch.Start();
+        Debug.Log($"ゲーム内時間: {time} 時間経過");
+        _grid.SimulateInfectionAsync().Forget();
+        stopwatch.Stop();
+        Debug.Log($"更新完了 : 実行時間 {stopwatch.ElapsedMilliseconds} ミリ秒");
     }
 
     private void HandleBattles()

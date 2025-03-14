@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using Debug = UnityEngine.Debug;
 
 /// <summary>
@@ -104,6 +106,20 @@ public class Area
         }
         
         Debug.Log($"{settings.name.ToString()}エリアのセルの数：{_cells.Count} 実行時間: {stopwatch.ElapsedMilliseconds} ミリ秒");
+    }
+
+    /// <summary>
+    /// 各セルに対してエージェントの情報を更新する指示を出す
+    /// </summary>
+    public async UniTask SimulateInfectionAsync()
+    {
+        List<Task> tasks = new List<Task>();
+        foreach (var cell in _cells)
+        {
+            tasks.Add(Task.Run(() => cell.SimulateInfection(5f, InfectionRate)));
+        }
+
+        await Task.WhenAll(tasks);
     }
 
     /// <summary>

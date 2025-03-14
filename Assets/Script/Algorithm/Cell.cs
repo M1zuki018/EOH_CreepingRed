@@ -22,7 +22,9 @@ public class Cell
         _agents = new List<Agent>(citizen + magicSoldier);
         InitializeAgents(citizen, magicSoldier).Forget();
     }
-    
+
+    #region 初期化
+
     /// <summary>
     /// エージェントの生成
     /// </summary>
@@ -108,6 +110,75 @@ public class Cell
 
             // エージェントを追加
             agents[index] = new Agent(agentIndex, type, x, y);
+        }
+    }
+
+    #endregion
+
+    /// <summary>
+    /// 感染シミュレーション
+    /// </summary>
+    public void SimulateInfection(float baseInfectionRate, float infectionMultiplier)
+    {
+        int count = _agents.Count;
+        if(count == 0) return; // エージェントがセル内に一人も居なければ処理は行わない
+        
+        NativeArray<Agent> agentArray = new NativeArray<Agent>(count, Allocator.TempJob);
+        NativeArray<bool> infectionResults = new NativeArray<bool>(count, Allocator.TempJob);
+        
+        // リストから NativeArray へコピー
+        for (int i = 0; i < count; i++)
+        {
+            agentArray[i] = _agents[i];
+        }
+
+        InfectionJob job = new InfectionJob
+        {
+            agents = agentArray,
+            infectionResults = infectionResults,
+            baseInfectionRate = baseInfectionRate,
+            infectionMultiplier = infectionMultiplier,
+        };
+        
+        JobHandle jobHandle = job.Schedule(count, 64); // 64スレッド単位で並列処理
+        jobHandle.Complete(); // 終了を待つ
+        
+        // 感染結果を反映
+        for (int i = 0; i < count; i++)
+        {
+            if (infectionResults[i])
+            {
+                _agents[i].Infect();
+            }
+        }
+
+        // メモリ解放
+        agentArray.Dispose();
+        infectionResults.Dispose();
+    }
+    
+    [BurstCompile]
+    private struct InfectionJob : IJobParallelFor
+    {
+        [ReadOnly] public NativeArray<Agent> agents;
+        public NativeArray<bool> infectionResults;
+        public float baseInfectionRate;
+        public float infectionMultiplier;
+
+        public void Execute(int index)
+        {
+            Agent agent = agents[index];
+            if (agent.State == AgentState.Infected)
+            {
+                infectionResults[index] = false;
+                return;
+            }
+
+            int infectedNeighbors = agent.CountInfectedNeighbors(); // 感染した近隣の人間の数を取得
+            float infectionProbability = baseInfectionRate + (infectedNeighbors * infectionMultiplier);
+
+            // 感染判定
+            infectionResults[index] = 10 < infectionProbability;
         }
     }
 }
