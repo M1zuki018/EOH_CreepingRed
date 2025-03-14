@@ -1,7 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading.Tasks;
-using UnityEngine;
+using Debug = UnityEngine.Debug;
 
 /// <summary>
 /// 各区域を管理するクラス
@@ -77,6 +78,9 @@ public class Area
     /// </summary>
     private void InitializeCells(AreaSettingsSO settings)
     {
+        Stopwatch stopwatch = new Stopwatch();
+        stopwatch.Start();
+        
         int cellPopulation = 100000; // 1セルあたりの人口
         int cellCount = Population / cellPopulation; // セルの個数計算
         
@@ -100,7 +104,7 @@ public class Area
             _cells.Add(new Cell(cellCount, remainderCitizenPopulation, remainderMagicSoldierPopulation));
         }
         
-        Debug.Log($"{settings.name.ToString()}エリアのセルの数：{_cells.Count}");
+        Debug.Log($"{settings.name.ToString()}エリアのセルの数：{_cells.Count} 実行時間: {stopwatch.ElapsedMilliseconds} ミリ秒");
     }
 
     /// <summary>

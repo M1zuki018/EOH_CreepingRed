@@ -17,7 +17,7 @@ MonoBehaviour:
   name: 0
   category: 0
   population: 135
-  citizenPopulation: 50
+  citizenPopulation: 55
   magicSoldierPopulation: 80
   areaSize: 77.2
   populationDensity: 16839
