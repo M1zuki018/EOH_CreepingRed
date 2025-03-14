@@ -52,8 +52,8 @@ public class Area
         Name = settings.name;
         Category = settings.category;
         Population = settings.population * 10000;
-        CitizenPopulation = settings.citizenPopulation;
-        MagicSoldierPopulation = settings.magicSoldierPopulation;
+        CitizenPopulation = settings.citizenPopulation * 10000;
+        MagicSoldierPopulation = settings.magicSoldierPopulation * 10000;
         AreaSize = settings.areaSize;
         PopulationDensity = settings.populationDensity;
         Security = settings.security;
@@ -77,17 +77,27 @@ public class Area
     /// </summary>
     private void InitializeCells(AreaSettingsSO settings)
     {
-        // 人口10万人単位に分割してセルを生成
-        int cellCount = Population / 100000;  // 10万人単位で分割
+        int cellPopulation = 100000; // 1セルあたりの人口
+        int cellCount = Population / cellPopulation; // セルの個数計算
+        
+        // セルごとの市民と魔法士の人数を計算
+        int cellCitizenPopulation = (int)(cellPopulation * (CitizenPopulation / (float)Population));
+        int cellMagicSoldierPopulation = cellPopulation - cellCitizenPopulation;
+        
+        // セルを生成
         for (int i = 0; i < cellCount; i++)
         {
-            _cells.Add(new Cell(i, 100000));
+            _cells.Add(new Cell(i, cellCitizenPopulation, cellMagicSoldierPopulation));
         }
 
         // あまりがあった場合
-        if (Population - (cellCount * 100000) != 0)
+        int remainderPopulation = Population - (cellCount * cellPopulation);
+        if (remainderPopulation > 0)
         {
-            _cells.Add(new Cell(cellCount, Population - (cellCount * 100000)));
+            int remainderCitizenPopulation = (int)(remainderPopulation * (CitizenPopulation / (float)Population));
+            int remainderMagicSoldierPopulation = remainderPopulation - remainderCitizenPopulation;
+            
+            _cells.Add(new Cell(cellCount, remainderCitizenPopulation, remainderMagicSoldierPopulation));
         }
         
         Debug.Log($"{settings.name.ToString()}エリアのセルの数：{_cells.Count}");
