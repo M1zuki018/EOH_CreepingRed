@@ -15,7 +15,7 @@ public class Simulation
 
     public Simulation(List<AreaSettingsSO> areaSettings)
     {
-        grid = new Grid(areaSettings);
+        grid = new Grid(areaSettings); // グリッドを生成する
     }
 
     public void Run()

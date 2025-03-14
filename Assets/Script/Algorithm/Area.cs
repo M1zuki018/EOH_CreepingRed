@@ -69,6 +69,14 @@ public class Area
         Ghost = 0;
         Perished = 0;
         
+        InitializeCells(settings);
+    }
+
+    /// <summary>
+    /// 初期化処理：セルを生成する
+    /// </summary>
+    private void InitializeCells(AreaSettingsSO settings)
+    {
         // 人口10万人単位に分割してセルを生成
         int cellCount = Population / 100000;  // 10万人単位で分割
         for (int i = 0; i < cellCount; i++)

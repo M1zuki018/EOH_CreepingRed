@@ -15,6 +15,14 @@ public class Grid
 
     public Grid(List<AreaSettingsSO> areaSettings)
     {
+        InitializeAreas(areaSettings);
+    }
+
+    /// <summary>
+    /// 初期化処理：エリアを生成する
+    /// </summary>
+    private void InitializeAreas(List<AreaSettingsSO> areaSettings)
+    {
         foreach (var areaSetting in areaSettings)
         {
             int x = areaSetting.x;
@@ -24,7 +32,7 @@ public class Grid
             Areas[x, y] = new Area(areaSetting);
             Debug.Log($"座標 ({x}, {y}) : {areaSetting.name.ToString()}");
         }
-        
+
         Debug.Log($"Grid Initialize Finish");
     }
 
