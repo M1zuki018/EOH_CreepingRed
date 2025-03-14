@@ -7,7 +7,7 @@ using System.Collections.Generic;
 public class Simulation
 {
     private Grid grid;
-    private List<Agent> agents;
+    private List<Agent> agents = new List<Agent>();
     private int day = 0;
     private int timeStep = 0;
     private int maxDays = 30;  // 1ヶ月
@@ -15,7 +15,6 @@ public class Simulation
     public Simulation(int width, int height, int agentCount)
     {
         grid = new Grid(width, height);
-        agents = new List<Agent>();
         
         Random random = new Random();
 
@@ -50,7 +49,7 @@ public class Simulation
         // 環境更新
         foreach (var row in grid.Areas)
         {
-            row.UpdateEnvironment();
+            row.UpdateEnvironment(10, 10,10);
         }
 
         // エージェント更新

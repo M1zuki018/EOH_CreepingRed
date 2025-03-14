@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 /// <summary>
 /// 感染シミュレーション全体を管理するクラス
 /// </summary>
@@ -15,11 +17,13 @@ public class Grid
         
         Areas = new Area[width, height];
 
+        // エリア生成
         for (int x = 0; x < width; x++)
         {
             for (int y = 0; y < height; y++)
             {
-                Areas[x, y] = new Area(x, y);
+                Areas[x, y] = new Area(x, y,SectionEnum.CentralTower, AreaCategoryEnum.CentralDistrict, 10, 10, 10, 
+                    10, 10, 10, 10, 10, 10, new List<string>());
             }
         }
     }
