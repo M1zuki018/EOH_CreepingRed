@@ -2,16 +2,16 @@ using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 /// <summary>
-/// エージェント約10万人が詰められたセル。感染シミュレーションを行う部分
+/// 縮小テスト用エージェント約10万人が詰められたセル。感染シミュレーションを行う部分
 /// </summary>
-public class Cell
+public class MiniCell
 {
     private int _id; // セル自体のID
     
     private Quadtree _quadtree;
     public AgentStateCount StateCount { get; private set; }
     
-    public Cell(int id, int citizen, int magicSoldier)
+    public MiniCell(int id, int citizen, int magicSoldier)
     {
         _id = id;
         _quadtree = new Quadtree(new Rect(0, 0, 1000, 1000));

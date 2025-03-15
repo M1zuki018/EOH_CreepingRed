@@ -41,7 +41,7 @@ public class MiniArea
 
     #endregion
     
-    private List<Cell> _cells = new List<Cell>();
+    private List<MiniCell> _cells = new List<MiniCell>();
     public AgentStateCount AreaStateCount { get; private set; }
 
     /// <summary>
@@ -95,7 +95,7 @@ public class MiniArea
         // セルを生成
         for (int i = 0; i < cellCount; i++)
         {
-            _cells.Add(new Cell(i, cellCitizenPopulation, cellMagicSoldierPopulation));
+            _cells.Add(new MiniCell(i, cellCitizenPopulation, cellMagicSoldierPopulation));
         }
 
         // あまりがあった場合
@@ -105,7 +105,7 @@ public class MiniArea
             int remainderCitizenPopulation = (int)(remainderPopulation * (CitizenPopulation / (float)Population));
             int remainderMagicSoldierPopulation = remainderPopulation - remainderCitizenPopulation;
             
-            _cells.Add(new Cell(cellCount, remainderCitizenPopulation, remainderMagicSoldierPopulation));
+            _cells.Add(new MiniCell(cellCount, remainderCitizenPopulation, remainderMagicSoldierPopulation));
         }
         
         Debug.Log($"{settings.name.ToString()}エリアのセルの数：{_cells.Count} 実行時間: {stopwatch.ElapsedMilliseconds} ミリ秒");
