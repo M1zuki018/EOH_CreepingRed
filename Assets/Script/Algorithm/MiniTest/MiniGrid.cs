@@ -8,7 +8,7 @@ using UnityEngine;
 /// </summary>
 public class MiniGrid
 {
-    public Area[,] Areas { get; } = new Area[1 ,1]; 
+    public MiniArea[,] Areas { get; } = new MiniArea[1 ,1]; 
     public AgentStateCount TotalStateCount { get; private set; } // ゲーム内に存在するエージェントの累計
     
      public MiniGrid(List<AreaSettingsSO> areaSettings)
@@ -31,7 +31,7 @@ public class MiniGrid
             if (x >= 0 && x < Areas.GetLength(0) && y >= 0 && y < Areas.GetLength(1))
             {
                 // SOで設定した座標に基づいてエリアを配置
-                Areas[x, y] = new Area(areaSetting);
+                Areas[x, y] = new MiniArea(areaSetting);
                 Debug.Log($"エリア作成 ({x}, {y}) : {areaSetting.name.ToString()}");
             }
             else
@@ -80,7 +80,7 @@ public class MiniGrid
     /// <summary>
     /// エリアデータを取得する（範囲外なら null）
     /// </summary>
-    public Area? GetArea(int x, int y)
+    public MiniArea? GetArea(int x, int y)
     {
         if (x < 0 || x >= Areas.GetLength(0) || y < 0 || y >= Areas.GetLength(1))
         {
