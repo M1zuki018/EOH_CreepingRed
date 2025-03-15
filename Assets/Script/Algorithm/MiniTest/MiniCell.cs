@@ -8,13 +8,13 @@ public class MiniCell
 {
     private int _id; // セル自体のID
     
-    private Quadtree _quadtree;
+    private MiniQuadtree _quadtree;
     public AgentStateCount StateCount { get; private set; }
     
     public MiniCell(int id, int citizen, int magicSoldier)
     {
         _id = id;
-        _quadtree = new Quadtree(new Rect(0, 0, 1000, 1000));
+        _quadtree = new MiniQuadtree(new Rect(0, 0, 1000, 1000));
         StateCount = new AgentStateCount();
         
         InitializeAgents(citizen, magicSoldier).Forget();

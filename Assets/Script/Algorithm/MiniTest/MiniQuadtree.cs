@@ -8,14 +8,14 @@ using UnityEngine;
 using Debug = UnityEngine.Debug;
 
 /// <summary>
-/// Quadtreeを用いたエージェント管理システム
+/// 縮小テスト用Quadtreeを用いたエージェント管理システム
 /// </summary>
-public class Quadtree
+public class MiniQuadtree
 {
     private const int MAX_AGENTS = 2500; // 1区画の最大エージェント数
     private const int MAX_DEPTH = 10; // 最大分割回数
     
-    private Dictionary<Quadtree, bool> _subTrees; // サブツリーとSkipフラグ
+    private Dictionary<MiniQuadtree, bool> _subTrees; // サブツリーとSkipフラグ
     private Dictionary<(int x, int y), Agent> _agents; // エージェントの情報
     private Rect _bounds;
     private int _depth = 0; // 現在の分割数
@@ -24,11 +24,11 @@ public class Quadtree
     private List<Agent> _infectedAgents = new List<Agent>(); // 処理を行う感染済みのエージェント
     private List<Agent> _checkAgents = new List<Agent>(); // 感染判定を行う対象のエージェント
 
-    public Quadtree(Rect bounds, int depth = 0)
+    public MiniQuadtree(Rect bounds, int depth = 0)
     {
         _bounds = bounds;
         _depth = depth;
-        _subTrees = new Dictionary<Quadtree, bool>();
+        _subTrees = new Dictionary<MiniQuadtree, bool>();
         _agents = new Dictionary<(int x, int y), Agent>();
         _infectedAgents = new List<Agent>();
         _checkAgents = new List<Agent>();
@@ -198,10 +198,10 @@ public class Quadtree
         float y = _bounds.yMin;
         
         // 4つのサブツリーを作成
-        _subTrees.Add(new Quadtree(new Rect(x, y, halfWidth, halfHeight), _depth + 1), false);  // 左下
-        _subTrees.Add(new Quadtree(new Rect(x + halfWidth, y, halfWidth, halfHeight), _depth + 1), false);  // 右下
-        _subTrees.Add(new Quadtree(new Rect(x, y + halfHeight, halfWidth, halfHeight), _depth + 1), false);  // 左上
-        _subTrees.Add(new Quadtree(new Rect(x + halfWidth, y + halfHeight, halfWidth, halfHeight), _depth + 1), false);  // 右上
+        _subTrees.Add(new MiniQuadtree(new Rect(x, y, halfWidth, halfHeight), _depth + 1), false);  // 左下
+        _subTrees.Add(new MiniQuadtree(new Rect(x + halfWidth, y, halfWidth, halfHeight), _depth + 1), false);  // 右下
+        _subTrees.Add(new MiniQuadtree(new Rect(x, y + halfHeight, halfWidth, halfHeight), _depth + 1), false);  // 左上
+        _subTrees.Add(new MiniQuadtree(new Rect(x + halfWidth, y + halfHeight, halfWidth, halfHeight), _depth + 1), false);  // 右上
     }
     #endregion
 
