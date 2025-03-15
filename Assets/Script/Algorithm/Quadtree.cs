@@ -16,7 +16,7 @@ public class Quadtree
     private const int MAX_DEPTH = 10; // 最大分割回数
     
     private Dictionary<Quadtree, bool> _subTrees; // サブツリーとSkipフラグ
-    private Dictionary<Agent, bool> _agents; // エージェントの情報
+    private Dictionary<(int x, int y), Agent> _agents; // エージェントの情報
     private Rect _bounds;
     private int _depth = 0; // 現在の分割数
     private int _maxX = 1000; // セル内の座標の横幅の上限
@@ -29,7 +29,7 @@ public class Quadtree
         _bounds = bounds;
         _depth = depth;
         _subTrees = new Dictionary<Quadtree, bool>();
-        _agents = new Dictionary<Agent, bool>();
+        _agents = new Dictionary<(int x, int y), Agent>();
         _infectedAgents = new List<Agent>();
         _checkAgents = new List<Agent>();
     }
@@ -56,8 +56,8 @@ public class Quadtree
         await UniTask.WhenAll(tasks);  // 全てのタスクが完了するまで待機
         
         // 生成終了後にエージェントをツリーに追加する処理を行う
-        InsertBatchAgents(citizenAgents);
-        InsertBatchAgents(magicSoldierAgents);
+        InsertBatchAgents(citizenAgents, batchSize);
+        InsertBatchAgents(magicSoldierAgents, batchSize);
         
         citizenAgents.Dispose();
         magicSoldierAgents.Dispose();
@@ -102,18 +102,7 @@ public class Quadtree
         JobHandle jobHandle = job.Schedule(batchSize, 64); // バッチサイズ64で並列化
         jobHandle.Complete(); // 完了まで待機
     }
-
-    /// <summary>
-    /// バッチで生成したエージェントをツリーに追加
-    /// </summary>
-    private void InsertBatchAgents(NativeArray<Agent> agents)
-    {
-        foreach (var agent in agents)
-        {
-            Insert(agent);
-        }
-    }
-
+    
     /// <summary>
     /// エージェントを生成するJob
     /// </summary>
@@ -137,7 +126,32 @@ public class Quadtree
         }
     }
 
+    /// <summary>
+    /// バッチで生成したエージェントをツリーに追加
+    /// </summary>
+    private void InsertBatchAgents(NativeArray<Agent> agents, int batchSize)
+    {
+        int totalAgents = agents.Length;
 
+        for (int i = 0; i < totalAgents; i += batchSize)
+        {
+            int end = Mathf.Min(i + batchSize, totalAgents);
+            InsertBatch(agents, i, end);
+        }
+    }
+    
+    /// <summary>
+    /// バッチ内でエージェントを一度にツリーに追加
+    /// </summary>
+    private void InsertBatch(NativeArray<Agent> agents, int start, int end)
+    {
+        // バッチ内でエージェントを挿入
+        for (int i = start; i < end; i++)
+        {
+            Insert(agents[i]);
+        }
+    }
+    
     /// <summary>
     /// エージェントをツリーに追加する処理
     /// </summary>
@@ -150,7 +164,7 @@ public class Quadtree
 
         if (_agents.Count < MAX_AGENTS || _depth >= MAX_DEPTH)
         {
-            _agents[agent] = false; // 容量に空きがあり、分割数にも余裕があればエージェントを追加
+            _agents[(agent.X, agent.Y)] = agent; // 容量に空きがあり、分割数にも余裕があればエージェントを追加
             return;
         }
 
@@ -163,9 +177,13 @@ public class Quadtree
         // サブツリーへの追加処理
         foreach (var subTree in _subTrees)
         {
-            subTree.Key.Insert(agent);
+            if (agent.X < subTree.Key._bounds.xMin || agent.X >= subTree.Key._bounds.xMax || 
+                agent.Y < subTree.Key._bounds.yMin || agent.Y >= subTree.Key._bounds.yMax)  // サブツリーの範囲内である場合のみ追加
+            {
+                subTree.Key.Insert(agent);  // このサブツリーにのみエージェントを追加
+                break;  // 1つのサブツリーにのみ追加する
+            }
         }
-
     }
 
     /// <summary>
@@ -192,9 +210,9 @@ public class Quadtree
     {
         foreach (var agent in _agents)
         {
-            if (agent.Key.State == AgentState.Infected && agent.Value == false)
+            if (agent.Value.State == AgentState.Infected && !agent.Value.Skip)
             {
-                _infectedAgents.Add(agent.Key); // 処理を行うエージェントをリストに詰める
+                _infectedAgents.Add(agent.Value); // 処理を行うエージェントをリストに詰める
             }
         }
 
@@ -219,7 +237,24 @@ public class Quadtree
     {
         foreach (var agent in _infectedAgents)
         {
-            // ここで感染範囲内のエージェントをリストに追加
+            // 感染範囲を定義（例えば半径2マス）
+            int infectionRange = 2;
+
+            // 周囲の座標を調べ、感染範囲内にいるエージェントを取得
+            for (int dx = -infectionRange; dx <= infectionRange; dx++)
+            {
+                for (int dy = -infectionRange; dy <= infectionRange; dy++)
+                {
+                    (int, int) neighborCoord = (agent.X + dx, agent.Y + dy);
+
+                    // 辞書にその座標のエージェントが存在するか確認
+                    if (!_agents.TryGetValue(neighborCoord, out var otherAgent))
+                    {
+                        // 自身以外のエージェントであれば感染判定
+                        _checkAgents.Add(otherAgent);
+                    }
+                }
+            }
         }
         
         if (_subTrees.Count > 0)

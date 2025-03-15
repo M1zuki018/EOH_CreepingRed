@@ -11,6 +11,7 @@ public struct Agent
     public int X { get; private set; }
     public int Y { get; private set; }
     public AgentState State { get; set; }
+    public bool Skip{get;set;}
 
     // Randomは構造体に直接埋め込むのは難しいので、必要なときに生成する
     private static Random random = new Random();
@@ -22,6 +23,7 @@ public struct Agent
         X = x;
         Y = y;
         State = AgentState.Healthy;
+        Skip = false;
     }
 
     public void Move(Grid grid)
