@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using Cysharp.Threading.Tasks;
 using Unity.Burst;
 using Unity.Collections;
@@ -34,6 +35,7 @@ public class Quadtree
         _checkAgents = new List<Agent>();
     }
 
+    #region 初期化
     /// <summary>
     /// シミュレーションの初期化処理
     /// </summary>
@@ -202,6 +204,7 @@ public class Quadtree
         _subTrees.Add(new Quadtree(new Rect(x, y + halfHeight, halfWidth, halfHeight), _depth + 1), false);  // 左上
         _subTrees.Add(new Quadtree(new Rect(x + halfWidth, y + halfHeight, halfWidth, halfHeight), _depth + 1), false);  // 右上
     }
+    #endregion
 
     /// <summary>
     /// 感染状態のエージェントで、Skipフラグがfalseのエージェントを探す
@@ -210,7 +213,7 @@ public class Quadtree
     {
         foreach (var agent in _agents)
         {
-            if (agent.Value.State == AgentState.Infected && !agent.Value.Skip)
+            if (!agent.Value.Skip && agent.Value.State == AgentState.Infected)
             {
                 _infectedAgents.Add(agent.Value); // 処理を行うエージェントをリストに詰める
             }
@@ -273,15 +276,38 @@ public class Quadtree
     /// </summary>
     private void InfectionDetermination()
     {
-        InfectionJob job = new InfectionJob { agents = _checkAgents };
-        JobHandle jobHandle = job.Schedule(_checkAgents.Count, 64); // 64スレッド単位で並列処理
+        NativeArray<Agent> agentArray = new NativeArray<Agent>(_checkAgents.ToArray(), Allocator.TempJob);
+        
+        Stopwatch stopwatch = new Stopwatch();
+        stopwatch.Start();
+        InfectionJob job = new InfectionJob
+        {
+            agents = agentArray,
+            baseInfectionRate = 5f,
+            infectionMultiplier = 2
+        };
+        
+        JobHandle jobHandle = job.Schedule(agentArray.Length, 64); // 64スレッド単位で並列処理
         jobHandle.Complete();
+        
+        stopwatch.Stop();
+        
+        Debug.Log($"感染処理の実行時間{stopwatch.ElapsedMilliseconds}ミリ秒");
+        
+        // 結果を戻す
+        _checkAgents.Clear();
+        for (int i = 0; i < agentArray.Length; i++)
+        {
+            _checkAgents.Add(agentArray[i]);
+        }
+
+        agentArray.Dispose();
     }
 
     [BurstCompile]
     private struct InfectionJob : IJobParallelFor
     {
-        public List<Agent> agents;
+        [ReadOnly] public NativeArray<Agent> agents;
         public float baseInfectionRate;
         public float infectionMultiplier;
 
@@ -289,11 +315,12 @@ public class Quadtree
         {
             Agent agent = agents[index];
             
-            float infectionProbability = baseInfectionRate * infectionMultiplier;
+            float infectionProbability = baseInfectionRate * infectionMultiplier + 20; // 感染する確率
 
             // 感染判定
-            if (10 < infectionProbability)
+            if (infectionProbability > 10)
             {
+                Debug.Log("あ");
                 agent.State = AgentState.Infected;
             }
         }

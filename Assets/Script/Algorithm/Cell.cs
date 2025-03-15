@@ -22,7 +22,7 @@ public class Cell
     public Cell(int id, int citizen, int magicSoldier)
     {
         _id = id;
-        _quadtree = new Quadtree(new Rect(0, 0, 1000, 1000), 1000);
+        _quadtree = new Quadtree(new Rect(0, 0, 1000, 1000));
         StateCount = new AgentStateCount();
         
         InitializeAgents(citizen, magicSoldier).Forget();
