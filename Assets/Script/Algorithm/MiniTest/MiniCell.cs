@@ -23,8 +23,6 @@ public class MiniCell
         StateCount = new AgentStateCount();
         
         InitializeAgents(citizen, magicSoldier).Forget();
-        
-        
     }
 
     /// <summary>
@@ -51,7 +49,7 @@ public class MiniCell
         
         stopwatch.Stop();
         
-        Debug.Log($"シミュレーション更新　{stopwatch.ElapsedMilliseconds} ミリ秒");
+        Debug.Log($"シミュレーション更新:{_id} {stopwatch.ElapsedMilliseconds} ミリ秒");
         // ここでエージェントの状態をカウント
         UpdateStateCount();
     }

@@ -69,12 +69,8 @@ public class MiniGrid
         }
         
         // Gridの集計データをUIに反映
-        Debug.Log($"健常者: {TotalStateCount.Healthy}");
-        Debug.Log($"感染者: {TotalStateCount.Infected}");
-        Debug.Log($"仮死状態: {TotalStateCount.NearDeath}");
-        Debug.Log($"亡霊: {TotalStateCount.Ghost}");
-        Debug.Log($"完全死亡状態: {TotalStateCount.Perished}");
-        Debug.Log($"魔法士: {TotalStateCount.MagicSoldiers}");
+        Debug.Log($"健常者: {TotalStateCount.Healthy} 感染者: {TotalStateCount.Infected} 仮死状態: {TotalStateCount.NearDeath} " +
+                  $"亡霊: {TotalStateCount.Ghost} 完全死亡状態: {TotalStateCount.Perished} 魔法士: {TotalStateCount.MagicSoldiers}");
     }
     
     /// <summary>

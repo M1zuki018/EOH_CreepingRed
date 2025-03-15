@@ -53,9 +53,9 @@ public class MiniArea
         Y = settings.y;
         Name = settings.name;
         Category = settings.category;
-        Population = 10;
-        CitizenPopulation = 10;
-        MagicSoldierPopulation = 0;
+        Population = settings.population;
+        CitizenPopulation = settings.citizenPopulation;
+        MagicSoldierPopulation = settings.magicSoldierPopulation;
         AreaSize = settings.areaSize;
         PopulationDensity = settings.populationDensity;
         Security = settings.security;

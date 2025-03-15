@@ -12,7 +12,7 @@ using Debug = UnityEngine.Debug;
 /// </summary>
 public class MiniQuadtree
 {
-    private const int MAX_AGENTS = 2500; // 1区画の最大エージェント数
+    private const int MAX_AGENTS = 2500; // 1ツリーの最大エージェント数
     private const int MAX_DEPTH = 10; // 最大分割回数
     
     private Dictionary<MiniQuadtree, bool> _subTrees; // サブツリーとSkipフラグ
@@ -73,11 +73,6 @@ public class MiniQuadtree
         _agents.TryGetValue((0,0), out var test);
         test.State = AgentState.Infected;
         _agents[(0, 0)] = test;
-        
-        foreach (var agent in _agents)
-        {
-            Debug.Log($"座標({agent.Key.x}, {agent.Key.y}) 状態{agent.Value.State} スキップ{agent.Value.Skip}");
-        }
     }
 
     /// <summary>
@@ -180,7 +175,7 @@ public class MiniQuadtree
             _agents[(agent.X, agent.Y)] = agent; // 容量に空きがあり、分割数にも余裕があればエージェントを追加
             return;
         }
-
+        
         if (_subTrees.Count == 0)
         {
             // 子がいなければ、分割処理を行う
@@ -204,6 +199,8 @@ public class MiniQuadtree
     /// </summary>
     private void Subdivide() 
     {
+        Debug.Log("サブツリー生成");
+        
         float halfWidth = _bounds.width / 2f;
         float halfHeight = _bounds.height / 2f;
         float x = _bounds.xMin;
@@ -328,11 +325,11 @@ public class MiniQuadtree
                 _agents[coord] = updatedAgent; // 更新を反映
             }
         }
-
-        foreach (var agent in _agents)
-        {
-            Debug.Log($"座標({agent.Key.x}, {agent.Key.y}) 状態{agent.Value.State} スキップ{agent.Value.Skip}");
-        }
+        
+        // foreach (var agent in _agents)
+        // {
+        //     Debug.Log($"座標({agent.Key.x}, {agent.Key.y}) 状態{agent.Value.State} スキップ{agent.Value.Skip}");
+        // }
         
         // ジョブ処理後に _agentArray を Dispose する
         _agentArray.Dispose();
