@@ -21,8 +21,8 @@ public class MiniQuadtree
     private int _depth = 0; // 現在の分割数
     private int _maxX = 1000; // セル内の座標の横幅の上限
     
-    private List<Agent> _infectedAgents = new List<Agent>(); // 処理を行う感染済みのエージェント
-    private List<Agent> _checkAgents = new List<Agent>(); // 感染判定を行う対象のエージェント
+    private List<(int, int)> _infectedAgentsCoords = new List<(int, int)>(); // 処理を行う感染済みのエージェント
+    private List<(int, int)> _checkAgentCoords = new List<(int, int)>(); // 感染判定を行う対象のエージェント
 
     public MiniQuadtree(Rect bounds, int depth = 0)
     {
@@ -30,8 +30,8 @@ public class MiniQuadtree
         _depth = depth;
         _subTrees = new Dictionary<MiniQuadtree, bool>();
         _agents = new Dictionary<(int x, int y), Agent>();
-        _infectedAgents = new List<Agent>();
-        _checkAgents = new List<Agent>();
+        _infectedAgentsCoords = new List<(int, int)>();
+        _checkAgentCoords = new List<(int, int)>();
     }
 
     #region 初期化
@@ -66,6 +66,16 @@ public class MiniQuadtree
         stopwatch.Stop();
         
         Debug.Log($"一般市民{citizen} 魔法士{magicSoldier} 実行時間: {stopwatch.ElapsedMilliseconds} ミリ秒");
+        Debug.Log($"{_subTrees.Count} サブツリー");
+
+        _agents.TryGetValue((0,0), out var test);
+        test.State = AgentState.Infected;
+        _agents[(0, 0)] = test;
+        
+        foreach (var agent in _agents)
+        {
+            Debug.Log($"座標({agent.Key.x}, {agent.Key.y}) 状態{agent.Value.State} スキップ{agent.Value.Skip}");
+        }
     }
 
     /// <summary>
@@ -214,7 +224,7 @@ public class MiniQuadtree
         {
             if (!agent.Value.Skip && agent.Value.State == AgentState.Infected)
             {
-                _infectedAgents.Add(agent.Value); // 処理を行うエージェントをリストに詰める
+                _infectedAgentsCoords.Add(agent.Key); // 座標をリストに追加
             }
         }
 
@@ -237,9 +247,13 @@ public class MiniQuadtree
     /// </summary>
     private void GetInfectedAreas()
     {
-        foreach (var agent in _infectedAgents)
+        foreach (var coord in _infectedAgentsCoords)
         {
-            // 感染範囲を定義（例えば半径2マス）
+            // 対応するエージェントが取得出来なかったら以降の処理を行わないで次
+            if (!_agents.TryGetValue(coord, out var infectedAgent))
+                continue;
+            
+            // 感染範囲を定義
             int infectionRange = 2;
 
             // 周囲の座標を調べ、感染範囲内にいるエージェントを取得
@@ -247,13 +261,13 @@ public class MiniQuadtree
             {
                 for (int dy = -infectionRange; dy <= infectionRange; dy++)
                 {
-                    (int, int) neighborCoord = (agent.X + dx, agent.Y + dy);
+                    (int, int) neighborCoord = (infectedAgent.X + dx, infectedAgent.Y + dy);
 
                     // 辞書にその座標のエージェントが存在するか確認
-                    if (!_agents.TryGetValue(neighborCoord, out var otherAgent))
+                    if (_agents.ContainsKey(neighborCoord) && !_checkAgentCoords.Contains(neighborCoord))
                     {
                         // 自身以外のエージェントであれば感染判定
-                        _checkAgents.Add(otherAgent);
+                        _checkAgentCoords.Add(neighborCoord);
                     }
                 }
             }
@@ -275,10 +289,22 @@ public class MiniQuadtree
     /// </summary>
     private void InfectionDetermination()
     {
-        NativeArray<Agent> agentArray = new NativeArray<Agent>(_checkAgents.ToArray(), Allocator.TempJob);
+        NativeArray<Agent> agentArray = new NativeArray<Agent>(_checkAgentCoords.Count, Allocator.TempJob);
         
         Stopwatch stopwatch = new Stopwatch();
         stopwatch.Start();
+        
+        // エージェントを辞書からNaticeArrayに変換
+        int index = 0;
+        foreach (var coord in _checkAgentCoords)
+        {
+            if (_agents.TryGetValue(coord, out var agent))
+            {
+                agentArray[index] = agent;
+                index++;
+            }
+        }
+        
         InfectionJob job = new InfectionJob
         {
             agents = agentArray,
@@ -293,20 +319,30 @@ public class MiniQuadtree
         
         Debug.Log($"感染処理の実行時間{stopwatch.ElapsedMilliseconds}ミリ秒");
         
-        // 結果を戻す
-        _checkAgents.Clear();
+        // 結果を _agents に反映
         for (int i = 0; i < agentArray.Length; i++)
         {
-            _checkAgents.Add(agentArray[i]);
+            var updatedAgent = agentArray[i];
+            var coord = (updatedAgent.X, updatedAgent.Y);
+
+            if (_agents.ContainsKey(coord))
+            {
+                _agents[coord] = updatedAgent; // 更新を反映
+            }
         }
 
         agentArray.Dispose();
+        
+        foreach (var agent in _agents)
+        {
+            Debug.Log($"座標({agent.Key.x}, {agent.Key.y}) 状態{agent.Value.State} スキップ{agent.Value.Skip}");
+        }
     }
 
     [BurstCompile]
     private struct InfectionJob : IJobParallelFor
     {
-        [ReadOnly] public NativeArray<Agent> agents;
+        public NativeArray<Agent> agents;
         public float baseInfectionRate;
         public float infectionMultiplier;
 
@@ -319,9 +355,10 @@ public class MiniQuadtree
             // 感染判定
             if (infectionProbability > 10)
             {
-                Debug.Log("あ");
                 agent.State = AgentState.Infected;
             }
+            
+            agents[index] = agent; // 変更を反映
         }
     }
 }
