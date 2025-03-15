@@ -8,13 +8,13 @@ using UnityEngine;
 public class MiniTestSimulator : ViewBase
 {
     [SerializeField] private List<AreaSettingsSO> _areaSettings;
-    private Simulation _simulation;
+    private MiniSimulation _simulation;
     
     public override UniTask OnStart()
     {
         // ヨコ5マス×タテ4マスのグリッド
         // 人口は9,130万人
-        _simulation = new Simulation(_areaSettings);
+        _simulation = new MiniSimulation(_areaSettings);
         
         return base.OnStart();
     }
