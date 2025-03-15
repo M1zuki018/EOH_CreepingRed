@@ -13,7 +13,7 @@ using Debug = UnityEngine.Debug;
 /// </summary>
 public class MiniQuadtree
 {
-    private const int MAX_AGENTS = 1000; // 1ツリーの最大エージェント数
+    private const int MAX_AGENTS = 10000; // 1ツリーの最大エージェント数
     private const int MAX_DEPTH = 10; // 最大分割回数
     
     private Dictionary<MiniQuadtree, bool> _subTrees; // サブツリーとSkipフラグ
@@ -46,9 +46,14 @@ public class MiniQuadtree
     {
         Debug.Log($"受け取った数：一般市民{citizen} 魔法士{magicSoldier}");
 
+        Stopwatch stopwatch = new Stopwatch();
+        stopwatch.Start();
+        
         await GenerateAgents(citizen, magicSoldier);
         
-        Debug.Log($"生成完了 エージェントの数{_agents.Count}/サブツリーの数{_subTrees.Count}");
+        stopwatch.Stop();
+        
+        Debug.Log($"生成完了（実行時間:{stopwatch.ElapsedMilliseconds}ミリ秒） エージェントの数{_agents.Count}/サブツリーの数{_subTrees.Count}");
         
         _agents.TryGetValue((0,0), out var test);
         test.State = AgentState.Infected;
@@ -85,75 +90,6 @@ public class MiniQuadtree
         }
         
         await UniTask.Yield();
-    }
-
-    /// <summary>
-    /// バッチ処理用のジョブを実行する
-    /// </summary>
-    private async UniTask CreateAgentBatchAsync(int start, int end, AgentType type, NativeArray<Agent> agentArray)
-    {
-        int batchSize = end - start;
-
-        // ジョブを設定
-        CreateAgentJob job = new CreateAgentJob
-        {
-            start = start,
-            maxX = _maxX,
-            type = type,
-            agents = agentArray
-        };
-
-        JobHandle jobHandle = job.Schedule(batchSize, 64); // バッチサイズ64で並列化
-        jobHandle.Complete();
-    }
-    
-    /// <summary>
-    /// エージェントを生成するJob
-    /// </summary>
-    [BurstCompile]
-    private struct CreateAgentJob : IJobParallelFor
-    {
-        public int start;
-        public int maxX;
-        public AgentType type;
-        public NativeArray<Agent> agents;
-
-        public void Execute(int index)
-        {
-            // 座標の計算
-            int agentIndex = start + index;
-            int x = agentIndex % maxX;
-            int y = agentIndex / maxX;
-
-            // エージェントを追加
-            agents[index] = new Agent(agentIndex, type, x, y);
-        }
-    }
-
-    /// <summary>
-    /// バッチで生成したエージェントをツリーに追加
-    /// </summary>
-    private void InsertBatchAgents(NativeArray<Agent> agents, int batchSize)
-    {
-        int totalAgents = agents.Length;
-
-        for (int i = 0; i < totalAgents; i += batchSize)
-        {
-            int end = Mathf.Min(i + batchSize, totalAgents);
-            InsertBatch(agents, i, end);
-        }
-    }
-    
-    /// <summary>
-    /// バッチ内でエージェントを一度にツリーに追加
-    /// </summary>
-    private void InsertBatch(NativeArray<Agent> agents, int start, int end)
-    {
-        // バッチ内でエージェントを挿入
-        for (int i = start; i < end; i++)
-        {
-            Insert(agents[i]);
-        }
     }
     
     /// <summary>

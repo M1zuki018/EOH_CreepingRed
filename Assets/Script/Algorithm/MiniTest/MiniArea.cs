@@ -53,9 +53,9 @@ public class MiniArea
         Y = settings.y;
         Name = settings.name;
         Category = settings.category;
-        Population = settings.population * 10;
-        CitizenPopulation = settings.citizenPopulation * 10;
-        MagicSoldierPopulation = settings.magicSoldierPopulation * 10;
+        Population = settings.population * 100;
+        CitizenPopulation = settings.citizenPopulation * 100;
+        MagicSoldierPopulation = settings.magicSoldierPopulation * 100;
         AreaSize = settings.areaSize;
         PopulationDensity = settings.populationDensity;
         Security = settings.security;
@@ -65,7 +65,7 @@ public class MiniArea
         SpecialFlags = settings.specialFlags ?? new List<string>();
 
         // 初期状態
-        Healthy = Population * 10;
+        Healthy = Population * 100;
         Infected = 0;
         NearDeath = 0;
         Ghost = 0;
