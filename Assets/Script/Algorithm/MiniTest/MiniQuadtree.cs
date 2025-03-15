@@ -121,17 +121,6 @@ public class MiniQuadtree
                 Subdivide(); // 分割処理
             }
         }
-        
-        // サブツリーへの追加処理
-        foreach (var subTree in _subTrees)
-        {
-            if (agent.X >= subTree.Key._bounds.xMin && agent.X < subTree.Key._bounds.xMax && 
-                agent.Y >= subTree.Key._bounds.yMin && agent.Y < subTree.Key._bounds.yMax)  // サブツリーの範囲内である場合のみ追加
-            {
-                subTree.Key.Insert(agent);  // このサブツリーにのみエージェントを追加
-                break;  // 1つのサブツリーにのみ追加する
-            }
-        }
     }
 
     /// <summary>
