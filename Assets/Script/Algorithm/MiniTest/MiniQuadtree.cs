@@ -22,7 +22,9 @@ public class MiniQuadtree
     private int _maxX = 1000; // セル内の座標の横幅の上限
     
     private List<(int, int)> _infectedAgentsCoords = new List<(int, int)>(); // 処理を行う感染済みのエージェント
-    private List<(int, int)> _checkAgentCoords = new List<(int, int)>(); // 感染判定を行う対象のエージェント
+    private HashSet<(int, int)> _checkAgentCoords = new HashSet<(int, int)>(); // 感染判定を行う対象のエージェント
+    private JobHandle _infectionJobHandle;
+    private NativeArray<Agent> _agentArray;
 
     public MiniQuadtree(Rect bounds, int depth = 0)
     {
@@ -31,7 +33,7 @@ public class MiniQuadtree
         _subTrees = new Dictionary<MiniQuadtree, bool>();
         _agents = new Dictionary<(int x, int y), Agent>();
         _infectedAgentsCoords = new List<(int, int)>();
-        _checkAgentCoords = new List<(int, int)>();
+        _checkAgentCoords = new HashSet<(int, int)>();
     }
 
     #region 初期化
@@ -218,7 +220,7 @@ public class MiniQuadtree
     /// <summary>
     /// 感染状態のエージェントで、Skipフラグがfalseのエージェントを探す
     /// </summary>
-    public void SimulateInfection()
+    public JobHandle SimulateInfection()
     {
         foreach (var agent in _agents)
         {
@@ -230,22 +232,21 @@ public class MiniQuadtree
 
         if (_subTrees.Count > 0)
         {
-            foreach (var subTree in _subTrees)
+            foreach (var subTree in _subTrees.Keys)
             {
-                if (!subTree.Value)
-                {
-                    subTree.Key.SimulateInfection(); // サブツリーの処理
-                }
+                _infectionJobHandle = JobHandle.CombineDependencies(
+                    _infectionJobHandle, subTree.SimulateInfection()
+                );
             }
         }
 
-        GetInfectedAreas();
+        return GetInfectedAreas();
     }
 
     /// <summary>
-    /// 感染判定を行う範囲内のエージェントを取得する
+    /// 感染範囲内のエージェントを収集し、ジョブをスケジュール
     /// </summary>
-    private void GetInfectedAreas()
+    private JobHandle GetInfectedAreas()
     {
         foreach (var coord in _infectedAgentsCoords)
         {
@@ -275,54 +276,51 @@ public class MiniQuadtree
         
         if (_subTrees.Count > 0)
         {
-            foreach (var subTree in _subTrees)
+            foreach (var subTree in _subTrees.Keys)
             {
-                subTree.Key.GetInfectedAreas(); // サブツリーの処理
+                _infectionJobHandle = JobHandle.CombineDependencies(
+                    _infectionJobHandle, subTree.GetInfectedAreas()
+                );
             }
         }
-        
-        InfectionDetermination();
+
+        return InfectionDetermination();
     }
 
     /// <summary>
     /// 感染判定を並列処理で一斉に行う
     /// </summary>
-    private void InfectionDetermination()
+    private JobHandle InfectionDetermination()
     {
-        NativeArray<Agent> agentArray = new NativeArray<Agent>(_checkAgentCoords.Count, Allocator.TempJob);
+        _agentArray = new NativeArray<Agent>(_checkAgentCoords.Count, Allocator.TempJob);
         
-        Stopwatch stopwatch = new Stopwatch();
-        stopwatch.Start();
-        
-        // エージェントを辞書からNaticeArrayに変換
+        // エージェントを辞書からNativeArrayに変換
         int index = 0;
         foreach (var coord in _checkAgentCoords)
         {
             if (_agents.TryGetValue(coord, out var agent))
             {
-                agentArray[index] = agent;
+                _agentArray[index] = agent;
                 index++;
             }
         }
         
         InfectionJob job = new InfectionJob
         {
-            agents = agentArray,
+            agents = _agentArray,
             baseInfectionRate = 5f,
             infectionMultiplier = 2
         };
         
-        JobHandle jobHandle = job.Schedule(agentArray.Length, 64); // 64スレッド単位で並列処理
+        JobHandle jobHandle = job.Schedule(_agentArray.Length, 64); // 64スレッド単位で並列処理
+        
+        // ジョブが完了した後に Dispose を呼び出す
         jobHandle.Complete();
         
-        stopwatch.Stop();
-        
-        Debug.Log($"感染処理の実行時間{stopwatch.ElapsedMilliseconds}ミリ秒");
-        
         // 結果を _agents に反映
-        for (int i = 0; i < agentArray.Length; i++)
+        for (int i = 0; i < _agentArray.Length; i++)
         {
-            var updatedAgent = agentArray[i];
+            var updatedAgent = _agentArray[i];
             var coord = (updatedAgent.X, updatedAgent.Y);
 
             if (_agents.ContainsKey(coord))
@@ -331,11 +329,30 @@ public class MiniQuadtree
             }
         }
 
-        agentArray.Dispose();
-        
         foreach (var agent in _agents)
         {
             Debug.Log($"座標({agent.Key.x}, {agent.Key.y}) 状態{agent.Value.State} スキップ{agent.Value.Skip}");
+        }
+        
+        // ジョブ処理後に _agentArray を Dispose する
+        _agentArray.Dispose();
+        
+        return jobHandle;
+    }
+    
+    public IEnumerable<Agent> GetAllAgents()
+    {
+        foreach (var agent in _agents.Values)
+        {
+            yield return agent;
+        }
+
+        foreach (var subTree in _subTrees.Keys)
+        {
+            foreach (var agent in subTree.GetAllAgents())
+            {
+                yield return agent;
+            }
         }
     }
 
