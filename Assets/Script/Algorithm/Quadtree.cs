@@ -1,93 +1,266 @@
 using System.Collections.Generic;
-using System.Drawing;
+using System.Diagnostics;
+using Cysharp.Threading.Tasks;
+using Unity.Burst;
+using Unity.Collections;
+using Unity.Jobs;
+using UnityEngine;
+using Debug = UnityEngine.Debug;
 
 /// <summary>
-/// クアッドツリー
+/// Quadtreeを用いたエージェント管理システム
 /// </summary>
 public class Quadtree
 {
-    private int _capacity; // 容量の上限
-    private List<Agent> _agents;
-    private Rectangle _boundary; // 境界
-    private bool _divided = false;
-    private Quadtree _northwest, _northeast;
-
-    public Quadtree(Rectangle boundary, int capacity)
-    {
-        _boundary = boundary;
-        _capacity = capacity;
-        _agents = new List<Agent>();
-    }
-
-    /// <summary>
-    /// 処理が必要なエリアを取得する
-    /// </summary>
-    public List<Agent> GetInfectedAreas()
-    {
-        return _agents;
-    }
-
-    /// <summary>
-    /// 感染状況を更新する
-    /// </summary>
-    public void UpdateInfectedStatus(List<Agent> agents)
-    {
-        _agents = agents;
-    }
+    private const int MAX_AGENTS = 2500; // 1区画の最大エージェント数
+    private const int MAX_DEPTH = 10; // 最大分割回数
     
-    public bool Insert(Agent agent)
+    private Dictionary<Quadtree, bool> _subTrees; // サブツリーとSkipフラグ
+    private Dictionary<Agent, bool> _agents; // エージェントの情報
+    private Rect _bounds;
+    private int _depth = 0; // 現在の分割数
+    private int _maxX = 1000; // セル内の座標の横幅の上限
+    
+    private List<Agent> _infectedAgents = new List<Agent>(); // 処理を行う感染済みのエージェント
+    private List<Agent> _checkAgents = new List<Agent>(); // 感染判定を行う対象のエージェント
+
+    public Quadtree(Rect bounds, int depth = 0)
     {
-        if (!_boundary.Contains(agent.X, agent.Y))
+        _bounds = bounds;
+        _depth = depth;
+        _subTrees = new Dictionary<Quadtree, bool>();
+        _agents = new Dictionary<Agent, bool>();
+        _infectedAgents = new List<Agent>();
+        _checkAgents = new List<Agent>();
+    }
+
+    /// <summary>
+    /// シミュレーションの初期化処理
+    /// </summary>
+    public async UniTaskVoid InitializeAgents(int citizen, int magicSoldier)
+    {
+        var batchSize = 1000; // バッチサイズ
+        var tasks = new List<UniTask>();
+
+        Stopwatch stopwatch = new Stopwatch();
+        stopwatch.Start();
+        
+        // メモリプリアロケーション（必要なエージェント数分のメモリを確保）
+        NativeArray<Agent> citizenAgents = new NativeArray<Agent>(citizen, Allocator.TempJob);
+        NativeArray<Agent> magicSoldierAgents = new NativeArray<Agent>(magicSoldier, Allocator.TempJob);
+        
+        // 市民と魔法士のエージェントをバッチ処理で生成
+        tasks.AddRange(CreateAgentBatchTasks(citizen, AgentType.Citizen, batchSize, citizenAgents));
+        tasks.AddRange(CreateAgentBatchTasks(magicSoldier, AgentType.MagicSoldier, batchSize, magicSoldierAgents));
+        
+        await UniTask.WhenAll(tasks);  // 全てのタスクが完了するまで待機
+        
+        // 生成終了後にエージェントをツリーに追加する処理を行う
+        InsertBatchAgents(citizenAgents);
+        InsertBatchAgents(magicSoldierAgents);
+        
+        citizenAgents.Dispose();
+        magicSoldierAgents.Dispose();
+        
+        stopwatch.Stop();
+        
+        Debug.Log($"一般市民{citizen} 魔法士{magicSoldier} 実行時間: {stopwatch.ElapsedMilliseconds} ミリ秒");
+    }
+
+    /// <summary>
+    /// エージェントバッチ生成タスクを作成
+    /// </summary>
+    private List<UniTask> CreateAgentBatchTasks(int totalCount, AgentType type, int batchSize, NativeArray<Agent> agentArray)
+    {
+        var tasks = new List<UniTask>();
+
+        for (int i = 0; i < totalCount; i += batchSize)
         {
-            // 範囲外なら無視
-            return false;
+            int end = Mathf.Min(i + batchSize, totalCount);
+            tasks.Add(CreateAgentBatchAsync(i, end, type, agentArray));
         }
 
-        if (_agents.Count < _capacity)
+        return tasks;
+    }
+
+    /// <summary>
+    /// バッチ処理用のジョブを実行する
+    /// </summary>
+    private async UniTask CreateAgentBatchAsync(int start, int end, AgentType type, NativeArray<Agent> agentArray)
+    {
+        int batchSize = end - start;
+
+        // ジョブを設定
+        CreateAgentJob job = new CreateAgentJob
         {
-            // 容量に空きがあれば追加
-            _agents.Add(agent);
-            return true;
+            start = start,
+            maxX = _maxX,
+            type = type,
+            agents = agentArray
+        };
+
+        JobHandle jobHandle = job.Schedule(batchSize, 64); // バッチサイズ64で並列化
+        jobHandle.Complete(); // 完了まで待機
+    }
+
+    /// <summary>
+    /// バッチで生成したエージェントをツリーに追加
+    /// </summary>
+    private void InsertBatchAgents(NativeArray<Agent> agents)
+    {
+        foreach (var agent in agents)
+        {
+            Insert(agent);
+        }
+    }
+
+    /// <summary>
+    /// エージェントを生成するJob
+    /// </summary>
+    [BurstCompile]
+    private struct CreateAgentJob : IJobParallelFor
+    {
+        public int start;
+        public int maxX;
+        public AgentType type;
+        public NativeArray<Agent> agents;
+
+        public void Execute(int index)
+        {
+            // 座標の計算
+            int agentIndex = start + index;
+            int x = agentIndex % maxX;
+            int y = agentIndex / maxX;
+
+            // エージェントを追加
+            agents[index] = new Agent(agentIndex, type, x, y);
+        }
+    }
+
+
+    /// <summary>
+    /// エージェントをツリーに追加する処理
+    /// </summary>
+    private void Insert(Agent agent)
+    {
+        if (agent.X < _bounds.xMin || agent.X >= _bounds.xMax || agent.Y < _bounds.yMin || agent.Y >= _bounds.yMax)
+        {
+            return; // 範囲外なら無視
         }
 
-        if (!_divided)
+        if (_agents.Count < MAX_AGENTS || _depth >= MAX_DEPTH)
         {
-            // 分割して再配置を行う
+            _agents[agent] = false; // 容量に空きがあり、分割数にも余裕があればエージェントを追加
+            return;
+        }
+
+        if (_subTrees.Count == 0)
+        {
+            // 子がいなければ、分割処理を行う
             Subdivide();
         }
-        
-        return (_northwest.Insert(agent) || _northeast.Insert(agent));
+
+        // サブツリーへの追加処理
+        foreach (var subTree in _subTrees)
+        {
+            subTree.Key.Insert(agent);
+        }
+
     }
-    
+
     /// <summary>
-    /// 細分化処理
+    /// サブツリーを分割する処理
     /// </summary>
-    private void Subdivide() {
-        int x = _boundary.X, y = _boundary.Y;
-        int w = _boundary.Width / 2, h = _boundary.Height / 2;
-
-        _northwest = new Quadtree(new Rectangle(x, y, w, h), _capacity);
-        _northeast = new Quadtree(new Rectangle((x + w), y, w, h), _capacity);
-        
-        _divided = true;
-    }
-    /*
-    public List<Agent> Query(Rectangle range, List<Agent> found) 
+    private void Subdivide() 
     {
-        if (!_boundary.Intersects(range)) return found;
+        float halfWidth = _bounds.width / 2f;
+        float halfHeight = _bounds.height / 2f;
+        float x = _bounds.xMin;
+        float y = _bounds.yMin;
+        
+        // 4つのサブツリーを作成
+        _subTrees.Add(new Quadtree(new Rect(x, y, halfWidth, halfHeight), _depth + 1), false);  // 左下
+        _subTrees.Add(new Quadtree(new Rect(x + halfWidth, y, halfWidth, halfHeight), _depth + 1), false);  // 右下
+        _subTrees.Add(new Quadtree(new Rect(x, y + halfHeight, halfWidth, halfHeight), _depth + 1), false);  // 左上
+        _subTrees.Add(new Quadtree(new Rect(x + halfWidth, y + halfHeight, halfWidth, halfHeight), _depth + 1), false);  // 右上
+    }
 
-        foreach (var agent in _agents) {
-            if (range.Contains(agent.X, agent.Y)) {
-                found.Add(agent);
+    /// <summary>
+    /// 感染状態のエージェントで、Skipフラグがfalseのエージェントを探す
+    /// </summary>
+    public void SimulateInfection()
+    {
+        foreach (var agent in _agents)
+        {
+            if (agent.Key.State == AgentState.Infected && agent.Value == false)
+            {
+                _infectedAgents.Add(agent.Key); // 処理を行うエージェントをリストに詰める
             }
         }
 
-        if (_divided) {
-            _northwest.Query(range, found);
-            _northeast.Query(range, found);
+        if (_subTrees.Count > 0)
+        {
+            foreach (var subTree in _subTrees)
+            {
+                if (!subTree.Value)
+                {
+                    subTree.Key.SimulateInfection(); // サブツリーの処理
+                }
+            }
         }
 
-        return found;
+        GetInfectedAreas();
     }
-    */
+
+    /// <summary>
+    /// 感染判定を行う範囲内のエージェントを取得する
+    /// </summary>
+    private void GetInfectedAreas()
+    {
+        foreach (var agent in _infectedAgents)
+        {
+            // ここで感染範囲内のエージェントをリストに追加
+        }
+        
+        if (_subTrees.Count > 0)
+        {
+            foreach (var subTree in _subTrees)
+            {
+                subTree.Key.GetInfectedAreas(); // サブツリーの処理
+            }
+        }
+        
+        InfectionDetermination();
+    }
+
+    /// <summary>
+    /// 感染判定を並列処理で一斉に行う
+    /// </summary>
+    private void InfectionDetermination()
+    {
+        InfectionJob job = new InfectionJob { agents = _checkAgents };
+        JobHandle jobHandle = job.Schedule(_checkAgents.Count, 64); // 64スレッド単位で並列処理
+        jobHandle.Complete();
+    }
+
+    [BurstCompile]
+    private struct InfectionJob : IJobParallelFor
+    {
+        public List<Agent> agents;
+        public float baseInfectionRate;
+        public float infectionMultiplier;
+
+        public void Execute(int index)
+        {
+            Agent agent = agents[index];
+            
+            float infectionProbability = baseInfectionRate * infectionMultiplier;
+
+            // 感染判定
+            if (10 < infectionProbability)
+            {
+                agent.State = AgentState.Infected;
+            }
+        }
+    }
 }

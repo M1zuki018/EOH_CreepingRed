@@ -33,11 +33,9 @@ public struct Agent
         Y = Math.Max(0, Math.Min(grid.Areas.GetLength(1) - 1, Y + dy));
     }
 
-    public int CountInfectedNeighbors()
-    {
-        return 5;
-    }
-
+    /// <summary>
+    /// 感染
+    /// </summary>
     public void Infect()
     {
         State = AgentState.Infected;
