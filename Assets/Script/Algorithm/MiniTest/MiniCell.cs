@@ -22,15 +22,16 @@ public class MiniCell
         _quadtree = new MiniQuadtree(new Rect(0, 0, 1000, 1000));
         StateCount = new AgentStateCount();
         
-        InitializeAgents(citizen, magicSoldier).Forget();
+        InitializeAgents(citizen, magicSoldier);
     }
 
     /// <summary>
     /// エージェントの生成
     /// </summary>
-    private async UniTaskVoid InitializeAgents(int citizen, int magicSoldier)
+    private void InitializeAgents(int citizen, int magicSoldier)
     {
         _quadtree.InitializeAgents(citizen, magicSoldier).Forget();
+        
     }
 
     /// <summary>

@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using Cysharp.Threading.Tasks;
 using Unity.Burst;
 using Unity.Collections;
@@ -12,7 +13,7 @@ using Debug = UnityEngine.Debug;
 /// </summary>
 public class MiniQuadtree
 {
-    private const int MAX_AGENTS = 2500; // 1ツリーの最大エージェント数
+    private const int MAX_AGENTS = 1000; // 1ツリーの最大エージェント数
     private const int MAX_DEPTH = 10; // 最大分割回数
     
     private Dictionary<MiniQuadtree, bool> _subTrees; // サブツリーとSkipフラグ
@@ -25,6 +26,7 @@ public class MiniQuadtree
     private HashSet<(int, int)> _checkAgentCoords = new HashSet<(int, int)>(); // 感染判定を行う対象のエージェント
     private JobHandle _infectionJobHandle;
     private NativeArray<Agent> _agentArray;
+    private readonly object _subdivideLock = new object();  // ロックオブジェクト
 
     public MiniQuadtree(Rect bounds, int depth = 0)
     {
@@ -42,53 +44,47 @@ public class MiniQuadtree
     /// </summary>
     public async UniTaskVoid InitializeAgents(int citizen, int magicSoldier)
     {
-        var batchSize = 1000; // バッチサイズ
-        var tasks = new List<UniTask>();
+        Debug.Log($"受け取った数：一般市民{citizen} 魔法士{magicSoldier}");
 
-        Stopwatch stopwatch = new Stopwatch();
-        stopwatch.Start();
+        await GenerateAgents(citizen, magicSoldier);
         
-        // メモリプリアロケーション（必要なエージェント数分のメモリを確保）
-        NativeArray<Agent> citizenAgents = new NativeArray<Agent>(citizen, Allocator.TempJob);
-        NativeArray<Agent> magicSoldierAgents = new NativeArray<Agent>(magicSoldier, Allocator.TempJob);
+        Debug.Log($"生成完了 エージェントの数{_agents.Count}/サブツリーの数{_subTrees.Count}");
         
-        // 市民と魔法士のエージェントをバッチ処理で生成
-        tasks.AddRange(CreateAgentBatchTasks(citizen, AgentType.Citizen, batchSize, citizenAgents));
-        tasks.AddRange(CreateAgentBatchTasks(magicSoldier, AgentType.MagicSoldier, batchSize, magicSoldierAgents));
-        
-        await UniTask.WhenAll(tasks);  // 全てのタスクが完了するまで待機
-        
-        // 生成終了後にエージェントをツリーに追加する処理を行う
-        InsertBatchAgents(citizenAgents, batchSize);
-        InsertBatchAgents(magicSoldierAgents, batchSize);
-        
-        citizenAgents.Dispose();
-        magicSoldierAgents.Dispose();
-        
-        stopwatch.Stop();
-        
-        Debug.Log($"一般市民{citizen} 魔法士{magicSoldier} 実行時間: {stopwatch.ElapsedMilliseconds} ミリ秒");
-        Debug.Log($"{_subTrees.Count} サブツリー");
-
         _agents.TryGetValue((0,0), out var test);
         test.State = AgentState.Infected;
         _agents[(0, 0)] = test;
     }
 
-    /// <summary>
-    /// エージェントバッチ生成タスクを作成
-    /// </summary>
-    private List<UniTask> CreateAgentBatchTasks(int totalCount, AgentType type, int batchSize, NativeArray<Agent> agentArray)
+    private async UniTask GenerateAgents(int citizen, int magicSoldier)
     {
-        var tasks = new List<UniTask>();
-
-        for (int i = 0; i < totalCount; i += batchSize)
+        int i = 0;
+        // エージェントを並列処理で生成
+        for (; i < citizen; i++)
         {
-            int end = Mathf.Min(i + batchSize, totalCount);
-            tasks.Add(CreateAgentBatchAsync(i, end, type, agentArray));
-        }
+            // 座標の計算（必要に応じてロジックを変更）
+            int x = i % _maxX;  // 例：X座標の計算
+            int y = i / _maxX;  // 例：Y座標の計算
 
-        return tasks;
+            _agents[(x, y)] = new Agent(i, AgentType.Citizen, x, y);
+        
+            // クワッドツリーに追加（非同期で追加）
+            Insert(_agents[(x, y)]);
+        }
+        
+        // エージェントを並列処理で生成
+        for (; i < citizen + magicSoldier; i++)
+        {
+            // 座標の計算（必要に応じてロジックを変更）
+            int x = i % _maxX;  // 例：X座標の計算
+            int y = i / _maxX;  // 例：Y座標の計算
+
+            _agents[(x, y)] = new Agent(i, AgentType.MagicSoldier, x, y);
+        
+            // クワッドツリーに追加（非同期で追加）
+            Insert(_agents[(x, y)]);
+        }
+        
+        await UniTask.Yield();
     }
 
     /// <summary>
@@ -108,7 +104,7 @@ public class MiniQuadtree
         };
 
         JobHandle jobHandle = job.Schedule(batchSize, 64); // バッチサイズ64で並列化
-        jobHandle.Complete(); // 完了まで待機
+        jobHandle.Complete();
     }
     
     /// <summary>
@@ -170,23 +166,31 @@ public class MiniQuadtree
             return; // 範囲外なら無視
         }
 
-        if (_agents.Count < MAX_AGENTS || _depth >= MAX_DEPTH)
+        if (_agents.Count < MAX_AGENTS)
         {
-            _agents[(agent.X, agent.Y)] = agent; // 容量に空きがあり、分割数にも余裕があればエージェントを追加
+            _agents[(agent.X, agent.Y)] = agent; // 容量に空きがあったらそのままエージェントを追加
+            return;
+        }
+
+        if (_depth >= MAX_DEPTH) // 分割数に余裕がない場合
+        {
+            _agents[(agent.X, agent.Y)] = agent; // そのままエージェントを追加
             return;
         }
         
-        if (_subTrees.Count == 0)
+        lock (_subdivideLock)  // 排他制御を行って分割処理をシリアルに実行
         {
-            // 子がいなければ、分割処理を行う
-            Subdivide();
+            if (_subTrees.Count == 0)  // 既にサブツリーが作成されていない場合のみ分割
+            {
+                Subdivide(); // 分割処理
+            }
         }
-
+        
         // サブツリーへの追加処理
         foreach (var subTree in _subTrees)
         {
-            if (agent.X < subTree.Key._bounds.xMin || agent.X >= subTree.Key._bounds.xMax || 
-                agent.Y < subTree.Key._bounds.yMin || agent.Y >= subTree.Key._bounds.yMax)  // サブツリーの範囲内である場合のみ追加
+            if (agent.X >= subTree.Key._bounds.xMin && agent.X < subTree.Key._bounds.xMax && 
+                agent.Y >= subTree.Key._bounds.yMin && agent.Y < subTree.Key._bounds.yMax)  // サブツリーの範囲内である場合のみ追加
             {
                 subTree.Key.Insert(agent);  // このサブツリーにのみエージェントを追加
                 break;  // 1つのサブツリーにのみ追加する
@@ -213,6 +217,8 @@ public class MiniQuadtree
         _subTrees.Add(new MiniQuadtree(new Rect(x + halfWidth, y + halfHeight, halfWidth, halfHeight), _depth + 1), false);  // 右上
     }
     #endregion
+
+    #region 感染処理
 
     /// <summary>
     /// 感染状態のエージェントで、Skipフラグがfalseのエージェントを探す
@@ -326,11 +332,6 @@ public class MiniQuadtree
             }
         }
         
-        // foreach (var agent in _agents)
-        // {
-        //     Debug.Log($"座標({agent.Key.x}, {agent.Key.y}) 状態{agent.Value.State} スキップ{agent.Value.Skip}");
-        // }
-        
         // ジョブ処理後に _agentArray を Dispose する
         _agentArray.Dispose();
         
@@ -375,4 +376,6 @@ public class MiniQuadtree
             agents[index] = agent; // 変更を反映
         }
     }
+
+    #endregion
 }
