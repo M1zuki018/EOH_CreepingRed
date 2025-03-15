@@ -10,7 +10,7 @@ using Debug = UnityEngine.Debug;
 /// </summary>
 public class MiniSimulation : IDisposable
 {
-    private Grid _grid;
+    private MiniGrid _grid;
     private TimeManager _timeManager;
     private int day = 0;
     private int timeStep = 0;
@@ -18,7 +18,7 @@ public class MiniSimulation : IDisposable
 
     public MiniSimulation(List<AreaSettingsSO> areaSettings)
     {
-        _grid = new Grid(areaSettings); // グリッドを生成する
+        _grid = new MiniGrid(areaSettings); // グリッドを生成する
         _timeManager = new TimeManager(); // 時間を管理するクラスを生成
 
         _timeManager.GameTimeProp.Subscribe(UpdateSimulation);
