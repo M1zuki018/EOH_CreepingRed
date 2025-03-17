@@ -5,16 +5,19 @@ using UnityEngine;
 /// <summary>
 /// シミュレーションテスト用のクラス
 /// </summary>
-public class TestSimulator : ViewBase
+public class TestSimulator : ViewBase, ISimulator
 {
     [SerializeField] private List<AreaSettingsSO> AreaSettings = new List<AreaSettingsSO>();
     private Simulation _simulation;
+    private ITimeObservable _timeManager;
+    public ITimeObservable TimeManager => _timeManager;
 
     public override UniTask OnStart()
     {
+        _timeManager = new TimeManager();
         // ヨコ5マス×タテ4マスのグリッド
         // 人口は9,130万人
-        _simulation = new Simulation(AreaSettings);
+        _simulation = new Simulation(AreaSettings, _timeManager);
 
         return base.OnStart();
     }

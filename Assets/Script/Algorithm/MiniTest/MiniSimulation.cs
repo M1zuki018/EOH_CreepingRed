@@ -13,11 +13,11 @@ public class MiniSimulation : IDisposable
     private MiniGrid _grid;
     private ITimeObservable _timeObserver;
 
-    public MiniSimulation(List<AreaSettingsSO> areaSettings)
+    public MiniSimulation(List<AreaSettingsSO> areaSettings, ITimeObservable timeObserver)
     {
         _grid = new MiniGrid(areaSettings); // グリッドを生成する
-        _timeObserver = new TimeManager(); // 時間を管理するクラスを生成
-
+        _timeObserver = timeObserver;
+            
         _timeObserver.GameTimeProp.Subscribe(UpdateSimulation);
     }
     

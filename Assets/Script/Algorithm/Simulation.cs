@@ -13,10 +13,10 @@ public class Simulation : IDisposable
     private Grid _grid;
     private ITimeObservable _timeObserver;
 
-    public Simulation(List<AreaSettingsSO> areaSettings)
+    public Simulation(List<AreaSettingsSO> areaSettings, ITimeObservable timeObserver)
     {
         _grid = new Grid(areaSettings); // グリッドを生成する
-        _timeObserver = new TimeManager(); // 時間を管理するクラスを生成
+        _timeObserver = timeObserver;
 
         _timeObserver.GameTimeProp.Subscribe(UpdateSimulation);
     }

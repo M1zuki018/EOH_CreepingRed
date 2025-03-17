@@ -1,11 +1,13 @@
 using Cysharp.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.UI;
 
 /// <summary>
 /// InGameシーンのUI全体を管理するManager
 /// </summary>
 public class InGameSceneUIManager : UIManagerBase
 {
+    [SerializeField, HighlightIfNull] private Text _timeText;
     [SerializeField, HighlightIfNull] private BaseViewUIController _baseView;
     
     public override UniTask OnAwake()
@@ -20,6 +22,7 @@ public class InGameSceneUIManager : UIManagerBase
 
     public override UniTask OnBind()
     {
+        new TimeView(_timeText, FindAnyObjectByType<GameManager>().TimeManager);
         _baseView.OnMacroView += () => ShowMacroView();
         
         return base.OnBind();
