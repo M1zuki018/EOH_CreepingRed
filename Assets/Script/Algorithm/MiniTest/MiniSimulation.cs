@@ -12,9 +12,6 @@ public class MiniSimulation : IDisposable
 {
     private MiniGrid _grid;
     private TimeManager _timeManager;
-    private int day = 0;
-    private int timeStep = 0;
-    private int maxDays = 30;  // 1ヶ月
 
     public MiniSimulation(List<AreaSettingsSO> areaSettings)
     {

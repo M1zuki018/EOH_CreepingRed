@@ -12,9 +12,6 @@ public class Simulation : IDisposable
 {
     private Grid _grid;
     private TimeManager _timeManager;
-    private int day = 0;
-    private int timeStep = 0;
-    private int maxDays = 30;  // 1ヶ月
 
     public Simulation(List<AreaSettingsSO> areaSettings)
     {
