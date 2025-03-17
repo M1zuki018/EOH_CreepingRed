@@ -9,7 +9,6 @@ public class TimeManager : ITimeObservable, IDisposable
     private readonly ReactiveProperty<float> _timeScaleProp = new ReactiveProperty<float>(1); // 倍速
     private readonly ReactiveProperty<int> _gameTimeProp = new ReactiveProperty<int>(0); // ゲーム内時間
     
-    public ReadOnlyReactiveProperty<float> TimeScaleProp => _timeScaleProp;
     public ReadOnlyReactiveProperty<int> GameTimeProp => _gameTimeProp;
     
     private IDisposable _timeSubscription;
