@@ -1,4 +1,5 @@
 using Cysharp.Threading.Tasks;
+using UnityEngine;
 
 /// <summary>
 /// GameManager
@@ -10,6 +11,10 @@ public class GameManager : ViewBase
     public override UniTask OnAwake()
     {
         TimeManager = FindActiveSimulator().TimeManager;
+        if (TimeManager == null)
+        {
+            Debug.LogError("\u274c\u274c\u274c GameManager : TimeManagerが取得できませんでした \u274c\u274c\u274c");
+        }
         
         return base.OnAwake();
     }
@@ -19,16 +24,8 @@ public class GameManager : ViewBase
     /// </summary>
     private ISimulator FindActiveSimulator()
     {
-        if (FindAnyObjectByType<TestSimulator>() != null)
-        {
-            return FindAnyObjectByType<TestSimulator>();
-        }
-        if (FindAnyObjectByType<MiniTestSimulator>() != null)
-        {
-            return FindAnyObjectByType<MiniTestSimulator>();
-        }
-        
-        return FindAnyObjectByType<UITestSimulator>();
-        
+        return (ISimulator)FindAnyObjectByType<TestSimulator>() ??
+               (ISimulator)FindAnyObjectByType<MiniTestSimulator>() ??
+               (ISimulator)FindAnyObjectByType<UITestSimulator>();
     }
 }

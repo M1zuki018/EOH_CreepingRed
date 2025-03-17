@@ -1,7 +1,7 @@
 using Cysharp.Threading.Tasks;
 
 /// <summary>
-/// 
+/// UITest用のSimulatorクラス
 /// </summary>
 public class UITestSimulator : ViewBase, ISimulator
 {
@@ -9,10 +9,10 @@ public class UITestSimulator : ViewBase, ISimulator
     private ITimeObservable _timeManager;
     public ITimeObservable TimeManager => _timeManager;
 
-    public override UniTask OnStart()
+    public override UniTask OnAwake()
     {
         _timeManager = new TimeManager();
 
-        return base.OnStart();
+        return base.OnAwake();
     }
 }

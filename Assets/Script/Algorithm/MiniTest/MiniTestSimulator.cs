@@ -13,13 +13,13 @@ public class MiniTestSimulator : ViewBase, ISimulator
     private ITimeObservable _timeManager;
     public ITimeObservable TimeManager => _timeManager;
     
-    public override UniTask OnStart()
+    public override UniTask OnAwake()
     {
         _timeManager = new TimeManager();
         // ヨコ5マス×タテ4マスのグリッド
         // 人口は9,130万人
         _simulation = new MiniSimulation(_areaSettings, _timeManager);
         
-        return base.OnStart();
+        return base.OnAwake();
     }
 }
