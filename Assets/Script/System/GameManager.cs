@@ -13,7 +13,9 @@ public class GameManager : ViewBase
         TimeManager = FindActiveSimulator().TimeManager;
         if (TimeManager == null)
         {
-            Debug.LogError("\u274c\u274c\u274c GameManager : TimeManagerが取得できませんでした \u274c\u274c\u274c");
+            // Simulatorクラスを生成したあとに呼ばないとnullになるので注意
+            Debug.LogError("\u274c\u274c\u274c GameManager : TimeManagerが取得できませんでした \u274c\u274c\u274c" +
+                           "\ud83d\udea8 実行順がSimulator -> GameManagerであることを確認してください\ud83d\udea8");
         }
         
         return base.OnAwake();

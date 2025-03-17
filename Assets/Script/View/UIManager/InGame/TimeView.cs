@@ -1,6 +1,5 @@
 using System;
 using R3;
-using UnityEngine;
 using UnityEngine.UI;
 
 /// <summary>
@@ -10,11 +9,14 @@ public class TimeView : IDisposable
 {
     private Text _timeText;
     private ITimeObservable _timeObservable;
+    private DateTime _currentTime;
 
     public TimeView(Text timeText, ITimeObservable timeObservable)
     {
         _timeText = timeText;
         _timeObservable = timeObservable;
+        
+        _currentTime = new DateTime(2100, 08, 23, 14, 00, 00); // 初期の日付 2100-08-23 14:00:00
         
         _timeObservable.GameTimeProp.Subscribe(_ => UpdateTimeView()); // 時間更新のPropの購読を開始
     }
@@ -24,7 +26,8 @@ public class TimeView : IDisposable
     /// </summary>
     private void UpdateTimeView()
     {
-        Debug.Log("Time");
+        _currentTime = _currentTime.AddHours(2); // _currentTimeを更新
+        _timeText.text = _currentTime.ToString("yyyy-MM-dd\nHH:mm"); // フォーマットを整えて書き換え
     }
 
     public void Dispose()
