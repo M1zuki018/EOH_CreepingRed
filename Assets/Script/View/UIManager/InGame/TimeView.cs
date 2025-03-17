@@ -7,8 +7,8 @@ using UnityEngine.UI;
 /// </summary>
 public class TimeView : IDisposable
 {
-    private Text _timeText;
-    private ITimeObservable _timeObservable;
+    private readonly Text _timeText;
+    private readonly ITimeObservable _timeObservable;
     private DateTime _currentTime;
 
     public TimeView(Text timeText, ITimeObservable timeObservable)

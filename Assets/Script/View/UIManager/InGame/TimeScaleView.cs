@@ -1,21 +1,18 @@
 using UnityEngine.UI;
 
 /// <summary>
-/// ゲーム内時間の倍速を操作するボタンのView
+/// ゲーム内時間の倍速を操作するボタンに対して、倍速を変更するメソッドを購読させる
 /// </summary>
 public class TimeScaleView
 {
-    private Button[] _timeScaleButtons;
-    private ITimeObservable _timeObservable;
-    
     public TimeScaleView(Button[] timeScaleButtons, ITimeObservable timeObservable)
     {
-        _timeScaleButtons = timeScaleButtons;
-        _timeObservable = timeObservable;
+        var timeScaleButtons1 = timeScaleButtons;
+        var timeObservable1 = timeObservable;
         
-        _timeScaleButtons[0].onClick.AddListener(() => _timeObservable.SetTimeScale(0));
-        _timeScaleButtons[1].onClick.AddListener(() => _timeObservable.SetTimeScale(1));
-        _timeScaleButtons[2].onClick.AddListener(() => _timeObservable.SetTimeScale(2));
-        _timeScaleButtons[3].onClick.AddListener(() => _timeObservable.SetTimeScale(3));
+        timeScaleButtons1[0].onClick.AddListener(() => timeObservable1.SetTimeScale(0));
+        timeScaleButtons1[1].onClick.AddListener(() => timeObservable1.SetTimeScale(1));
+        timeScaleButtons1[2].onClick.AddListener(() => timeObservable1.SetTimeScale(2));
+        timeScaleButtons1[3].onClick.AddListener(() => timeObservable1.SetTimeScale(3));
     }
 }
