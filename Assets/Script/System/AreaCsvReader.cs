@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using UnityEditor;
 using UnityEngine;
@@ -52,8 +53,8 @@ public class AreaCsvReader : EditorWindow
         
         Directory.CreateDirectory(_outputPath); // フォルダを再作成
         
-        
         string[] lines = File.ReadAllLines(_csvFilePath);
+        List<AreaSettingsSO> createdAreas = new List<AreaSettingsSO>();
         
         // 縦横共にヘッダー行列があるので、その部分は読み飛ばす
         // 19エリア分を処理
@@ -79,12 +80,30 @@ public class AreaCsvReader : EditorWindow
             
             string assetPath = $"{_outputPath}{areaSettings.Name.ToString()}.asset";
             AssetDatabase.CreateAsset(areaSettings, assetPath);
+            createdAreas.Add(areaSettings);
         }
         
         AssetDatabase.SaveAssets();
         AssetDatabase.Refresh();
+        
+        AssignAreasToSimulator(createdAreas);
 
         Debug.Log("ScriptableObjectの生成が完了しました！");
+    }
+
+    /// <summary>
+    /// SimulatorクラスのAreaSettingsのリストに自動アサインする
+    /// </summary>
+    private void AssignAreasToSimulator(List<AreaSettingsSO> createdAreas)
+    {
+        TestSimulator simulator = FindObjectOfType<TestSimulator>();
+        if (simulator == null)
+        {
+            Debug.LogWarning("シーン内にSimulatorが見つかりません！");
+            return;
+        }
+        simulator.RegisterAreas(createdAreas);
+        Debug.Log($"Simulatorに {createdAreas.Count} 個の区域を登録しました。");
     }
 
     /// <summary>
