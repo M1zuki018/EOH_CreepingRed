@@ -9,16 +9,17 @@ using UnityEngine;
 /// </summary>
 public class AreaCsvReader : EditorWindow
 {
+    private const int AreaCount = 19;
     private string _csvFilePath = "Assets/Data/CSV/AreaData.csv"; // csvファイルのパス
     private string _outputPath = "Assets/Data/AreaData/"; // スクリプタブルオブジェクトを出力する先のファイル
 
-    [MenuItem("Tools/Creeping Red/AreaCsvReader")]
+    [MenuItem("Creeping Red/AreaCsvReader")]
     public static void ShowWindow()
     {
         GetWindow<AreaCsvReader>("AreaScvReader");
     }
 
-    void OnGUI()
+    private void OnGUI()
     {
         GUILayout.Label("区域データcsvファイルからScriptableObjectを生成", EditorStyles.boldLabel);
 
@@ -58,35 +59,47 @@ public class AreaCsvReader : EditorWindow
         
         // 縦横共にヘッダー行列があるので、その部分は読み飛ばす
         // 19エリア分を処理
-        for (int i = 1; i < 1 + 19; i++)
+        for (int i = 1; i < 1 + AreaCount; i++)
         {
             string[] values = lines[i].Split(',');
             
-            AreaSettingsSO areaSettings = CreateInstance<AreaSettingsSO>();
-            areaSettings.X = int.Parse(values[1]); 
-            areaSettings.Y = int.Parse(values[2]);
-            areaSettings.Name = ConversionSectionName(values[3]);
-            areaSettings.Explaination = values[4];
-            areaSettings.Category = ConversionCategoryName(values[5]);
-            areaSettings.Population = int.Parse(values[6]);
-            areaSettings.CitizenPopulation = int.Parse(values[7]);
-            areaSettings.MagicSoldierPopulation = int.Parse(values[8]);
-            areaSettings.AreaSize = float.Parse(values[9]);
-            areaSettings.PopulationDensity = int.Parse(values[10]);
-            areaSettings.Security = int.Parse(values[11]);
-            areaSettings.MobilityRate = int.Parse(values[12]);
-            areaSettings.InfectionRate = int.Parse(values[13]);
-            areaSettings.Control = int.Parse(values[14]);
-            
-            string assetPath = $"{_outputPath}{areaSettings.Name.ToString()}.asset";
-            AssetDatabase.CreateAsset(areaSettings, assetPath);
-            createdAreas.Add(areaSettings);
+            if (values.Length < 15)
+            {
+                Debug.LogWarning($"CSVデータが不足しています (行 {i})");
+                continue;
+            }
+
+            try
+            {
+                AreaSettingsSO areaSettings = CreateInstance<AreaSettingsSO>();
+                areaSettings.X = int.Parse(values[1]);
+                areaSettings.Y = int.Parse(values[2]);
+                areaSettings.Name = ConversionSectionName(values[3]);
+                areaSettings.Explaination = values[4];
+                areaSettings.Category = ConversionCategoryName(values[5]);
+                areaSettings.Population = int.Parse(values[6]);
+                areaSettings.CitizenPopulation = int.Parse(values[7]);
+                areaSettings.MagicSoldierPopulation = int.Parse(values[8]);
+                areaSettings.AreaSize = float.Parse(values[9]);
+                areaSettings.PopulationDensity = int.Parse(values[10]);
+                areaSettings.Security = int.Parse(values[11]);
+                areaSettings.MobilityRate = int.Parse(values[12]);
+                areaSettings.InfectionRate = int.Parse(values[13]);
+                areaSettings.Control = int.Parse(values[14]);
+
+                string assetPath = $"{_outputPath}{areaSettings.Name.ToString()}.asset";
+                AssetDatabase.CreateAsset(areaSettings, assetPath);
+                createdAreas.Add(areaSettings);
+            }
+            catch (Exception ex) when (ex is FormatException || ex is OverflowException)
+            {
+                Debug.LogError($"CSVデータの変換エラー (行 {i}): {ex.Message}");
+            }
         }
         
         AssetDatabase.SaveAssets();
         AssetDatabase.Refresh();
-        
-        AssignAreasToSimulator(createdAreas);
+        AssignAreasToSimulator(createdAreas); // 自動アサイン
 
         Debug.Log("ScriptableObjectの生成が完了しました！");
     }

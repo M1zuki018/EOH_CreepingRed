@@ -48,7 +48,7 @@ public class ButtonDrawer : Editor
     /// <summary>
     /// ButtonDrawerの有効/無効を切り替える
     /// </summary>
-    [MenuItem("Tools/Toggle ButtonDrawer")]
+    [MenuItem("Creeping Red/Toggle ButtonDrawer")]
     public static void ToggleButtonDrawer()
     {
         isEnabled = !isEnabled;

@@ -16,7 +16,7 @@ public class ScriptCreationWindow : EditorWindow
     private string _enumPath = "Assets";
     private readonly string _templateFolderPath = "Assets/Script/ScriptTemplates";
     
-    [MenuItem("Tools/Script Creation Window")]
+    [MenuItem("Creeping Red/Script Creation Window")]
     public static void ShowWindow()
     {
         // ウィンドウを表示
