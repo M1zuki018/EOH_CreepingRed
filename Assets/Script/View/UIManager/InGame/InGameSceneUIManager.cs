@@ -7,7 +7,8 @@ using UnityEngine.UI;
 /// </summary>
 public class InGameSceneUIManager : UIManagerBase
 {
-    [SerializeField, HighlightIfNull] private Text _timeText;
+    [SerializeField, HighlightIfNull, Comment("日付テキスト")] private Text _timeText;
+    [SerializeField, HighlightIfNull, Comment("倍速ボタン")] private Button[] _timeScaleButtons = new Button[4];
     [SerializeField, HighlightIfNull] private BaseViewUIController _baseView;
     
     public override UniTask OnAwake()
@@ -22,7 +23,9 @@ public class InGameSceneUIManager : UIManagerBase
 
     public override UniTask OnBind()
     {
-        new TimeView(_timeText, FindAnyObjectByType<GameManager>().TimeManager);
+        ITimeObservable timeManager = FindAnyObjectByType<GameManager>().TimeManager;
+        new TimeView(_timeText, timeManager);
+        new TimeScaleView(_timeScaleButtons, timeManager);
         _baseView.OnMacroView += () => ShowMacroView();
         
         return base.OnBind();
