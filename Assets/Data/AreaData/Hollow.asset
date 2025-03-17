@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 65b5aee03a9e6c149b0d7f369996c783, type: 3}
+  m_Name: Hollow
+  m_EditorClassIdentifier: 
+  X: 4
+  Y: 2
+  Name: 14
+  Explaination: "\u2026\u3053\u3053\u3067\u3057\u304B\u66AE\u3089\u305B\u306A\u3044\u8005\u305F\u3061\u3082\u3044\u308B"
+  Category: 5
+  Population: 250
+  CitizenPopulation: 250
+  MagicSoldierPopulation: 0
+  AreaSize: 338
+  PopulationDensity: 7396
+  Security: 10
+  MobilityRate: 50
+  InfectionRate: 2
+  Control: 50
+  SpecialFlags: []

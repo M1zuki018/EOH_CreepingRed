@@ -49,20 +49,20 @@ public class MiniArea
     /// </summary>
     public MiniArea(AreaSettingsSO settings)
     {
-        X = settings.x;
-        Y = settings.y;
-        Name = settings.name;
-        Category = settings.category;
-        Population = settings.population * 1000;
-        CitizenPopulation = settings.citizenPopulation * 1000;
-        MagicSoldierPopulation = settings.magicSoldierPopulation * 1000;
-        AreaSize = settings.areaSize;
-        PopulationDensity = settings.populationDensity;
-        Security = settings.security;
-        MobilityRate = settings.mobilityRate;
-        InfectionRate = settings.infectionRate;
-        Control = settings.control;
-        SpecialFlags = settings.specialFlags ?? new List<string>();
+        X = settings.X;
+        Y = settings.Y;
+        Name = settings.Name;
+        Category = settings.Category;
+        Population = settings.Population * 1000;
+        CitizenPopulation = settings.CitizenPopulation * 1000;
+        MagicSoldierPopulation = settings.MagicSoldierPopulation * 1000;
+        AreaSize = settings.AreaSize;
+        PopulationDensity = settings.PopulationDensity;
+        Security = settings.Security;
+        MobilityRate = settings.MobilityRate;
+        InfectionRate = settings.InfectionRate;
+        Control = settings.Control;
+        SpecialFlags = settings.SpecialFlags ?? new List<string>();
 
         // 初期状態
         Healthy = Population * 1000;
@@ -108,7 +108,7 @@ public class MiniArea
             _cells.Add(new MiniCell(cellCount, remainderCitizenPopulation, remainderMagicSoldierPopulation));
         }
         
-        Debug.Log($"{settings.name.ToString()}エリアのセルの数：{_cells.Count} 実行時間: {stopwatch.ElapsedMilliseconds} ミリ秒");
+        Debug.Log($"{settings.Name.ToString()}エリアのセルの数：{_cells.Count} 実行時間: {stopwatch.ElapsedMilliseconds} ミリ秒");
     }
 
     /// <summary>

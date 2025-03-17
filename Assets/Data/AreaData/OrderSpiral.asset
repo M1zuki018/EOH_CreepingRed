@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 65b5aee03a9e6c149b0d7f369996c783, type: 3}
+  m_Name: OrderSpiral
+  m_EditorClassIdentifier: 
+  X: 2
+  Y: 2
+  Name: 12
+  Explaination: "\u884C\u653F\u6A5F\u95A2\u3084\u4E3B\u8981\u306A\u65BD\u8A2D\u304C\u307E\u3068\u307E\u3063\u305F\u5730\u533A"
+  Category: 3
+  Population: 100
+  CitizenPopulation: 100
+  MagicSoldierPopulation: 0
+  AreaSize: 72.75
+  PopulationDensity: 13745
+  Security: 85
+  MobilityRate: 70
+  InfectionRate: 1
+  Control: 30
+  SpecialFlags: []

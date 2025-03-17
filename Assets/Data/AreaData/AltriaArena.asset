@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 65b5aee03a9e6c149b0d7f369996c783, type: 3}
+  m_Name: AltriaArena
+  m_EditorClassIdentifier: 
+  X: 3
+  Y: 1
+  Name: 8
+  Explaination: "\u30B9\u30DD\u30FC\u30C4\u30FB\u5A2F\u697D\u65BD\u8A2D\u30FB\u7AF6\u6280\u5834\u304C\u591A\u6570\u96C6\u307E\u308B\u30A8\u30EA\u30A2"
+  Category: 1
+  Population: 100
+  CitizenPopulation: 100
+  MagicSoldierPopulation: 0
+  AreaSize: 145.5
+  PopulationDensity: 6873
+  Security: 60
+  MobilityRate: 80
+  InfectionRate: 1
+  Control: 40
+  SpecialFlags: []

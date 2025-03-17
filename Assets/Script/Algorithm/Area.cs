@@ -49,20 +49,20 @@ public class Area
     /// </summary>
     public Area(AreaSettingsSO settings)
     {
-        X = settings.x;
-        Y = settings.y;
-        Name = settings.name;
-        Category = settings.category;
-        Population = settings.population * 10000;
-        CitizenPopulation = settings.citizenPopulation * 10000;
-        MagicSoldierPopulation = settings.magicSoldierPopulation * 10000;
-        AreaSize = settings.areaSize;
-        PopulationDensity = settings.populationDensity;
-        Security = settings.security;
-        MobilityRate = settings.mobilityRate;
-        InfectionRate = settings.infectionRate;
-        Control = settings.control;
-        SpecialFlags = settings.specialFlags ?? new List<string>();
+        X = settings.X;
+        Y = settings.Y;
+        Name = settings.Name;
+        Category = settings.Category;
+        Population = settings.Population * 10000;
+        CitizenPopulation = settings.CitizenPopulation * 10000;
+        MagicSoldierPopulation = settings.MagicSoldierPopulation * 10000;
+        AreaSize = settings.AreaSize;
+        PopulationDensity = settings.PopulationDensity;
+        Security = settings.Security;
+        MobilityRate = settings.MobilityRate;
+        InfectionRate = settings.InfectionRate;
+        Control = settings.Control;
+        SpecialFlags = settings.SpecialFlags ?? new List<string>();
 
         // 初期状態
         Healthy = Population * 10000;  // 10万人単位から実際の人数に換算
@@ -108,7 +108,7 @@ public class Area
             _cells.Add(new Cell(cellCount, remainderCitizenPopulation, remainderMagicSoldierPopulation));
         }
         
-        Debug.Log($"{settings.name.ToString()}エリアのセルの数：{_cells.Count} 実行時間: {stopwatch.ElapsedMilliseconds} ミリ秒");
+        Debug.Log($"{settings.Name.ToString()}エリアのセルの数：{_cells.Count} 実行時間: {stopwatch.ElapsedMilliseconds} ミリ秒");
     }
 
     /// <summary>

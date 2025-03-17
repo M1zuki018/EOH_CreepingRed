@@ -63,7 +63,7 @@ public static class GoogleDriveService
     {
         var listRequest = service.Files.List();
         listRequest.PageSize = 200;
-        listRequest.Fields = "nextPageToken, files(id, name)";
+        listRequest.Fields = "nextPageToken, files(id, Name)";
         listRequest.PageToken = pageToken.Token;
         listRequest.Q = query;
 

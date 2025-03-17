@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 65b5aee03a9e6c149b0d7f369996c783, type: 3}
+  m_Name: AltriaAgriculturalDome
+  m_EditorClassIdentifier: 
+  X: 1
+  Y: 3
+  Name: 16
+  Explaination: "\u98DF\u6599\u751F\u7523\u304C\u884C\u308F\u308C\u308B\u5927\u898F\u6A21\u8FB2\u696D\u65BD\u8A2D"
+  Category: 4
+  Population: 500
+  CitizenPopulation: 495
+  MagicSoldierPopulation: 5
+  AreaSize: 914
+  PopulationDensity: 5470
+  Security: 65
+  MobilityRate: 60
+  InfectionRate: 0
+  Control: 70
+  SpecialFlags: []

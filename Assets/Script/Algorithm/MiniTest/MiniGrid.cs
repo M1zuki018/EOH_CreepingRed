@@ -24,19 +24,19 @@ public class MiniGrid
     {
         foreach (var areaSetting in areaSettings)
         {
-            int x = areaSetting.x;
-            int y = areaSetting.y;
+            int x = areaSetting.X;
+            int y = areaSetting.Y;
             
             // Areasの範囲を超えないかチェック
             if (x >= 0 && x < Areas.GetLength(0) && y >= 0 && y < Areas.GetLength(1))
             {
                 // SOで設定した座標に基づいてエリアを配置
                 Areas[x, y] = new MiniArea(areaSetting);
-                Debug.Log($"エリア作成 ({x}, {y}) : {areaSetting.name.ToString()}");
+                Debug.Log($"エリア作成 ({x}, {y}) : {areaSetting.Name.ToString()}");
             }
             else
             {
-                Debug.LogWarning($"Invalid area coordinates ({x}, {y}) for area: {areaSetting.name}");
+                Debug.LogWarning($"Invalid area coordinates ({x}, {y}) for area: {areaSetting.Name}");
             }
         }
         Debug.Log($"グリッドの初期化完了");
