@@ -1,11 +1,10 @@
 using Cysharp.Threading.Tasks;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 /// <summary>
 /// TitleシーンのUI全体を管理するManager
 /// </summary>
-public class TitleSceneUIManager : ViewBase
+public class TitleSceneUIManager : UIManagerBase
 {
     [SerializeField, HighlightIfNull] private TitleUIController _title;
     [SerializeField, HighlightIfNull] private GameSettingsUIController _gameSettings;
@@ -37,32 +36,6 @@ public class TitleSceneUIManager : ViewBase
         return base.OnBind();
     }
 
-    /// <summary>
-    /// 画面遷移
-    /// </summary>
-    private void TransitionView<T>(T show, T hide) where T : IWindow
-    {
-        show.Show();
-        hide.Hide();
-    }
-
-    /// <summary>
-    /// オーバーレイとしての画面表示
-    /// </summary>
-    private void OverlayView<T>(T show, T block) where T : IWindow
-    {
-        show.Show();
-        block.Block();
-    }
-
-    /// <summary>
-    /// シーン遷移
-    /// </summary>
-    private void TransitionScene()
-    {
-        SceneManager.LoadScene("Dev_InGame");
-    }
-
     public override UniTask OnStart()
     {
         _title.Show();
@@ -72,5 +45,13 @@ public class TitleSceneUIManager : ViewBase
         _baseSelection.Hide();
         
         return base.OnStart();
+    }
+    
+    /// <summary>
+    /// シーン遷移
+    /// </summary>
+    private void TransitionScene()
+    {
+        TransitionScene("Dev_InGame");
     }
 }
