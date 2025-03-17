@@ -340,36 +340,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &644267788 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 5123743829013258350, guid: 9be3aeb83ed4eac4db28af4840704b68, type: 3}
-  m_PrefabInstance: {fileID: 2456730865685128156}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &644267793
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 644267788}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c2e131859b52b5c419dae3fe8dceb417, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _gameStartButton: {fileID: 0}
---- !u!225 &644267794
-CanvasGroup:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 644267788}
-  m_Enabled: 1
-  m_Alpha: 1
-  m_Interactable: 1
-  m_BlocksRaycasts: 1
-  m_IgnoreParentGroups: 0
 --- !u!1 &1078807519
 GameObject:
   m_ObjectHideFlags: 0
@@ -419,36 +389,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &1883639311 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 6194095583218162110, guid: 9be3aeb83ed4eac4db28af4840704b68, type: 3}
-  m_PrefabInstance: {fileID: 2456730865685128156}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &1883639316
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1883639311}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e4bf7e023115f754cb75c66d28eaaa59, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _gameStartButton: {fileID: 0}
---- !u!225 &1883639317
-CanvasGroup:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1883639311}
-  m_Enabled: 1
-  m_Alpha: 1
-  m_Interactable: 1
-  m_BlocksRaycasts: 1
-  m_IgnoreParentGroups: 0
 --- !u!1 &2083794799
 GameObject:
   m_ObjectHideFlags: 0
@@ -585,18 +525,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 262571100054648519, guid: 9be3aeb83ed4eac4db28af4840704b68, type: 3}
-      propertyPath: _macroView
-      value: 
-      objectReference: {fileID: 644267793}
-    - target: {fileID: 262571100054648519, guid: 9be3aeb83ed4eac4db28af4840704b68, type: 3}
-      propertyPath: _microView
-      value: 
-      objectReference: {fileID: 1883639316}
-    - target: {fileID: 2233361397306554557, guid: 9be3aeb83ed4eac4db28af4840704b68, type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 4707049991831858802, guid: 9be3aeb83ed4eac4db28af4840704b68, type: 3}
       propertyPath: m_Pivot.x
       value: 0
@@ -681,10 +609,6 @@ PrefabInstance:
       propertyPath: m_Camera
       value: 
       objectReference: {fileID: 519420031}
-    - target: {fileID: 5123743829013258350, guid: 9be3aeb83ed4eac4db28af4840704b68, type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 6164294547386205030, guid: 9be3aeb83ed4eac4db28af4840704b68, type: 3}
       propertyPath: m_Name
       value: MainCanvas
@@ -692,19 +616,7 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 5123743829013258350, guid: 9be3aeb83ed4eac4db28af4840704b68, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 644267794}
-    - targetCorrespondingSourceObject: {fileID: 5123743829013258350, guid: 9be3aeb83ed4eac4db28af4840704b68, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 644267793}
-    - targetCorrespondingSourceObject: {fileID: 6194095583218162110, guid: 9be3aeb83ed4eac4db28af4840704b68, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1883639317}
-    - targetCorrespondingSourceObject: {fileID: 6194095583218162110, guid: 9be3aeb83ed4eac4db28af4840704b68, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1883639316}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 9be3aeb83ed4eac4db28af4840704b68, type: 3}
 --- !u!1001 &5029673032093044718
 PrefabInstance:

@@ -7,12 +7,12 @@ using UnityEngine;
 /// </summary>
 public class MiniTestSimulator : ViewBase, ISimulator
 {
-    [SerializeField] private List<AreaSettingsSO> _areaSettings;
-    
+    [SerializeField] private List<AreaSettingsSO> _areaSettings = new List<AreaSettingsSO>();
+    public List<AreaSettingsSO> AreaSettings => _areaSettings;
     private MiniSimulation _simulation;
     private ITimeObservable _timeManager;
     public ITimeObservable TimeManager => _timeManager;
-    
+
     public override UniTask OnAwake()
     {
         _timeManager = new TimeManager();

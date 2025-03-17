@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
@@ -13,9 +14,10 @@ using UnityEngine.UI;
 [RequireComponent(typeof(CanvasGroup))]
 public class MacroViewUIController : ViewBase, IWindow
 {
-    [SerializeField, HighlightIfNull] private Button _gameStartButton;
+    [SerializeField, HighlightIfNull] private Button[] _areaButton = new Button[19];
     
     private CanvasGroup _canvasGroup;
+    private List<AreaSettingsSO> _areaSettings;
     public event Action OnGameStart;
         
     public override UniTask OnUIInitialize()
@@ -24,6 +26,27 @@ public class MacroViewUIController : ViewBase, IWindow
     
         //_gameStartButton.onClick.AddListener(() => OnGameStart?.Invoke());
         return base.OnUIInitialize();
+    }
+
+    /// <summary>
+    /// 初期化処理
+    /// </summary>
+    public void Initialize(List<AreaSettingsSO> areaSettings)
+    {
+        _areaSettings = areaSettings;
+        SetText();
+    }
+
+    /// <summary>
+    /// ボタンのテキストを変更する
+    /// </summary>
+    private void SetText()
+    {
+        for (int i = 0; i < _areaSettings.Count; i++)
+        {
+            Text text = _areaButton[i].GetComponentInChildren<Text>();
+            text.text = _areaSettings[i].Name.ToString();
+        }
     }
     
     public void Show()

@@ -25,9 +25,16 @@ public class InGameSceneUIManager : UIManagerBase
 
     public override UniTask OnBind()
     {
-        ITimeObservable timeManager = FindAnyObjectByType<GameManager>().TimeManager;
+        // タイマー系（日付・倍速）の初期化
+        GameManager gameManager = FindAnyObjectByType<GameManager>();
+        ITimeObservable timeManager = gameManager.TimeManager;
         new TimeView(_timeText, timeManager);
         new TimeScaleView(_timeScaleButtons, timeManager);
+        
+        // 都市全体ビューの初期化
+        _macroView.Initialize(gameManager.AreaSettings);
+        
+        // イベント登録
         _baseView.OnMacroView += () => TransitionView<IWindow>(_macroView, _baseView);
         
         return base.OnBind();

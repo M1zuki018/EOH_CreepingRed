@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 
@@ -7,10 +8,13 @@ using UnityEngine;
 public class GameManager : ViewBase
 {
     public ITimeObservable TimeManager { get; private set; }
+    public List<AreaSettingsSO> AreaSettings { get; private set; }
     
     public override UniTask OnAwake()
     {
-        TimeManager = FindActiveSimulator().TimeManager;
+        ISimulator simulator = FindActiveSimulator();
+        AreaSettings = simulator.AreaSettings;
+        TimeManager = simulator.TimeManager;
         if (TimeManager == null)
         {
             // Simulatorクラスを生成したあとに呼ばないとnullになるので注意
