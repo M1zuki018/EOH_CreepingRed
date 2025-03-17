@@ -6,11 +6,11 @@ using R3;
 /// </summary>
 public class TimeManager : ITimeObservable, IDisposable
 {
-    private readonly BindableReactiveProperty<float> _timeScaleProp = new BindableReactiveProperty<float>(); // 倍速
-    private readonly BindableReactiveProperty<int> _gameTimeProp = new BindableReactiveProperty<int>(); // ゲーム内時間
+    private readonly ReactiveProperty<float> _timeScaleProp = new ReactiveProperty<float>(); // 倍速
+    private readonly ReactiveProperty<int> _gameTimeProp = new ReactiveProperty<int>(); // ゲーム内時間
     
-    public IReadOnlyBindableReactiveProperty<float> TimeScaleProp => _timeScaleProp;
-    public IReadOnlyBindableReactiveProperty<int> GameTimeProp => _gameTimeProp;
+    public ReadOnlyReactiveProperty<float> TimeScaleProp => _timeScaleProp;
+    public ReadOnlyReactiveProperty<int> GameTimeProp => _gameTimeProp;
     
     private IDisposable _timeSubscription;
 

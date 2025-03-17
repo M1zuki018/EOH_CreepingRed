@@ -8,9 +8,9 @@ public interface ITimeObservable
     /// <summary>
     /// 倍速（1倍、2倍、3倍）
     /// </summary>
-    IReadOnlyBindableReactiveProperty<float> TimeScaleProp { get; } 
+    ReadOnlyReactiveProperty<float> TimeScaleProp { get; } 
     /// <summary>
     /// ゲーム内時間（例: 経過時間を時間単位で管理）
     /// </summary>
-    IReadOnlyBindableReactiveProperty<int> GameTimeProp { get; } 
+    ReadOnlyReactiveProperty<int> GameTimeProp { get; } 
 }

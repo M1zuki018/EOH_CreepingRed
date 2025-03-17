@@ -11,14 +11,14 @@ using Debug = UnityEngine.Debug;
 public class Simulation : IDisposable
 {
     private Grid _grid;
-    private TimeManager _timeManager;
+    private ITimeObservable _timeObserver;
 
     public Simulation(List<AreaSettingsSO> areaSettings)
     {
         _grid = new Grid(areaSettings); // グリッドを生成する
-        _timeManager = new TimeManager(); // 時間を管理するクラスを生成
+        _timeObserver = new TimeManager(); // 時間を管理するクラスを生成
 
-        _timeManager.GameTimeProp.Subscribe(UpdateSimulation);
+        _timeObserver.GameTimeProp.Subscribe(UpdateSimulation);
     }
     
     /// <summary>
@@ -36,6 +36,6 @@ public class Simulation : IDisposable
 
     public void Dispose()
     {
-        _timeManager?.Dispose();
+        _timeObserver?.GameTimeProp.Dispose();
     }
 }
