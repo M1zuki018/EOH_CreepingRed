@@ -6,11 +6,11 @@ using R3;
 /// </summary>
 public class TimeManager : ITimeObservable, IDisposable
 {
-    private readonly ReactiveProperty<float> _timeScaleProp = new ReactiveProperty<float>(); // 倍速
-    private readonly ReactiveProperty<int> _gameTimeProp = new ReactiveProperty<int>(); // ゲーム内時間
+    private readonly BindableReactiveProperty<float> _timeScaleProp = new BindableReactiveProperty<float>(); // 倍速
+    private readonly BindableReactiveProperty<int> _gameTimeProp = new BindableReactiveProperty<int>(); // ゲーム内時間
     
-    public ReactiveProperty<float> TimeScaleProp => _timeScaleProp;
-    public ReactiveProperty<int> GameTimeProp => _gameTimeProp;
+    public IReadOnlyBindableReactiveProperty<float> TimeScaleProp => _timeScaleProp;
+    public IReadOnlyBindableReactiveProperty<int> GameTimeProp => _gameTimeProp;
     
     private IDisposable _timeSubscription;
 
@@ -27,7 +27,7 @@ public class TimeManager : ITimeObservable, IDisposable
         _timeSubscription?.Dispose(); // 既存の購読を解除する
         _timeSubscription = Observable
             .Interval(TimeSpan.FromSeconds(3f / _timeScaleProp.Value))
-            .Subscribe(_ => GameTimeProp.Value += 2);
+            .Subscribe(_ => _gameTimeProp.Value += 2);
     }
 
     /// <summary>
