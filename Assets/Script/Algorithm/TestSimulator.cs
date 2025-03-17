@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
+using UnityEngine;
 
 /// <summary>
 /// シミュレーションテスト用のクラス
@@ -25,5 +26,11 @@ public class TestSimulator : ViewBase
     {
         AreaSettings.Clear();
         AreaSettings.AddRange(newAreas);
+    }
+
+    [Button]
+    public void Test()
+    {
+        Debug.Log("a");
     }
 }

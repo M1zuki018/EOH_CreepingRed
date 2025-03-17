@@ -9,7 +9,7 @@ using System.Reflection;
 public class ButtonDrawer : Editor
 {
     //動作を制御するフラグ
-    private static bool isEnabled = false;
+    private static bool isEnabled = true;
     
     public override void OnInspectorGUI()
     {
@@ -36,7 +36,7 @@ public class ButtonDrawer : Editor
                 string buttonText = string.IsNullOrEmpty(buttonAttribute.Label) ? method.Name : buttonAttribute.Label;
 
                 // ボタンを描画
-                if (GUILayout.Button(buttonText))
+                if (GUILayout.Button("MethodTest: " + buttonText))
                 {
                     // メソッドを呼び出す
                     method.Invoke(targetObject, null);
@@ -44,15 +44,4 @@ public class ButtonDrawer : Editor
             }
         }
     }
-    
-    /// <summary>
-    /// ButtonDrawerの有効/無効を切り替える
-    /// </summary>
-    [MenuItem("Creeping Red/Toggle ButtonDrawer")]
-    public static void ToggleButtonDrawer()
-    {
-        isEnabled = !isEnabled;
-        Debug.Log($"ButtonDrawerは現在 {(isEnabled ? "有効" : "無効")} です");
-    }
-    
 }
