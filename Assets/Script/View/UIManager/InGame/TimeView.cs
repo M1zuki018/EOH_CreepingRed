@@ -18,15 +18,15 @@ public class TimeView : IDisposable
         
         _currentTime = new DateTime(2100, 08, 23, 14, 00, 00); // 初期の日付 2100-08-23 14:00:00
         
-        _timeObservable.GameTimeProp.Subscribe(_ => UpdateTimeView()); // 時間更新のPropの購読を開始
+        _timeObservable.GameTimeProp.Subscribe(UpdateTimeView); // 時間更新のPropの購読を開始
     }
     
     /// <summary>
     /// 時間表示のUIを書き換える
     /// </summary>
-    private void UpdateTimeView()
+    private void UpdateTimeView(int time)
     {
-        _currentTime = _currentTime.AddHours(2); // _currentTimeを更新
+        _currentTime = _currentTime.AddHours(time); // _currentTimeを更新
         _timeText.text = _currentTime.ToString("yyyy-MM-dd\nHH:mm"); // フォーマットを整えて書き換え
     }
 
