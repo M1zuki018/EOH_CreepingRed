@@ -10,6 +10,8 @@ public class InGameSceneUIManager : UIManagerBase
     [SerializeField, HighlightIfNull, Comment("日付テキスト")] private Text _timeText;
     [SerializeField, HighlightIfNull, Comment("倍速ボタン")] private Button[] _timeScaleButtons = new Button[4];
     [SerializeField, HighlightIfNull] private BaseViewUIController _baseView;
+    [SerializeField, HighlightIfNull] private MacroViewUIController _macroView;
+    [SerializeField, HighlightIfNull] private MicroViewUIController _microView;
     
     public override UniTask OnAwake()
     {
@@ -26,19 +28,16 @@ public class InGameSceneUIManager : UIManagerBase
         ITimeObservable timeManager = FindAnyObjectByType<GameManager>().TimeManager;
         new TimeView(_timeText, timeManager);
         new TimeScaleView(_timeScaleButtons, timeManager);
-        _baseView.OnMacroView += () => ShowMacroView();
+        _baseView.OnMacroView += () => TransitionView<IWindow>(_macroView, _baseView);
         
         return base.OnBind();
-    }
-
-    private void ShowMacroView()
-    {
-        
     }
 
     public override UniTask OnStart()
     {
         _baseView.Show();
+        _macroView.Hide();
+        _microView.Hide();
         
         return base.OnStart();
     }

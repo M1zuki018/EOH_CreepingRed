@@ -773,13 +773,15 @@ GameObject:
   - component: {fileID: 8885937607526466104}
   - component: {fileID: 2274433093742904529}
   - component: {fileID: 6618823133002442323}
+  - component: {fileID: 7108103045379842035}
+  - component: {fileID: 6992571039546072879}
   m_Layer: 5
   m_Name: MacroView
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &3670898836523082115
 RectTransform:
   m_ObjectHideFlags: 0
@@ -864,6 +866,31 @@ MonoBehaviour:
   m_BlockingMask:
     serializedVersion: 2
     m_Bits: 4294967295
+--- !u!225 &7108103045379842035
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5123743829013258350}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
+--- !u!114 &6992571039546072879
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5123743829013258350}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c2e131859b52b5c419dae3fe8dceb417, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _gameStartButton: {fileID: 0}
 --- !u!1 &6164294547386205030
 GameObject:
   m_ObjectHideFlags: 0
@@ -988,7 +1015,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _timeText: {fileID: 5782602815358711336}
+  _timeScaleButtons:
+  - {fileID: 1259743253794111578}
+  - {fileID: 7610068598489783943}
+  - {fileID: 4843641667831682902}
+  - {fileID: 7065523557480319239}
   _baseView: {fileID: 1017992177415110960}
+  _macroView: {fileID: 6992571039546072879}
+  _microView: {fileID: 4697893808252698665}
 --- !u!1 &6194095583218162110
 GameObject:
   m_ObjectHideFlags: 0
@@ -1001,6 +1035,8 @@ GameObject:
   - component: {fileID: 4351806977015923320}
   - component: {fileID: 3399219804449655773}
   - component: {fileID: 7243998945817910851}
+  - component: {fileID: 2651601538637586849}
+  - component: {fileID: 4697893808252698665}
   m_Layer: 5
   m_Name: MicroView
   m_TagString: Untagged
@@ -1090,6 +1126,31 @@ MonoBehaviour:
   m_BlockingMask:
     serializedVersion: 2
     m_Bits: 4294967295
+--- !u!225 &2651601538637586849
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6194095583218162110}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
+--- !u!114 &4697893808252698665
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6194095583218162110}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e4bf7e023115f754cb75c66d28eaaa59, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _gameStartButton: {fileID: 0}
 --- !u!1 &6451775412440948539
 GameObject:
   m_ObjectHideFlags: 0
