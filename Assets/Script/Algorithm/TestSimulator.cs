@@ -7,15 +7,15 @@ using UnityEngine;
 /// </summary>
 public class TestSimulator : ViewBase
 {
-    public List<AreaSettingsSO> AreaSettings = new List<AreaSettingsSO>();
+    [SerializeField] private List<AreaSettingsSO> AreaSettings = new List<AreaSettingsSO>();
     private Simulation _simulation;
-    
+
     public override UniTask OnStart()
     {
         // ヨコ5マス×タテ4マスのグリッド
         // 人口は9,130万人
         _simulation = new Simulation(AreaSettings);
-        
+
         return base.OnStart();
     }
 
@@ -26,11 +26,5 @@ public class TestSimulator : ViewBase
     {
         AreaSettings.Clear();
         AreaSettings.AddRange(newAreas);
-    }
-
-    [Button]
-    public void Test()
-    {
-        Debug.Log("a");
     }
 }
