@@ -34,11 +34,6 @@ public class Simulation : IDisposable
         Debug.Log($"更新完了 : 実行時間 {stopwatch.ElapsedMilliseconds} ミリ秒");
     }
 
-    private void HandleBattles()
-    {
-        // 魔法士と亡霊の戦闘ロジックを記述
-    }
-
     public void Dispose()
     {
         _timeManager?.Dispose();

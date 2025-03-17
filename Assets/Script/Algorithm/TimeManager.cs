@@ -4,10 +4,13 @@ using R3;
 /// <summary>
 /// ゲーム内時間を管理するクラス
 /// </summary>
-public class TimeManager : IDisposable
+public class TimeManager : ITimeObservable, IDisposable
 {
-    private ReactiveProperty<float> _timeScaleProp = new ReactiveProperty<float>(1f); // 倍速（1倍、2倍、3倍）
-    public ReactiveProperty<int> GameTimeProp { get; } = new ReactiveProperty<int>(0); // ゲーム内時間（例: 経過時間を時間単位で管理）
+    private readonly ReactiveProperty<float> _timeScaleProp = new ReactiveProperty<float>(); // 倍速
+    private readonly ReactiveProperty<int> _gameTimeProp = new ReactiveProperty<int>(); // ゲーム内時間
+    
+    public ReactiveProperty<float> TimeScaleProp => _timeScaleProp;
+    public ReactiveProperty<int> GameTimeProp => _gameTimeProp;
     
     private IDisposable _timeSubscription;
 
