@@ -45,10 +45,13 @@ public class AreaCsvReader : EditorWindow
             return;
         }
 
-        if (!Directory.Exists(_outputPath))
+        if (Directory.Exists(_outputPath))
         {
-            Directory.CreateDirectory(_outputPath); // ディレクトリを作成
+            Directory.Delete(_outputPath, true); // フォルダが既に存在したら一旦全て削除
         }
+        
+        Directory.CreateDirectory(_outputPath); // フォルダを再作成
+        
         
         string[] lines = File.ReadAllLines(_csvFilePath);
         
