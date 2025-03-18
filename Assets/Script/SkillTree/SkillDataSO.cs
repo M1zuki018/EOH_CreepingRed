@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 /// <summary>
 /// 各スキルのデータを管理するスクリプタブルオブジェクト
@@ -14,7 +15,7 @@ public class SkillDataSO : ScriptableObject
     [SerializeField, Comment("感染力")] private float _infectionRate = 0;
     [SerializeField, Comment("危険度")] private float _riskRate = 0;
     [SerializeField, Comment("致死率")] private float _resistanceRate = 0;
-    [SerializeField, Comment("前提スキル")] private List<SkillButton> _prerequisiteSkills;
+    [SerializeField, Comment("前提スキル")] private List<SkillEnum> _prerequisiteSkillsEnum;
     
     public Sprite Icon => _icon;
     public string Name => _name;
@@ -23,5 +24,5 @@ public class SkillDataSO : ScriptableObject
     public float InfectionRate => _infectionRate;
     public float RiskRate => _riskRate;
     public float ResistanceRate => _resistanceRate;
-    public List<SkillButton> PrerequisiteSkills => _prerequisiteSkills;
+    public List<SkillEnum> PrerequisiteSkillsEnum => _prerequisiteSkillsEnum;
 }
