@@ -20,12 +20,19 @@ public class MacroViewUIController : ViewBase, IWindow
     private CanvasGroup _canvasGroup;
     private List<AreaSettingsSO> _areaSettings;
     public event Action OnSkillTree;
+    public event Action OnArea;
         
     public override UniTask OnUIInitialize()
     {
         _canvasGroup = GetComponent<CanvasGroup>();
     
         _skillTreeButton.onClick.AddListener(() => OnSkillTree?.Invoke());
+
+        for (int i = 0; i < _areaButton.Length; i++)
+        {
+            _areaButton[i].onClick.AddListener(() => OnArea?.Invoke());
+        }
+        
         return base.OnUIInitialize();
     }
 

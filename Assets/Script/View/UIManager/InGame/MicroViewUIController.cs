@@ -13,16 +13,16 @@ using UnityEngine.UI;
 [RequireComponent(typeof(CanvasGroup))]
 public class MicroViewUIController : ViewBase, IWindow
 {
-    [SerializeField, HighlightIfNull] private Button _gameStartButton;
+    [SerializeField, HighlightIfNull] private Button _backButton;
     
     private CanvasGroup _canvasGroup;
-    public event Action OnGameStart;
+    public event Action OnMacroView;
         
     public override UniTask OnUIInitialize()
     {
         _canvasGroup = GetComponent<CanvasGroup>();
     
-        //_gameStartButton.onClick.AddListener(() => OnGameStart?.Invoke());
+        _backButton.onClick.AddListener(() => OnMacroView?.Invoke());
         return base.OnUIInitialize();
     }
     
