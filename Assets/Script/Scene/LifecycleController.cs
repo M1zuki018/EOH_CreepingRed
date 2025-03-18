@@ -111,6 +111,8 @@ public class LifecycleController : MonoBehaviour
             if (childViewBase != null)
             {
                 _instantiatedViews.Add(childViewBase);
+                // 子オブジェクトがさらに子を持つ可能性があるので再帰的に呼び出す
+                FindChildViewBase(childViewBase);
             }
         }
     }
