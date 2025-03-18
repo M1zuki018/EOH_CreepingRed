@@ -585,6 +585,14 @@ PrefabInstance:
       propertyPath: m_Camera
       value: 
       objectReference: {fileID: 540776175}
+    - target: {fileID: 1090549950738278227, guid: 3df7cdf4d1232b746a2264d1c09a2a3c, type: 3}
+      propertyPath: m_Name
+      value: LethalityRate
+      objectReference: {fileID: 0}
+    - target: {fileID: 3289538085214670636, guid: 3df7cdf4d1232b746a2264d1c09a2a3c, type: 3}
+      propertyPath: m_Text
+      value: "\u62E1\u6563\u6027"
+      objectReference: {fileID: 0}
     - target: {fileID: 3721582708392206722, guid: 3df7cdf4d1232b746a2264d1c09a2a3c, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
@@ -721,6 +729,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Ability
       objectReference: {fileID: 0}
+    - target: {fileID: 7502136028177665982, guid: 3df7cdf4d1232b746a2264d1c09a2a3c, type: 3}
+      propertyPath: m_Text
+      value: "\u767A\u899A\u7387"
+      objectReference: {fileID: 0}
     - target: {fileID: 7605485055397229047, guid: 3df7cdf4d1232b746a2264d1c09a2a3c, type: 3}
       propertyPath: m_Color.a
       value: 0
@@ -760,6 +772,26 @@ PrefabInstance:
     - target: {fileID: 8079804057380772193, guid: 3df7cdf4d1232b746a2264d1c09a2a3c, type: 3}
       propertyPath: m_Text
       value: "\u75C7\u72B6"
+      objectReference: {fileID: 0}
+    - target: {fileID: 8155430852189718916, guid: 3df7cdf4d1232b746a2264d1c09a2a3c, type: 3}
+      propertyPath: m_Name
+      value: Detection
+      objectReference: {fileID: 0}
+    - target: {fileID: 8375735834045738145, guid: 3df7cdf4d1232b746a2264d1c09a2a3c, type: 3}
+      propertyPath: m_Text
+      value: "\u81F4\u6B7B\u7387"
+      objectReference: {fileID: 0}
+    - target: {fileID: 8375735834045738145, guid: 3df7cdf4d1232b746a2264d1c09a2a3c, type: 3}
+      propertyPath: m_FontData.m_MinSize
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 8375735834045738145, guid: 3df7cdf4d1232b746a2264d1c09a2a3c, type: 3}
+      propertyPath: m_FontData.m_FontSize
+      value: 42
+      objectReference: {fileID: 0}
+    - target: {fileID: 8461570129153974326, guid: 3df7cdf4d1232b746a2264d1c09a2a3c, type: 3}
+      propertyPath: m_Name
+      value: Spread
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
