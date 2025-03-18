@@ -14,6 +14,9 @@ using UnityEngine.UI;
 [RequireComponent(typeof(CanvasGroup))]
 public class SkillTreeUIController : ViewBase, IWindow
 {
+    [Header("InGameViewとしてのセットアップ")]
+    [SerializeField, HighlightIfNull] private Button _closeButton;
+    
     [Header("スキルツリーのためのセットアップ")]
     [SerializeField] private List<SkillBase> _skillTrees = new List<SkillBase>();
     [SerializeField, HighlightIfNull, Comment("スキル名のエリア")] private Text _skillName;
@@ -22,11 +25,13 @@ public class SkillTreeUIController : ViewBase, IWindow
     [SerializeField, HighlightIfNull, Comment("解放ボタン")] private Button _unlockButton;
     
     private CanvasGroup _canvasGroup;
+    public event Action OnClose;
     public event Action OnUnlock;
         
     public override UniTask OnUIInitialize()
     {
         _canvasGroup = GetComponent<CanvasGroup>();
+        _closeButton.onClick.AddListener(() => OnClose?.Invoke());
 
         foreach (var skillTree in _skillTrees)
         {
@@ -84,6 +89,8 @@ public class SkillTreeUIController : ViewBase, IWindow
 
     private void OnDestroy()
     {
-        _unlockButton.onClick.RemoveAllListeners(); // 登録解除
+        // 登録解除
+        _unlockButton.onClick.RemoveAllListeners(); 
+        _closeButton.onClick.RemoveAllListeners();
     }
 }

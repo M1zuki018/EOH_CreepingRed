@@ -213,7 +213,7 @@ GameObject:
   - component: {fileID: 3799140241400224720}
   - component: {fileID: 2255436164272275369}
   m_Layer: 5
-  m_Name: SkillTree
+  m_Name: ShowSkillTreeButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3849,12 +3849,12 @@ RectTransform:
   - {fileID: 8639980510862840982}
   - {fileID: 3670898836523082115}
   - {fileID: 8294241442929487275}
-  - {fileID: 6849468812652450510}
   - {fileID: 4622680276133671634}
   - {fileID: 321128162879050367}
   - {fileID: 2850180837296246360}
   - {fileID: 8651138149278625594}
   - {fileID: 68238428380385833}
+  - {fileID: 6849468812652450510}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -6245,13 +6245,17 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 6785906467514343101, guid: e9676e9847b438a448b4c5e566ef10f0, type: 3}
+      propertyPath: _closeButton
+      value: 
+      objectReference: {fileID: 1728998442326939477}
     - target: {fileID: 8783554999381924573, guid: e9676e9847b438a448b4c5e566ef10f0, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8949228973263384692, guid: e9676e9847b438a448b4c5e566ef10f0, type: 3}
       propertyPath: m_Alpha
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8949228973263384692, guid: e9676e9847b438a448b4c5e566ef10f0, type: 3}
       propertyPath: m_Interactable
@@ -6266,6 +6270,17 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e9676e9847b438a448b4c5e566ef10f0, type: 3}
+--- !u!114 &1728998442326939477 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1890763153116908518, guid: e9676e9847b438a448b4c5e566ef10f0, type: 3}
+  m_PrefabInstance: {fileID: 991906813617609907}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &6048215583453889038 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 6785906467514343101, guid: e9676e9847b438a448b4c5e566ef10f0, type: 3}
