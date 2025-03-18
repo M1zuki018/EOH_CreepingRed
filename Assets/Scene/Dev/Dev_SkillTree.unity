@@ -222,7 +222,7 @@ PrefabInstance:
     - target: {fileID: 1045542282753035367, guid: 9a85962852f38d449bce7fd880952087, type: 3}
       propertyPath: _skillData
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 11400000, guid: 72eb03f653fb48e449b21437ec97bf69, type: 2}
     - target: {fileID: 8813719897871548401, guid: 9a85962852f38d449bce7fd880952087, type: 3}
       propertyPath: m_Name
       value: BloodborneInfectionII
