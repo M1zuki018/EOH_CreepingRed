@@ -12,6 +12,7 @@ public class InGameSceneUIManager : UIManagerBase
     [SerializeField, HighlightIfNull] private BaseViewUIController _baseView;
     [SerializeField, HighlightIfNull] private MacroViewUIController _macroView;
     [SerializeField, HighlightIfNull] private MicroViewUIController _microView;
+    [SerializeField, HighlightIfNull] private SkillTreeUIController _skillTree;
     
     public override UniTask OnAwake()
     {
@@ -45,6 +46,7 @@ public class InGameSceneUIManager : UIManagerBase
         _baseView.Show();
         _macroView.Hide();
         _microView.Hide();
+        _skillTree.Hide();
         
         return base.OnStart();
     }
