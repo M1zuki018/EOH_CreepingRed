@@ -14,17 +14,18 @@ using UnityEngine.UI;
 [RequireComponent(typeof(CanvasGroup))]
 public class MacroViewUIController : ViewBase, IWindow
 {
+    [SerializeField, HighlightIfNull] private Button _skillTreeButton;
     [SerializeField, HighlightIfNull] private Button[] _areaButton = new Button[19];
     
     private CanvasGroup _canvasGroup;
     private List<AreaSettingsSO> _areaSettings;
-    public event Action OnGameStart;
+    public event Action OnSkillTree;
         
     public override UniTask OnUIInitialize()
     {
         _canvasGroup = GetComponent<CanvasGroup>();
     
-        //_gameStartButton.onClick.AddListener(() => OnGameStart?.Invoke());
+        _skillTreeButton.onClick.AddListener(() => OnSkillTree?.Invoke());
         return base.OnUIInitialize();
     }
 

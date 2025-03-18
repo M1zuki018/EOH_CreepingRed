@@ -37,6 +37,7 @@ public class InGameSceneUIManager : UIManagerBase
         
         // イベント登録
         _baseView.OnMacroView += () => TransitionView<IWindow>(_macroView, _baseView);
+        _macroView.OnSkillTree += () => TransitionView<IWindow>(_skillTree, _macroView);
         
         return base.OnBind();
     }

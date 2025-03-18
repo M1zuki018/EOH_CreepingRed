@@ -3271,6 +3271,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c2e131859b52b5c419dae3fe8dceb417, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _skillTreeButton: {fileID: 2255436164272275369}
   _areaButton:
   - {fileID: 7230028010448636091}
   - {fileID: 1539286720989403986}
@@ -3848,12 +3849,12 @@ RectTransform:
   - {fileID: 8639980510862840982}
   - {fileID: 3670898836523082115}
   - {fileID: 8294241442929487275}
+  - {fileID: 6849468812652450510}
   - {fileID: 4622680276133671634}
   - {fileID: 321128162879050367}
   - {fileID: 2850180837296246360}
   - {fileID: 8651138149278625594}
   - {fileID: 68238428380385833}
-  - {fileID: 6849468812652450510}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -6150,11 +6151,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 439114669289184227, guid: e9676e9847b438a448b4c5e566ef10f0, type: 3}
       propertyPath: m_AnchorMax.y
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1827278432660383208, guid: e9676e9847b438a448b4c5e566ef10f0, type: 3}
       propertyPath: m_AnchorMax.y
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5966643220807126653, guid: e9676e9847b438a448b4c5e566ef10f0, type: 3}
       propertyPath: m_Pivot.x
@@ -6242,11 +6243,23 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6029320462271497398, guid: e9676e9847b438a448b4c5e566ef10f0, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8783554999381924573, guid: e9676e9847b438a448b4c5e566ef10f0, type: 3}
       propertyPath: m_AnchorMax.y
-      value: 1
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8949228973263384692, guid: e9676e9847b438a448b4c5e566ef10f0, type: 3}
+      propertyPath: m_Alpha
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8949228973263384692, guid: e9676e9847b438a448b4c5e566ef10f0, type: 3}
+      propertyPath: m_Interactable
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8949228973263384692, guid: e9676e9847b438a448b4c5e566ef10f0, type: 3}
+      propertyPath: m_BlocksRaycasts
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
