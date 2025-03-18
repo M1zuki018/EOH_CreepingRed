@@ -13,7 +13,9 @@ using UnityEngine.UI;
 [RequireComponent(typeof(CanvasGroup))]
 public class SkillTreeUIController : ViewBase, IWindow
 {
-    //[SerializeField, HighlightIfNull] private Button _gameStartButton;
+    [SerializeField, HighlightIfNull, Comment("スキル名のエリア")] private Text _skillName;
+    [SerializeField, HighlightIfNull, Comment("スキル説明のエリア")] private Text _skillDescription;
+    [SerializeField, HighlightIfNull, Comment("解放コストのエリア")] private Text _point;
     
     private CanvasGroup _canvasGroup;
     public event Action OnGameStart;
@@ -22,8 +24,19 @@ public class SkillTreeUIController : ViewBase, IWindow
     {
         _canvasGroup = GetComponent<CanvasGroup>();
     
-        //_gameStartButton.onClick.AddListener(() => OnGameStart?.Invoke());
+        SkillTextsUpdate(" ", " ", " ");
+        
         return base.OnUIInitialize();
+    }
+
+    /// <summary>
+    /// スキル表示のUIを更新する
+    /// </summary>
+    public void SkillTextsUpdate(string name, string description, string point)
+    {
+        _skillName.text = name;
+        _skillDescription.text = description;
+        _point.text = point;
     }
     
     public void Show()

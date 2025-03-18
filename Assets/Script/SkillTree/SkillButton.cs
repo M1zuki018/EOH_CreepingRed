@@ -1,3 +1,4 @@
+using System;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
@@ -11,11 +12,19 @@ public class SkillButton　: ViewBase
     public SkillDataSO SkillData => _skillData;
     private bool _isUnlocked = false; // 解放済みか
     private Button _button;
+    
+    public event Action<SkillDataSO> OnClick; 
 
-    public override UniTask OnBind()
+    public override UniTask OnUIInitialize()
     {
         _button = GetComponent<Button>();
-        return base.OnBind();
+        _button.onClick.AddListener(() => OnClick?.Invoke(_skillData));
+        return base.OnUIInitialize();
+    }
+
+    private void OnDestroy()
+    {
+        _button.onClick.RemoveAllListeners(); // 購読解除
     }
 
     /// <summary>
