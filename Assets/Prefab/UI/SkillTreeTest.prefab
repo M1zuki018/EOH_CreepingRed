@@ -603,6 +603,8 @@ GameObject:
   - component: {fileID: 1769075833441596706}
   - component: {fileID: 364999390542035711}
   - component: {fileID: 8694369700846934975}
+  - component: {fileID: 3923426011002129195}
+  - component: {fileID: 1471729882966255074}
   m_Layer: 5
   m_Name: SkillTree
   m_TagString: Untagged
@@ -670,6 +672,35 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!225 &3923426011002129195
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1868061981104144361}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
+--- !u!114 &1471729882966255074
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1868061981104144361}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f526448da2179044e9919298ca0bc0f0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _skillTrees:
+  - {fileID: 8904593850786430065}
+  _skillName: {fileID: 8976383762438009400}
+  _skillDescription: {fileID: 7368698890585292842}
+  _point: {fileID: 3801438303115983908}
 --- !u!1 &2026291651639734011
 GameObject:
   m_ObjectHideFlags: 0
@@ -2503,8 +2534,6 @@ GameObject:
   - component: {fileID: 1051885909441260662}
   - component: {fileID: 2013719664233347871}
   - component: {fileID: 5323907912144574687}
-  - component: {fileID: 5133829893999626497}
-  - component: {fileID: 1775890399036412435}
   m_Layer: 5
   m_Name: SkillTreeTest
   m_TagString: Untagged
@@ -2599,33 +2628,6 @@ MonoBehaviour:
   m_BlockingMask:
     serializedVersion: 2
     m_Bits: 4294967295
---- !u!225 &5133829893999626497
-CanvasGroup:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7965310099753755294}
-  m_Enabled: 1
-  m_Alpha: 1
-  m_Interactable: 1
-  m_BlocksRaycasts: 1
-  m_IgnoreParentGroups: 0
---- !u!114 &1775890399036412435
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7965310099753755294}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f526448da2179044e9919298ca0bc0f0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _skillName: {fileID: 0}
-  _skillDescription: {fileID: 0}
-  _point: {fileID: 0}
 --- !u!1 &7968914754651238754
 GameObject:
   m_ObjectHideFlags: 0

@@ -5,7 +5,7 @@ using UnityEngine;
 /// <summary>
 /// 感染スキルのツリー
 /// </summary>
-public class ContagionSkillBase : SkillBase
+public class ContagionSkillTree : SkillBase
 {
     [SerializeField] private List<SkillButton> _skillButtons = new List<SkillButton>();
     private SkillTreeUIController _skillTreeUIController;
@@ -24,7 +24,7 @@ public class ContagionSkillBase : SkillBase
     /// </summary>
     private void UIUpdate(SkillDataSO skillData)
     {
-        
+        _skillTreeUIController.SkillTextsUpdate(skillData.Name,skillData.Description,skillData.Cost.ToString());
     }
 
     /// <summary>
