@@ -459,6 +459,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 598804927668011654, guid: 3df7cdf4d1232b746a2264d1c09a2a3c, type: 3}
+      propertyPath: m_FontData.m_Font
+      value: 
+      objectReference: {fileID: 12800000, guid: 28c4e00aa4cf96649b74e399f64dac72, type: 3}
     - target: {fileID: 1051885909441260662, guid: 3df7cdf4d1232b746a2264d1c09a2a3c, type: 3}
       propertyPath: m_Camera
       value: 
@@ -561,11 +565,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7158462373273825047, guid: 3df7cdf4d1232b746a2264d1c09a2a3c, type: 3}
       propertyPath: m_Color.b
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7158462373273825047, guid: 3df7cdf4d1232b746a2264d1c09a2a3c, type: 3}
       propertyPath: m_Color.g
-      value: 0
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7158462373273825047, guid: 3df7cdf4d1232b746a2264d1c09a2a3c, type: 3}
+      propertyPath: m_Color.r
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7965310099753755294, guid: 3df7cdf4d1232b746a2264d1c09a2a3c, type: 3}
       propertyPath: m_Name
