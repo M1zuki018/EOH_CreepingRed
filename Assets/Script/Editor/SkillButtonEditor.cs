@@ -13,7 +13,8 @@ public class SkillButtonEditor : Editor
         base.OnInspectorGUI();
         
         SkillButton skillButton = (SkillButton)target;
-
+        GUI.backgroundColor = Color.red;
+        
         if (skillButton.SkillData == null)
         {
             if (GUILayout.Button("スキルデータを自動作成＆アサイン"))
@@ -35,12 +36,12 @@ public class SkillButtonEditor : Editor
         }
 
         // ファイル名をユニークIDで作成
-        string skillName = System.Guid.NewGuid().ToString("N").Substring(0, 6);
+        string skillName = skillButton.gameObject.name;
         string assetPath = $"{folderPath}{skillName}.asset";
 
         // ScriptableObject を新規作成
         SkillDataSO newSkillData = CreateInstance<SkillDataSO>();
-        newSkillData.name = skillButton.gameObject.name; // 初期名をオブジェクト名にする
+        newSkillData.SetName(skillButton.gameObject.name); // スキルの初期名をオブジェクト名にする
 
         // アセットとして保存
         AssetDatabase.CreateAsset(newSkillData, assetPath);

@@ -467,6 +467,10 @@ PrefabInstance:
       propertyPath: m_AnchorMax.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5423895062174810873, guid: 3df7cdf4d1232b746a2264d1c09a2a3c, type: 3}
+      propertyPath: _skillData
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 5501374588335235260, guid: 3df7cdf4d1232b746a2264d1c09a2a3c, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
@@ -555,12 +559,21 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7158462373273825047, guid: 3df7cdf4d1232b746a2264d1c09a2a3c, type: 3}
+      propertyPath: m_Color.b
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7158462373273825047, guid: 3df7cdf4d1232b746a2264d1c09a2a3c, type: 3}
+      propertyPath: m_Color.g
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 7965310099753755294, guid: 3df7cdf4d1232b746a2264d1c09a2a3c, type: 3}
       propertyPath: m_Name
       value: SkillTreeTest
       objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: 8819927450137829657, guid: 3df7cdf4d1232b746a2264d1c09a2a3c, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 3df7cdf4d1232b746a2264d1c09a2a3c, type: 3}
