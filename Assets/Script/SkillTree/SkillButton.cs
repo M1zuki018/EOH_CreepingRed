@@ -14,12 +14,12 @@ public class SkillButton　: ViewBase
     public bool IsUnlocked => _isUnlocked;
     private Button _button;
     
-    public event Action<SkillDataSO> OnClick; 
+    public event Action<SkillButton> OnClick; 
 
     public override UniTask OnUIInitialize()
     {
         _button = GetComponent<Button>();
-        _button.onClick.AddListener(() => OnClick?.Invoke(_skillData));
+        _button.onClick.AddListener(() => OnClick?.Invoke(this));
         
         return base.OnUIInitialize();
     }

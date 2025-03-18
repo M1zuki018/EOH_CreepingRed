@@ -22,9 +22,10 @@ public class ContagionSkillTree : SkillBase
     /// <summary>
     /// 受け取ったスキルデータに合わせてUIを更新する
     /// </summary>
-    private void UIUpdate(SkillDataSO skillData)
+    private void UIUpdate(SkillButton button)
     {
-        _skillTreeUIController.SkillTextsUpdate(skillData.Name,skillData.Description,skillData.Cost.ToString());
+        _skillTreeUIController.SkillTextsUpdate(button.SkillData.Name, button.SkillData.Description,button.SkillData.Cost.ToString());
+        _skillTreeUIController.ChangeUnlockButton(true);
     }
 
     /// <summary>

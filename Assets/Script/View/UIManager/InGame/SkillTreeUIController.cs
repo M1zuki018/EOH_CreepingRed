@@ -19,9 +19,10 @@ public class SkillTreeUIController : ViewBase, IWindow
     [SerializeField, HighlightIfNull, Comment("スキル名のエリア")] private Text _skillName;
     [SerializeField, HighlightIfNull, Comment("スキル説明のエリア")] private Text _skillDescription;
     [SerializeField, HighlightIfNull, Comment("解放コストのエリア")] private Text _point;
+    [SerializeField, HighlightIfNull, Comment("解放ボタン")] private Button _unlockButton;
     
     private CanvasGroup _canvasGroup;
-    public event Action OnGameStart;
+    public event Action OnUnlock;
         
     public override UniTask OnUIInitialize()
     {
@@ -33,6 +34,8 @@ public class SkillTreeUIController : ViewBase, IWindow
         }
         
         SkillTextsUpdate(" ", " ", " ");
+        ChangeUnlockButton(false);
+        _unlockButton.onClick.AddListener(UnlockedSkill);
         
         return base.OnUIInitialize();
     }
@@ -45,6 +48,23 @@ public class SkillTreeUIController : ViewBase, IWindow
         _skillName.text = name;
         _skillDescription.text = description;
         _point.text = point;
+    }
+
+    /// <summary>
+    /// スキルの解放ボタンにインタラクティブできるかどうかを切り替える
+    /// </summary>
+    public void ChangeUnlockButton(bool isUnlock)
+    {
+        _unlockButton.interactable = isUnlock;
+    }
+
+    /// <summary>
+    /// スキルを解放する
+    /// </summary>
+    public void UnlockedSkill()
+    {
+        OnUnlock?.Invoke();
+        Debug.Log("スキル解放");
     }
     
     public void Show()
@@ -60,5 +80,10 @@ public class SkillTreeUIController : ViewBase, IWindow
     public void Block()
     {
         CanvasVisibilityController.Block(_canvasGroup);
+    }
+
+    private void OnDestroy()
+    {
+        _unlockButton.onClick.RemoveAllListeners(); // 登録解除
     }
 }
