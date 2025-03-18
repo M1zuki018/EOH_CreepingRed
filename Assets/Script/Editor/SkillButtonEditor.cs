@@ -41,7 +41,7 @@ public class SkillButtonEditor : Editor
 
         // ScriptableObject を新規作成
         SkillDataSO newSkillData = CreateInstance<SkillDataSO>();
-        newSkillData.SetName(skillButton.gameObject.name); // スキルの初期名をオブジェクト名にする
+        newSkillData.name = skillButton.gameObject.name; // スキルの初期名をオブジェクト名にする
 
         // アセットとして保存
         AssetDatabase.CreateAsset(newSkillData, assetPath);

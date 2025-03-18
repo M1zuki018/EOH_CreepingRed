@@ -24,6 +24,4 @@ public class SkillDataSO : ScriptableObject
     public float RiskRate => _riskRate;
     public float ResistanceRate => _resistanceRate;
     public List<SkillButton> PrerequisiteSkills => _prerequisiteSkills;
-    
-    public void SetName(string newName) => _name = newName;
 }
