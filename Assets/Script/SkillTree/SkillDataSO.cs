@@ -2,10 +2,10 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// 各スキルのデータ
+/// 各スキルのデータを管理するスクリプタブルオブジェクト
 /// </summary>
-[CreateAssetMenu(fileName = "SkillData", menuName = "Create SO/SkillData")]
-public class SkillData : ScriptableObject
+[CreateAssetMenu(fileName = "SkillData", menuName = "Create SO/SkillDataSO")]
+public class SkillDataSO : ScriptableObject
 {
     [SerializeField] private Sprite _icon;
     [SerializeField, Comment("スキル名")] private string _name;

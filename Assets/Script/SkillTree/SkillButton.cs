@@ -5,5 +5,5 @@ using UnityEngine;
 /// </summary>
 public class SkillButton　: ViewBase
 {
-    [SerializeField, HighlightIfNull, Expandable] private SkillData _skillData;
+    [SerializeField, HighlightIfNull, Expandable] private SkillDataSO _skillData;
 }
