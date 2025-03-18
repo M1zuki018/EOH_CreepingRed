@@ -88,10 +88,10 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 842271600908506885}
+  - component: {fileID: 1045542282753035367}
   - component: {fileID: 495214984924872506}
   - component: {fileID: 2779001763074007433}
   - component: {fileID: 5390105389856713287}
-  - component: {fileID: 1045542282753035367}
   m_Layer: 5
   m_Name: SkillButton
   m_TagString: Untagged
@@ -119,6 +119,19 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 247}
   m_SizeDelta: {x: 80, y: 80}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1045542282753035367
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8813719897871548401}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8b2c046491ba7f347b69e81ac148ac98, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _skillData: {fileID: 0}
 --- !u!222 &495214984924872506
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -201,16 +214,3 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
---- !u!114 &1045542282753035367
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8813719897871548401}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8b2c046491ba7f347b69e81ac148ac98, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _skillData: {fileID: 0}

@@ -11,7 +11,7 @@ public class ExpandableDrawer : PropertyDrawer
     {
         if (property.objectReferenceValue == null) return EditorGUIUtility.singleLineHeight;
 
-        SerializedObject serializedObject = new SerializedObject(property.objectReferenceValue);
+        using SerializedObject serializedObject = new SerializedObject(property.objectReferenceValue);
         SerializedProperty iterator = serializedObject.GetIterator();
         iterator.NextVisible(true); // スクリプトの表示をスキップする
 
@@ -34,12 +34,15 @@ public class ExpandableDrawer : PropertyDrawer
 
         if (property.objectReferenceValue != null)
         {
-            SerializedObject serializedObject = new SerializedObject(property.objectReferenceValue);
+            using SerializedObject serializedObject = new SerializedObject(property.objectReferenceValue);
+            serializedObject.Update(); // Inspecterを更新
+            
             SerializedProperty iterator = serializedObject.GetIterator();
             iterator.NextVisible(true); // スクリプトの表示をスキップする
 
             // 枠を描画
-            Rect boxRect = new Rect(position.x, position.y + EditorGUIUtility.singleLineHeight + 2, position.width, GetPropertyHeight(property, label) - EditorGUIUtility.singleLineHeight - 4);
+            Rect boxRect = new Rect(position.x, position.y + EditorGUIUtility.singleLineHeight + 2, position.width,
+                GetPropertyHeight(property, label) - EditorGUIUtility.singleLineHeight - 4);
             GUI.Box(boxRect, GUIContent.none, EditorStyles.helpBox);
 
             float yOffset = position.y + EditorGUIUtility.singleLineHeight + 6;
