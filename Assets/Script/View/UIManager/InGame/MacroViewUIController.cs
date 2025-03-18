@@ -15,18 +15,21 @@ using UnityEngine.UI;
 public class MacroViewUIController : ViewBase, IWindow
 {
     [SerializeField, HighlightIfNull] private Button _skillTreeButton;
+    [SerializeField, HighlightIfNull] private Button _closeButton;
     [SerializeField, HighlightIfNull] private Button[] _areaButton = new Button[19];
     
     private CanvasGroup _canvasGroup;
     private List<AreaSettingsSO> _areaSettings;
     public event Action OnSkillTree;
     public event Action OnArea;
+    public event Action OnClose;
         
     public override UniTask OnUIInitialize()
     {
         _canvasGroup = GetComponent<CanvasGroup>();
     
         _skillTreeButton.onClick.AddListener(() => OnSkillTree?.Invoke());
+        _closeButton.onClick.AddListener(() => OnClose?.Invoke());
 
         for (int i = 0; i < _areaButton.Length; i++)
         {
