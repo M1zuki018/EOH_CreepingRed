@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
@@ -13,6 +14,8 @@ using UnityEngine.UI;
 [RequireComponent(typeof(CanvasGroup))]
 public class SkillTreeUIController : ViewBase, IWindow
 {
+    [Header("スキルツリーのためのセットアップ")]
+    [SerializeField] private List<SkillBase> _skillTrees = new List<SkillBase>();
     [SerializeField, HighlightIfNull, Comment("スキル名のエリア")] private Text _skillName;
     [SerializeField, HighlightIfNull, Comment("スキル説明のエリア")] private Text _skillDescription;
     [SerializeField, HighlightIfNull, Comment("解放コストのエリア")] private Text _point;
@@ -23,7 +26,12 @@ public class SkillTreeUIController : ViewBase, IWindow
     public override UniTask OnUIInitialize()
     {
         _canvasGroup = GetComponent<CanvasGroup>();
-    
+
+        foreach (var skillTree in _skillTrees)
+        {
+            skillTree.SetUIController(this);
+        }
+        
         SkillTextsUpdate(" ", " ", " ");
         
         return base.OnUIInitialize();

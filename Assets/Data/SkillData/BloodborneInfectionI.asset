@@ -15,8 +15,8 @@ MonoBehaviour:
   _icon: {fileID: 0}
   _name: "\u8840\u6DB2\u5A92\u4ECB\u611F\u67D31"
   _description: "\u8840\u6DB2\u3092\u4ECB\u3057\u3066\u611F\u67D3\u304C\u5E83\u304C\u308B\u6700\u521D\u306E\u6BB5\u968E\u3002"
-  _cost: 1
-  _spreadRate: 0
-  _detectionRate: 0
+  _cost: 5
+  _spreadRate: 10
+  _detectionRate: 5
   _lethalityRate: 0
-  _prerequisiteSkillsEnum: 00000000
+  _prerequisiteSkillsEnum: 

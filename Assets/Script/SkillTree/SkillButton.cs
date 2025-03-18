@@ -19,6 +19,7 @@ public class SkillButton　: ViewBase
     {
         _button = GetComponent<Button>();
         _button.onClick.AddListener(() => OnClick?.Invoke(_skillData));
+        
         return base.OnUIInitialize();
     }
 

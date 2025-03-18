@@ -13,10 +13,10 @@ MonoBehaviour:
   m_Name: BloodborneInfectionIII
   m_EditorClassIdentifier: 
   _icon: {fileID: 0}
-  _name: New Skill
-  _description: Skill Description
-  _cost: 1
-  _spreadRate: 0
-  _detectionRate: 0
+  _name: "\u8840\u6DB2\u5A92\u4ECB\u611F\u67D33"
+  _description: "\u9AD8\u5EA6\u306A\u8840\u6DB2\u5A92\u4ECB\u611F\u67D3\u304C\u53EF\u80FD\u3068\u306A\u308A\u3001\u3088\u308A\u8FC5\u901F\u306B\u611F\u67D3\u304C\u62E1\u5927\u3059\u308B\u3002"
+  _cost: 15
+  _spreadRate: 35
+  _detectionRate: 15
   _lethalityRate: 0
-  _prerequisiteSkillsEnum: 
+  _prerequisiteSkillsEnum: 0a000000

@@ -5,9 +5,10 @@ using UnityEngine;
 /// <summary>
 /// 感染スキルのツリー
 /// </summary>
-public class ContagionSkillTree : ViewBase
+public class ContagionSkillBase : SkillBase
 {
     [SerializeField] private List<SkillButton> _skillButtons = new List<SkillButton>();
+    private SkillTreeUIController _skillTreeUIController;
 
     public override UniTask OnBind()
     {
@@ -24,5 +25,13 @@ public class ContagionSkillTree : ViewBase
     private void UIUpdate(SkillDataSO skillData)
     {
         
+    }
+
+    /// <summary>
+    /// スキルツリーの参照を得る
+    /// </summary>
+    public override void SetUIController(SkillTreeUIController skillTreeUIController)
+    {
+        _skillTreeUIController = skillTreeUIController;
     }
 }
