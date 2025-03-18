@@ -25,4 +25,16 @@ public class SkillDataSO : ScriptableObject
     public float RiskRate => _riskRate;
     public float ResistanceRate => _resistanceRate;
     public List<SkillEnum> PrerequisiteSkillsEnum => _prerequisiteSkillsEnum;
+
+    /// <summary>
+    /// データをセットする
+    /// </summary>
+    public void SetData(string description, int cost, float infectionRate, float riskRate, float resistanseRate)
+    {
+        _description = description;
+        _cost = cost;
+        _infectionRate = infectionRate;
+        _riskRate = riskRate;
+        _resistanceRate = resistanseRate;
+    }
 }
