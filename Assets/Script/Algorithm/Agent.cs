@@ -10,7 +10,7 @@ public struct Agent
     public AgentType Type { get; }
     public int X { get; private set; }
     public int Y { get; private set; }
-    public AgentState State { get; set; }
+    public AgentState State { get; private set; }
     public bool Skip{get;set;}
 
     // Randomは構造体に直接埋め込むのは難しいので、必要なときに生成する
@@ -41,5 +41,14 @@ public struct Agent
     public void Infect()
     {
         State = AgentState.Infected;
+    }
+
+    /// <summary>
+    /// 0-100の乱数を返す
+    /// </summary>
+    /// <returns></returns>
+    public int RandomNumber()
+    {
+        return random.Next(0, 100);
     }
 }

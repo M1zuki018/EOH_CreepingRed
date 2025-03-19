@@ -12,17 +12,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 65b5aee03a9e6c149b0d7f369996c783, type: 3}
   m_Name: AreaSettings
   m_EditorClassIdentifier: 
-  x: 0
-  y: 0
-  name: 0
-  category: 0
-  population: 135
-  citizenPopulation: 55
-  magicSoldierPopulation: 80
-  areaSize: 77.2
-  populationDensity: 16839
-  security: 90
-  mobilityRate: 30
-  infectionRate: -2
-  control: 95
-  specialFlags: []
+  X: 0
+  Y: 0
+  Name: 0
+  Explaination: a
+  Category: 0
+  Population: 50
+  CitizenPopulation: 35
+  MagicSoldierPopulation: 15
+  AreaSize: 15
+  PopulationDensity: 1
+  Security: 1
+  MobilityRate: 1
+  InfectionRate: 1
+  Control: 1
+  SpecialFlags: []

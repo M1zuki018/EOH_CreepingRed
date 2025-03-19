@@ -56,7 +56,7 @@ public class MiniQuadtree
         Debug.Log($"生成完了（実行時間:{stopwatch.ElapsedMilliseconds}ミリ秒） エージェントの数{_agents.Count}/サブツリーの数{_subTrees.Count}");
         
         _agents.TryGetValue((0,0), out var test);
-        test.State = AgentState.Infected;
+        test.Infect();
         _agents[(0, 0)] = test;
     }
 
@@ -236,8 +236,8 @@ public class MiniQuadtree
         InfectionJob job = new InfectionJob
         {
             agents = _agentArray,
-            baseInfectionRate = 5f,
-            infectionMultiplier = 2
+            baseRate = 90f,
+            regionMod = 2
         };
         
         JobHandle jobHandle = job.Schedule(_agentArray.Length, 64); // 64スレッド単位で並列処理
@@ -283,19 +283,26 @@ public class MiniQuadtree
     private struct InfectionJob : IJobParallelFor
     {
         public NativeArray<Agent> agents;
-        public float baseInfectionRate;
-        public float infectionMultiplier;
-
+        public float baseRate; // 基礎感染率（スキルツリーによって変動）
+        public float regionMod; // 区域補正（AreaData参照。変動しない）
+        public float envMod; // 環境補正（ゲーム進行中に変動する）
+        public float difficultyMod; // 難易度補正（GameSettingsの難易度参照。変動しない）
+        
         public void Execute(int index)
         {
             Agent agent = agents[index];
+            float targetResistMod = agent.Type == AgentType.MagicSoldier ? 0.2f : 0f; // agentsのタイプによってかかる補正
+            envMod = 0;
+            difficultyMod = 0;
             
-            float infectionProbability = baseInfectionRate * infectionMultiplier + 20; // 感染する確率
-
-            // 感染判定
-            if (infectionProbability > 10)
+            // 感染確率を計算
+            // 基礎感染率×区域補正× (1 + 環境補正) × (1 + 難易度補正) × (1 - 対象耐性補正)
+            float infectionProbability = baseRate * (1 + regionMod) * (1 + envMod) * (1 + difficultyMod) * (1 - targetResistMod);
+            
+            // 感染判定。乱数が感染確率
+            if (infectionProbability > agent.RandomNumber())
             {
-                agent.State = AgentState.Infected;
+                agent.Infect(); // 感染
             }
             
             agents[index] = agent; // 変更を反映

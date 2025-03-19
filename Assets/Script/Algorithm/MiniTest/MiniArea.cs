@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
@@ -129,6 +128,9 @@ public class MiniArea
         await Task.WhenAll(tasks);
     }
     
+    /// <summary>
+    /// AgentStateCountを更新する
+    /// </summary>
     private void UpdateStateCount()
     {
         AreaStateCount.ResetStateCount();

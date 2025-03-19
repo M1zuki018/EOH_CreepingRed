@@ -1,6 +1,4 @@
-using System.Collections.Generic;
 using System.Diagnostics;
-using Cysharp.Threading.Tasks;
 using Unity.Jobs;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
@@ -31,7 +29,6 @@ public class MiniCell
     private void InitializeAgents(int citizen, int magicSoldier)
     {
         _quadtree.InitializeAgents(citizen, magicSoldier).Forget();
-        
     }
 
     /// <summary>

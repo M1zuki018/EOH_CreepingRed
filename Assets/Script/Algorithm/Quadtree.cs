@@ -320,7 +320,7 @@ public class Quadtree
             if (infectionProbability > 10)
             {
                 Debug.Log("あ");
-                agent.State = AgentState.Infected;
+                agent.Infect();
             }
         }
     }
