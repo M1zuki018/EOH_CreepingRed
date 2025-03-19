@@ -118,7 +118,7 @@ public class MiniArea
         List<Task> tasks = new List<Task>();
         foreach (var cell in _cells)
         {
-            tasks.Add(Task.Run(() => cell.SimulateInfection(100f, InfectionRate)));
+            tasks.Add(Task.Run(() => cell.SimulateInfection()));
         }
         
         await Task.WhenAll(tasks);

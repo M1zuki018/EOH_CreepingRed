@@ -34,7 +34,7 @@ public class MiniCell
     /// <summary>
     /// 感染シミュレーション
     /// </summary>
-    public void SimulateInfection(float baseInfectionRate, float infectionMultiplier)
+    public void SimulateInfection()
     {
         Stopwatch stopwatch = new Stopwatch();
         stopwatch.Start();
