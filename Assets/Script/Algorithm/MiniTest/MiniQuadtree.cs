@@ -26,8 +26,10 @@ public class MiniQuadtree
     // シミュレーション関連
     private List<(int, int)> _infectedAgentsCoords = new List<(int, int)>(); // 処理を行う感染済みのエージェント
     private HashSet<(int, int)> _checkAgentCoords = new HashSet<(int, int)>(); // 感染判定を行う対象のエージェント
+    private List<(int, int)> _nearDeathAgentsCoords = new List<(int, int)>(); // 仮死判定を行う対象のエージェント
     private JobHandle _infectionJobHandle;
-    private NativeArray<Agent> _agentArray;
+    private NativeArray<Agent> _agentArray; // 感染判定を行うエージェントのNativeArray
+    private NativeArray<Agent> _nearDeathAgentsArray; // 死亡判定を行うエージェントのNativeArray
     private readonly object _subdivideLock = new object();  // ロックオブジェクト
     private float _regionMod; // 感染確率計算の環境補正
     private float _difficultyMod; // 感染確率計算の難易度補正
@@ -173,9 +175,13 @@ public class MiniQuadtree
     {
         foreach (var agent in _agents)
         {
-            if (!agent.Value.Skip && agent.Value.State == AgentState.Infected)
+            if (agent.Value.State == AgentState.Infected)
             {
-                _infectedAgentsCoords.Add(agent.Key); // スキップしなかったエージェントを座標をリストに追加
+                if (!agent.Value.Skip)
+                {
+                    _infectedAgentsCoords.Add(agent.Key); // スキップしなかったエージェントを座標をリストに追加
+                }
+                _nearDeathAgentsCoords.Add(agent.Key);
             }
         }
 
@@ -189,6 +195,7 @@ public class MiniQuadtree
             }
         }
 
+        NearDeathDetermination();
         return GetInfectedAreas();
     }
 
@@ -334,8 +341,69 @@ public class MiniQuadtree
             {
                 agent.Infect(); // 感染
             }
+            
+            agents[index] = agent; // 変更を反映
+        }
+    }
 
-            if (InfectionParameters.LethalityRate > agent.RandomNumber())
+    #endregion
+
+    #region 死亡判定
+
+    /// <summary>
+    /// 死亡判定を行う
+    /// </summary>
+    private void NearDeathDetermination()
+    {
+        _nearDeathAgentsArray = new NativeArray<Agent>(_nearDeathAgentsCoords.Count, Allocator.TempJob);
+        
+        int index = 0;
+        foreach (var coord in _nearDeathAgentsCoords)
+        {
+            if (_agents.TryGetValue(coord, out var agent))
+            {
+                _nearDeathAgentsArray[index] = agent;
+                index++;
+            }
+        }
+
+        NearDeathJob job = new NearDeathJob
+        {
+            agents = _nearDeathAgentsArray,
+            lethalityRate = InfectionParameters.LethalityRate,
+        };
+        
+        JobHandle jobHandle = job.Schedule(_nearDeathAgentsArray.Length, 64);
+        
+        jobHandle.Complete();
+        
+        // 結果を _agents に反映
+        for (int i = 0; i < _nearDeathAgentsArray.Length; i++)
+        {
+            var updatedAgent = _nearDeathAgentsArray[i];
+            var coord = (updatedAgent.X, updatedAgent.Y);
+
+            if (_agents.ContainsKey(coord))
+            {
+                _agents[coord] = updatedAgent; // 更新を反映
+            }
+        }
+        
+        // メモリ解放
+        _nearDeathAgentsArray.Dispose();
+    }
+    
+    [BurstCompile]
+    private struct NearDeathJob : IJobParallelFor
+    {
+        public NativeArray<Agent> agents;
+        public float lethalityRate; // 致死率
+        
+        public void Execute(int index)
+        {
+            Agent agent = agents[index];
+
+            if (lethalityRate > agent.RandomNumber())
             {
                 agent.NearDeath();
             }
