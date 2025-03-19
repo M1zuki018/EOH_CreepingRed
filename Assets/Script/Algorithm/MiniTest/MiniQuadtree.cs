@@ -164,7 +164,7 @@ public class MiniQuadtree
     }
     #endregion
 
-    #region 感染処理
+    #region 感染シミュレーション
 
     /// <summary>
     /// 感染状態のエージェントで、Skipフラグがfalseのエージェントを探す
@@ -175,7 +175,7 @@ public class MiniQuadtree
         {
             if (!agent.Value.Skip && agent.Value.State == AgentState.Infected)
             {
-                _infectedAgentsCoords.Add(agent.Key); // 座標をリストに追加
+                _infectedAgentsCoords.Add(agent.Key); // スキップしなかったエージェントを座標をリストに追加
             }
         }
 
@@ -333,6 +333,11 @@ public class MiniQuadtree
             if (infectionProbability > agent.RandomNumber())
             {
                 agent.Infect(); // 感染
+            }
+
+            if (InfectionParameters.LethalityRate > agent.RandomNumber())
+            {
+                agent.NearDeath();
             }
             
             agents[index] = agent; // 変更を反映

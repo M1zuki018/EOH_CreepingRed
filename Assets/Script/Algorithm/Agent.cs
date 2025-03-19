@@ -1,4 +1,5 @@
 using System;
+using UnityEngine;
 using Random = System.Random;
 
 /// <summary>
@@ -41,6 +42,14 @@ public struct Agent
     public void Infect()
     {
         State = AgentState.Infected;
+    }
+
+    /// <summary>
+    /// 仮死
+    /// </summary>
+    public void NearDeath()
+    { 
+        State = AgentState.NearDeath;
     }
 
     /// <summary>
