@@ -14,10 +14,10 @@ public class MiniCell
     private JobHandle _quadtreeJobHandle;
     public AgentStateCount StateCount { get; private set; }
     
-    public MiniCell(int id, int citizen, int magicSoldier)
+    public MiniCell(int id, int citizen, int magicSoldier, float regionMod)
     {
         _id = id;
-        _quadtree = new MiniQuadtree(new Rect(0, 0, 1000, 1000));
+        _quadtree = new MiniQuadtree(new Rect(0, 0, 1000, 1000), regionMod);
         StateCount = new AgentStateCount();
         
         InitializeAgents(citizen, magicSoldier);

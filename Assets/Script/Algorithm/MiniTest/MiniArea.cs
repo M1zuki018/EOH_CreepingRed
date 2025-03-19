@@ -94,7 +94,7 @@ public class MiniArea
         // セルを生成
         for (int i = 0; i < cellCount; i++)
         {
-            _cells.Add(new MiniCell(i, cellCitizenPopulation, cellMagicSoldierPopulation));
+            _cells.Add(new MiniCell(i, cellCitizenPopulation, cellMagicSoldierPopulation, InfectionRate * 0.01f));
         }
 
         // あまりがあった場合
@@ -104,7 +104,7 @@ public class MiniArea
             int remainderCitizenPopulation = (int)(remainderPopulation * (CitizenPopulation / (float)Population));
             int remainderMagicSoldierPopulation = remainderPopulation - remainderCitizenPopulation;
             
-            _cells.Add(new MiniCell(cellCount, remainderCitizenPopulation, remainderMagicSoldierPopulation));
+            _cells.Add(new MiniCell(cellCount, remainderCitizenPopulation, remainderMagicSoldierPopulation, InfectionRate * 0.01f));
         }
         
         Debug.Log($"{settings.Name.ToString()}エリアのセルの数：{_cells.Count} 実行時間: {stopwatch.ElapsedMilliseconds} ミリ秒");

@@ -13,29 +13,51 @@ using Debug = UnityEngine.Debug;
 /// </summary>
 public class MiniQuadtree
 {
+    // 定数
     private const int MAX_AGENTS = 10000; // 1ツリーの最大エージェント数
     private const int MAX_DEPTH = 10; // 最大分割回数
     
+    // QuadTree関連
     private Dictionary<MiniQuadtree, bool> _subTrees; // サブツリーとSkipフラグ
     private Dictionary<(int x, int y), Agent> _agents; // エージェントの情報
     private Rect _bounds;
     private int _depth = 0; // 現在の分割数
     private int _maxX = 1000; // セル内の座標の横幅の上限
     
+    // シミュレーション関連
     private List<(int, int)> _infectedAgentsCoords = new List<(int, int)>(); // 処理を行う感染済みのエージェント
     private HashSet<(int, int)> _checkAgentCoords = new HashSet<(int, int)>(); // 感染判定を行う対象のエージェント
     private JobHandle _infectionJobHandle;
     private NativeArray<Agent> _agentArray;
     private readonly object _subdivideLock = new object();  // ロックオブジェクト
+    private float _regionMod; // 感染確率計算の環境補正
+    private float _difficultyMod; // 感染確率計算の難易度補正
 
-    public MiniQuadtree(Rect bounds, int depth = 0)
+    public MiniQuadtree(Rect bounds, float regionMod, int depth = 0)
     {
         _bounds = bounds;
+        _regionMod = regionMod;
         _depth = depth;
         _subTrees = new Dictionary<MiniQuadtree, bool>();
         _agents = new Dictionary<(int x, int y), Agent>();
         _infectedAgentsCoords = new List<(int, int)>();
         _checkAgentCoords = new HashSet<(int, int)>();
+        SetDifficultyMod();
+    }
+
+    /// <summary>
+    /// 現在の難易度に応じて難易度補正の値を決める
+    /// </summary>
+    private void SetDifficultyMod()
+    {
+        _difficultyMod = GameSettingsManager.Difficulty switch
+        {
+            DifficultyEnum.Breeze => 0,
+            DifficultyEnum.Storm => 0.05f, // 普通
+            DifficultyEnum.Catastrophe => 0.1f, //難しい
+            DifficultyEnum.Unknown => 0.2f, // 激ムズ
+            DifficultyEnum.Custom => 0f, // カスタム難易度
+        };
     }
 
     #region 初期化
