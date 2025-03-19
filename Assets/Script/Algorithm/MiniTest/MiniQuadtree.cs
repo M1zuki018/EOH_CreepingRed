@@ -158,10 +158,10 @@ public class MiniQuadtree
         float y = _bounds.yMin;
         
         // 4つのサブツリーを作成
-        _subTrees.Add(new MiniQuadtree(new Rect(x, y, halfWidth, halfHeight), _depth + 1), false);  // 左下
-        _subTrees.Add(new MiniQuadtree(new Rect(x + halfWidth, y, halfWidth, halfHeight), _depth + 1), false);  // 右下
-        _subTrees.Add(new MiniQuadtree(new Rect(x, y + halfHeight, halfWidth, halfHeight), _depth + 1), false);  // 左上
-        _subTrees.Add(new MiniQuadtree(new Rect(x + halfWidth, y + halfHeight, halfWidth, halfHeight), _depth + 1), false);  // 右上
+        _subTrees.Add(new MiniQuadtree(new Rect(x, y, halfWidth, halfHeight), _regionMod,_depth + 1), false);  // 左下
+        _subTrees.Add(new MiniQuadtree(new Rect(x + halfWidth, y, halfWidth, halfHeight), _regionMod,_depth + 1), false);  // 右下
+        _subTrees.Add(new MiniQuadtree(new Rect(x, y + halfHeight, halfWidth, halfHeight), _regionMod,_depth + 1), false);  // 左上
+        _subTrees.Add(new MiniQuadtree(new Rect(x + halfWidth, y + halfHeight, halfWidth, halfHeight), _regionMod,_depth + 1), false);  // 右上
     }
     #endregion
 
@@ -259,7 +259,9 @@ public class MiniQuadtree
         {
             agents = _agentArray,
             baseRate = 90f,
-            regionMod = 2
+            regionMod = _regionMod,
+            envMod = 0f,
+            difficultyMod = _difficultyMod,
         };
         
         JobHandle jobHandle = job.Schedule(_agentArray.Length, 64); // 64スレッド単位で並列処理
@@ -314,8 +316,6 @@ public class MiniQuadtree
         {
             Agent agent = agents[index];
             float targetResistMod = agent.Type == AgentType.MagicSoldier ? 0.2f : 0f; // agentsのタイプによってかかる補正
-            envMod = 0;
-            difficultyMod = 0;
             
             // 感染確率を計算
             // 基礎感染率×区域補正× (1 + 環境補正) × (1 + 難易度補正) × (1 - 対象耐性補正)

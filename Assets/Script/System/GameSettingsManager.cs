@@ -7,7 +7,7 @@ public static class GameSettingsManager
 {
     private static GameSettings _instance;
     
-    private static DifficultyEnum _difficulty;
+    private static DifficultyEnum _difficulty = DifficultyEnum.Breeze;
 
     private static GameSettings Instance
     {
