@@ -14,7 +14,7 @@ public struct Agent
     public bool Skip{get;set;}
 
     // Randomは構造体に直接埋め込むのは難しいので、必要なときに生成する
-    private static Random random = new Random();
+    private static Random _random = new Random();
 
     public Agent(int id, AgentType type, int x, int y)
     {
@@ -29,8 +29,8 @@ public struct Agent
     public void Move(Grid grid)
     {
         // 生活・逃走などのルールに応じた移動処理
-        int dx = random.Next(-1, 2);
-        int dy = random.Next(-1, 2);
+        int dx = _random.Next(-1, 2);
+        int dy = _random.Next(-1, 2);
         X = Math.Max(0, Math.Min(grid.Areas.GetLength(0) - 1, X + dx));
         Y = Math.Max(0, Math.Min(grid.Areas.GetLength(1) - 1, Y + dy));
     }
@@ -49,6 +49,6 @@ public struct Agent
     /// <returns></returns>
     public int RandomNumber()
     {
-        return random.Next(0, 100);
+        return _random.Next(0, 100);
     }
 }

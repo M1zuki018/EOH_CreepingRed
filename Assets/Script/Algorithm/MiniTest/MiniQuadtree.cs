@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using Cysharp.Threading.Tasks;
 using Unity.Burst;
 using Unity.Collections;
@@ -255,12 +254,19 @@ public class MiniQuadtree
             }
         }
         
+        // 感染率と環境補正データをここで一度NativeArrayに移す
+        NativeArray<float> baseRateArray = new NativeArray<float>(1, Allocator.TempJob);
+        NativeArray<float> envModArray = new NativeArray<float>(1, Allocator.TempJob);
+
+        baseRateArray[0] = InfectionParameters.BaseRate;
+        envModArray[0] = InfectionParameters.EnvMod;
+        
         InfectionJob job = new InfectionJob
         {
             agents = _agentArray,
-            baseRate = 90f,
+            baseRate = baseRateArray[0],
             regionMod = _regionMod,
-            envMod = 0f,
+            envMod = envModArray[0],
             difficultyMod = _difficultyMod,
         };
         
@@ -281,8 +287,10 @@ public class MiniQuadtree
             }
         }
         
-        // ジョブ処理後に _agentArray を Dispose する
+        // メモリ解放
         _agentArray.Dispose();
+        baseRateArray.Dispose();
+        envModArray.Dispose();
         
         return jobHandle;
     }
