@@ -1,7 +1,7 @@
 /// <summary>
 /// 難易度の列挙型
 /// </summary>
-public enum Difficulty
+public enum DifficultyEnum
 {
     Breeze, // 簡単
     Storm, // 普通

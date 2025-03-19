@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.Audio;
 
 /// <summary>
 /// GameSettingsをラップする静的クラス
@@ -8,7 +7,7 @@ public static class GameSettingsManager
 {
     private static GameSettings _instance;
     
-    private static int _difficulty;
+    private static DifficultyEnum _difficulty;
 
     private static GameSettings Instance
     {
@@ -29,7 +28,7 @@ public static class GameSettingsManager
     /// <summary>
     /// 難易度
     /// </summary>
-    public static int Difficulty
+    public static DifficultyEnum Difficulty
     {
         get => _difficulty;
         set => _difficulty = value;

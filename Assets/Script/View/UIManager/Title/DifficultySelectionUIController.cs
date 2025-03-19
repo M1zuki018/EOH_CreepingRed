@@ -26,18 +26,18 @@ public class DifficultySelectionUIController : ViewBase, IWindow
     {
         _canvasGroup = GetComponent<CanvasGroup>();
     
-        _breeze.onClick.AddListener(() => Registration(0));
-        _storm.onClick.AddListener(() => Registration(1));
-        _catastrophe.onClick.AddListener(() => Registration(2));
-        _unknown.onClick.AddListener(() => Registration(3));
-        _custom.onClick.AddListener(() => Registration(4));
+        _breeze.onClick.AddListener(() => Registration(DifficultyEnum.Breeze));
+        _storm.onClick.AddListener(() => Registration(DifficultyEnum.Storm));
+        _catastrophe.onClick.AddListener(() => Registration(DifficultyEnum.Catastrophe));
+        _unknown.onClick.AddListener(() => Registration(DifficultyEnum.Unknown));
+        _custom.onClick.AddListener(() => Registration(DifficultyEnum.Custom));
         
         return base.OnUIInitialize();
     }
 
-    private void Registration(int index)
+    private void Registration(DifficultyEnum difficulty)
     {
-        GameSettingsManager.Difficulty = index; // 難易度をセット
+        GameSettingsManager.Difficulty = difficulty; // 難易度をセット
         OnSelect?.Invoke();
     }
     
