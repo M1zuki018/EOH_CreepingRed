@@ -13,15 +13,20 @@ using UnityEngine.UI;
 [RequireComponent(typeof(CanvasGroup))]
 public class EzechielSkillTreeUIController : ViewBase, IWindow
 {
+    [Header("InGameViewとしてのセットアップ")]
+    [SerializeField, HighlightIfNull] private Button _closeButton;
+    
+    [Header("スキルツリーのためのセットアップ")]
     [SerializeField, HighlightIfNull, Comment("リタのスキルツリーボタン")] private Button _ritaTreeButton;
     
     private CanvasGroup _canvasGroup;
+    public event Action OnClose;
     public event Action OnShowRitaTree;
         
     public override UniTask OnUIInitialize()
     {
         _canvasGroup = GetComponent<CanvasGroup>();
-    
+        _closeButton.onClick.AddListener(() => OnClose?.Invoke());
         _ritaTreeButton.onClick.AddListener(() => OnShowRitaTree?.Invoke());
         return base.OnUIInitialize();
     }
@@ -39,5 +44,12 @@ public class EzechielSkillTreeUIController : ViewBase, IWindow
     public void Block()
     {
         CanvasVisibilityController.Block(_canvasGroup);
+    }
+
+    private void OnDestroy()
+    {
+        // 登録解除
+        _closeButton.onClick.RemoveAllListeners();
+        _ritaTreeButton.onClick.RemoveAllListeners();
     }
 }

@@ -46,6 +46,7 @@ public class InGameSceneUIManager : UIManagerBase
         _skillTree.OnClose += () => TransitionView<IWindow>(_macroView, _skillTree);
         _skillTree.OnShowEzechielTree += () => TransitionView<IWindow>(_ezechielSkillTree, _skillTree);
         
+        _ezechielSkillTree.OnClose += () => TransitionView<IWindow>(_macroView, _ezechielSkillTree);
         _ezechielSkillTree.OnShowRitaTree += () => TransitionView<IWindow>(_skillTree, _ezechielSkillTree);
         
         _microView.OnMacroView += () => TransitionView<IWindow>(_macroView, _microView);
