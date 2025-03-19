@@ -23,15 +23,18 @@ public class SkillTreeUIController : ViewBase, IWindow
     [SerializeField, HighlightIfNull, Comment("スキル説明のエリア")] private Text _skillDescription;
     [SerializeField, HighlightIfNull, Comment("解放コストのエリア")] private Text _point;
     [SerializeField, HighlightIfNull, Comment("解放ボタン")] private Button _unlockButton;
+    [SerializeField, HighlightIfNull, Comment("エゼキエルのスキルツリーボタン")] private Button _ezechielButton;
     
     private CanvasGroup _canvasGroup;
     public event Action OnClose;
+    public event Action OnShowEzechielTree;
     public event Action OnUnlock;
         
     public override UniTask OnUIInitialize()
     {
         _canvasGroup = GetComponent<CanvasGroup>();
         _closeButton.onClick.AddListener(() => OnClose?.Invoke());
+        _ezechielButton.onClick.AddListener(() => OnShowEzechielTree?.Invoke());
 
         foreach (var skillTree in _skillTrees)
         {
@@ -92,5 +95,6 @@ public class SkillTreeUIController : ViewBase, IWindow
         // 登録解除
         _unlockButton.onClick.RemoveAllListeners(); 
         _closeButton.onClick.RemoveAllListeners();
+        _ezechielButton.onClick.RemoveAllListeners();
     }
 }

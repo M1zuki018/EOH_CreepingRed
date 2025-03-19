@@ -13,6 +13,7 @@ public class InGameSceneUIManager : UIManagerBase
     [SerializeField, HighlightIfNull] private MacroViewUIController _macroView;
     [SerializeField, HighlightIfNull] private MicroViewUIController _microView;
     [SerializeField, HighlightIfNull] private SkillTreeUIController _skillTree;
+    [SerializeField, HighlightIfNull] private EzechielSkillTreeUIController _ezechielSkillTree;
     
     public override UniTask OnAwake()
     {
@@ -43,6 +44,9 @@ public class InGameSceneUIManager : UIManagerBase
         _macroView.OnClose += () => TransitionView<IWindow>(_baseView, _macroView);
         
         _skillTree.OnClose += () => TransitionView<IWindow>(_macroView, _skillTree);
+        _skillTree.OnShowEzechielTree += () => TransitionView<IWindow>(_ezechielSkillTree, _skillTree);
+        
+        _ezechielSkillTree.OnShowRitaTree += () => TransitionView<IWindow>(_skillTree, _ezechielSkillTree);
         
         _microView.OnMacroView += () => TransitionView<IWindow>(_macroView, _microView);
         
@@ -55,6 +59,7 @@ public class InGameSceneUIManager : UIManagerBase
         _macroView.Hide();
         _microView.Hide();
         _skillTree.Hide();
+        _ezechielSkillTree.Hide();
         
         return base.OnStart();
     }

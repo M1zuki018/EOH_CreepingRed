@@ -119,6 +119,46 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!114 &267263604 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 8252501971034364666, guid: 9be3aeb83ed4eac4db28af4840704b68, type: 3}
+  m_PrefabInstance: {fileID: 2456730865685128156}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &433617664 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2578487975326467534, guid: 9be3aeb83ed4eac4db28af4840704b68, type: 3}
+  m_PrefabInstance: {fileID: 2456730865685128156}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!1 &437996322 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5000115111326584666, guid: 9be3aeb83ed4eac4db28af4840704b68, type: 3}
+  m_PrefabInstance: {fileID: 2456730865685128156}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &437996324
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 437996322}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b68e4dc28267e274b9c4baf9a2ae4e20, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _ritaTreeButton: {fileID: 267263604}
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
@@ -525,9 +565,21 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 262571100054648519, guid: 9be3aeb83ed4eac4db28af4840704b68, type: 3}
+      propertyPath: _ezechielSkillTree
+      value: 
+      objectReference: {fileID: 437996324}
+    - target: {fileID: 396726637940526277, guid: 9be3aeb83ed4eac4db28af4840704b68, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 854550928862381904, guid: 9be3aeb83ed4eac4db28af4840704b68, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1360603057074171754, guid: 9be3aeb83ed4eac4db28af4840704b68, type: 3}
+      propertyPath: m_Name
+      value: Rita
       objectReference: {fileID: 0}
     - target: {fileID: 1483999781373344091, guid: 9be3aeb83ed4eac4db28af4840704b68, type: 3}
       propertyPath: m_AnchorMax.y
@@ -613,22 +665,54 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4949480903263360845, guid: 9be3aeb83ed4eac4db28af4840704b68, type: 3}
+      propertyPath: m_Color.b
+      value: 0.40183342
+      objectReference: {fileID: 0}
+    - target: {fileID: 4949480903263360845, guid: 9be3aeb83ed4eac4db28af4840704b68, type: 3}
+      propertyPath: m_Color.g
+      value: 0.49108312
+      objectReference: {fileID: 0}
+    - target: {fileID: 4949480903263360845, guid: 9be3aeb83ed4eac4db28af4840704b68, type: 3}
+      propertyPath: m_Color.r
+      value: 0.6603774
+      objectReference: {fileID: 0}
     - target: {fileID: 5002589395135050100, guid: 9be3aeb83ed4eac4db28af4840704b68, type: 3}
       propertyPath: m_Camera
       value: 
       objectReference: {fileID: 519420031}
+    - target: {fileID: 6048215583453889038, guid: 9be3aeb83ed4eac4db28af4840704b68, type: 3}
+      propertyPath: _ezechielButton
+      value: 
+      objectReference: {fileID: 433617664}
     - target: {fileID: 6164294547386205030, guid: 9be3aeb83ed4eac4db28af4840704b68, type: 3}
       propertyPath: m_Name
       value: MainCanvas
+      objectReference: {fileID: 0}
+    - target: {fileID: 6389657568810365193, guid: 9be3aeb83ed4eac4db28af4840704b68, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7186850342858490442, guid: 9be3aeb83ed4eac4db28af4840704b68, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7421284551788555170, guid: 9be3aeb83ed4eac4db28af4840704b68, type: 3}
+      propertyPath: m_Text
+      value: Rita SkillTree
       objectReference: {fileID: 0}
     - target: {fileID: 8369519077054711406, guid: 9be3aeb83ed4eac4db28af4840704b68, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 8788426250411315415, guid: 9be3aeb83ed4eac4db28af4840704b68, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 5000115111326584666, guid: 9be3aeb83ed4eac4db28af4840704b68, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 437996324}
   m_SourcePrefab: {fileID: 100100000, guid: 9be3aeb83ed4eac4db28af4840704b68, type: 3}
 --- !u!1001 &5029673032093044718
 PrefabInstance:
