@@ -35,6 +35,7 @@ public class MiniQuadtree
     private readonly object _subdivideLock = new object();  // ロックオブジェクト
     private readonly float _regionMod; // 感染確率計算の環境補正
     private float _difficultyMod; // 感染確率計算の難易度補正
+    private int _infectionRange; // 感染範囲
 
     public MiniQuadtree(Rect bounds, float regionMod, int depth = 0)
     {
@@ -178,6 +179,7 @@ public class MiniQuadtree
         // リストを最初にクリアしておく
         _infectedAgentsCoords.Clear();
         _checkAgentCoords.Clear();
+        _infectionRange = InfectionParameters.InfectionRange; // 感染範囲を更新
         
         foreach (var agent in _agents)
         {
@@ -215,22 +217,17 @@ public class MiniQuadtree
 
         lock (_lockObject)
         {
-
-
             foreach (var coord in _infectedAgentsCoords)
             {
                 // 対応するエージェントが取得出来なかったら以降の処理を行わないで次
                 if (!_agents.TryGetValue(coord, out var infectedAgent))
                     continue;
 
-                // 感染範囲を定義
-                int infectionRange = 2;
-
                 // 周囲の座標を調べ、感染範囲内にいるエージェントを取得
                 bool allNeighborsInfected = true; // 初期状態は全て感染していると仮定
-                for (int dx = -infectionRange; dx <= infectionRange; dx++)
+                for (int dx = -_infectionRange; dx <= _infectionRange; dx++)
                 {
-                    for (int dy = -infectionRange; dy <= infectionRange; dy++)
+                    for (int dy = -_infectionRange; dy <= _infectionRange; dy++)
                     {
                         (int, int) neighborCoord = (infectedAgent.X + dx, infectedAgent.Y + dy);
 
@@ -264,7 +261,7 @@ public class MiniQuadtree
 
         lock (_lockObject)
         {
-            _checkAgentCoords.AddRange(coordsToCheck);
+            _checkAgentCoords.AddRange(coordsToCheck); // lockして同期をとる
         }
         
         if (_subTrees.Count > 0)
