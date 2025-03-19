@@ -4,6 +4,7 @@ using Cysharp.Threading.Tasks;
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Jobs;
+using Unity.VisualScripting;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
 
@@ -31,7 +32,7 @@ public class MiniQuadtree
     private NativeArray<Agent> _agentArray; // 感染判定を行うエージェントのNativeArray
     private NativeArray<Agent> _nearDeathAgentsArray; // 死亡判定を行うエージェントのNativeArray
     private readonly object _subdivideLock = new object();  // ロックオブジェクト
-    private float _regionMod; // 感染確率計算の環境補正
+    private readonly float _regionMod; // 感染確率計算の環境補正
     private float _difficultyMod; // 感染確率計算の難易度補正
 
     public MiniQuadtree(Rect bounds, float regionMod, int depth = 0)
@@ -173,6 +174,10 @@ public class MiniQuadtree
     /// </summary>
     public JobHandle SimulateInfection()
     {
+        // リストを最初にクリアしておく
+        _infectedAgentsCoords.Clear();
+        _checkAgentCoords.Clear();
+        
         foreach (var agent in _agents)
         {
             if (agent.Value.State == AgentState.Infected)
@@ -195,7 +200,7 @@ public class MiniQuadtree
             }
         }
 
-        NearDeathDetermination();
+        NearDeathDetermination(); // 死亡判定
         return GetInfectedAreas();
     }
 
@@ -211,9 +216,10 @@ public class MiniQuadtree
                 continue;
             
             // 感染範囲を定義
-            int infectionRange = 2;
+            int infectionRange = 100;
 
             // 周囲の座標を調べ、感染範囲内にいるエージェントを取得
+            bool allNeighborsInfected = true; // 初期状態は全て感染していると仮定
             for (int dx = -infectionRange; dx <= infectionRange; dx++)
             {
                 for (int dy = -infectionRange; dy <= infectionRange; dy++)
@@ -223,10 +229,21 @@ public class MiniQuadtree
                     // 辞書にその座標のエージェントが存在するか確認
                     if (_agents.ContainsKey(neighborCoord) && !_checkAgentCoords.Contains(neighborCoord))
                     {
-                        // 自身以外のエージェントであれば感染判定
-                        _checkAgentCoords.Add(neighborCoord);
+                        if (_agents[neighborCoord].State == AgentState.Healthy)
+                        {
+                            allNeighborsInfected = false;
+                            _checkAgentCoords.Add(neighborCoord); // 感染判定のリストに入れる
+                        }
                     }
                 }
+            }
+
+            // 全ての隣接エージェントが感染していれば、Skipフラグを設定
+            if (allNeighborsInfected)
+            {
+                _agents.TryGetValue(coord, out infectedAgent);
+                infectedAgent.Skip = true;
+                _agents[coord] = infectedAgent;
             }
         }
         
@@ -261,20 +278,14 @@ public class MiniQuadtree
             }
         }
         
-        // 感染率と環境補正データをここで一度NativeArrayに移す
-        NativeArray<float> baseRateArray = new NativeArray<float>(1, Allocator.TempJob);
-        NativeArray<float> envModArray = new NativeArray<float>(1, Allocator.TempJob);
-
-        baseRateArray[0] = InfectionParameters.BaseRate;
-        envModArray[0] = InfectionParameters.EnvMod;
+        // 感染確率はジョブ外で計算
+        // 基礎感染率×区域補正× (1 + 環境補正) × (1 + 難易度補正) (× (1 - 対象耐性補正))
+        float infectionRate = InfectionParameters.BaseRate * (1 + _regionMod) *　(1 + InfectionParameters.EnvMod) * (1 + _difficultyMod);
         
         InfectionJob job = new InfectionJob
         {
             agents = _agentArray,
-            baseRate = baseRateArray[0],
-            regionMod = _regionMod,
-            envMod = envModArray[0],
-            difficultyMod = _difficultyMod,
+            infectionRate = infectionRate,
         };
         
         JobHandle jobHandle = job.Schedule(_agentArray.Length, 64); // 64スレッド単位で並列処理
@@ -296,36 +307,15 @@ public class MiniQuadtree
         
         // メモリ解放
         _agentArray.Dispose();
-        baseRateArray.Dispose();
-        envModArray.Dispose();
         
         return jobHandle;
-    }
-    
-    public IEnumerable<Agent> GetAllAgents()
-    {
-        foreach (var agent in _agents.Values)
-        {
-            yield return agent;
-        }
-
-        foreach (var subTree in _subTrees.Keys)
-        {
-            foreach (var agent in subTree.GetAllAgents())
-            {
-                yield return agent;
-            }
-        }
     }
 
     [BurstCompile]
     private struct InfectionJob : IJobParallelFor
     {
         public NativeArray<Agent> agents;
-        public float baseRate; // 基礎感染率（スキルツリーによって変動）
-        public float regionMod; // 区域補正（AreaData参照。変動しない）
-        public float envMod; // 環境補正（ゲーム進行中に変動する）
-        public float difficultyMod; // 難易度補正（GameSettingsの難易度参照。変動しない）
+        public float infectionRate;
         
         public void Execute(int index)
         {
@@ -334,7 +324,7 @@ public class MiniQuadtree
             
             // 感染確率を計算
             // 基礎感染率×区域補正× (1 + 環境補正) × (1 + 難易度補正) × (1 - 対象耐性補正)
-            float infectionProbability = baseRate * (1 + regionMod) * (1 + envMod) * (1 + difficultyMod) * (1 - targetResistMod);
+            float infectionProbability = infectionRate * (1 - targetResistMod);
             
             // 感染判定。乱数が感染確率
             if (infectionProbability > agent.RandomNumber())
@@ -413,4 +403,20 @@ public class MiniQuadtree
     }
 
     #endregion
+    
+    public IEnumerable<Agent> GetAllAgents()
+    {
+        foreach (var agent in _agents.Values)
+        {
+            yield return agent;
+        }
+
+        foreach (var subTree in _subTrees.Keys)
+        {
+            foreach (var agent in subTree.GetAllAgents())
+            {
+                yield return agent;
+            }
+        }
+    }
 }
