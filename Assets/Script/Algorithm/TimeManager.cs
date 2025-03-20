@@ -24,8 +24,10 @@ public class TimeManager : ITimeObservable, IDisposable
     private void SubscribeToTimeUpdates()
     {
         _timeSubscription?.Dispose(); // 既存の購読を解除する
-        _timeSubscription = Observable
-            .Interval(TimeSpan.FromSeconds(3f / _timeScaleProp.Value))
+        _timeSubscription = _timeScaleProp
+            .Where(value => value > 0) // timeScaleProp.Value が 0 より大きいときのみ実行
+            .Select(value => Observable.Interval(TimeSpan.FromSeconds(3f / value)))
+            .Switch() // 既存の Interval をキャンセルし、新しい Interval を開始
             .Subscribe(_ => _gameTimeProp.Value += 2);
     }
 
@@ -34,7 +36,7 @@ public class TimeManager : ITimeObservable, IDisposable
     /// </summary>
     public void SetTimeScale(float scale)
     {
-        if (scale <= 0 || scale > 3) return; // 無効な倍速を防ぐ
+        if (scale < 0 || scale > 3) return; // 無効な倍速を防ぐ。有効範囲は0~3
         _timeScaleProp.Value = scale;
         SubscribeToTimeUpdates(); // 新しい倍速で購読を再設定する
     }
