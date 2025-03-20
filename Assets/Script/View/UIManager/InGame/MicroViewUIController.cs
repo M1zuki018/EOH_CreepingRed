@@ -24,7 +24,7 @@ public class MicroViewUIController : ViewBase, IWindow
     [SerializeField, HighlightIfNull] private Text _nameText;
     [SerializeField, HighlightIfNull] private Text _explainText;
     
-    private List<AreaSettingsSO> _areaSettings;
+    private List<AreaViewSettingsSO> _areaSettings;
     private int _selectedArea; // 現在表示中のエリアのIndex
     private CanvasGroup _canvasGroup;
     public event Action OnMacroView;
@@ -43,7 +43,7 @@ public class MicroViewUIController : ViewBase, IWindow
     /// <summary>
     /// 初期化処理
     /// </summary>
-    public void Initialize(List<AreaSettingsSO> areaSettings)
+    public void Initialize(List<AreaViewSettingsSO> areaSettings)
     {
         _areaSettings = areaSettings; // areaSettingsリストを受け取り
     }

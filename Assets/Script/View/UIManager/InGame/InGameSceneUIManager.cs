@@ -35,8 +35,8 @@ public class InGameSceneUIManager : UIManagerBase
         new TimeScaleView(_timeScaleButtons, timeManager);
         
         // 各ビューの初期化
-        _macroView.Initialize(gameManager.AreaSettings);
-        _microView.Initialize(gameManager.AreaSettings);
+        _macroView.Initialize(gameManager.AreaUISettings);
+        _microView.Initialize(gameManager.AreaUISettings);
         
         // イベント登録
         _baseView.OnMacroView += () => TransitionView<IWindow>(_macroView, _baseView);

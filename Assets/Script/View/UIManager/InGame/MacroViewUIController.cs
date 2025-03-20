@@ -19,7 +19,7 @@ public class MacroViewUIController : ViewBase, IWindow
     [SerializeField, HighlightIfNull] private Button[] _areaButton = new Button[19];
     
     private CanvasGroup _canvasGroup;
-    private List<AreaSettingsSO> _areaSettings;
+    private List<AreaViewSettingsSO> _areaSettings;
     public event Action OnSkillTree;
     public event Action<int> OnArea;
     public event Action OnClose;
@@ -43,7 +43,7 @@ public class MacroViewUIController : ViewBase, IWindow
     /// <summary>
     /// 初期化処理
     /// </summary>
-    public void Initialize(List<AreaSettingsSO> areaSettings)
+    public void Initialize(List<AreaViewSettingsSO> areaSettings)
     {
         _areaSettings = areaSettings; // areaSettingsリストを受け取り
         SetText();

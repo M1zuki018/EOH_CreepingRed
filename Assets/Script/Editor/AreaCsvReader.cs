@@ -12,6 +12,7 @@ public class AreaCsvReader : EditorWindow
     private const int AreaCount = 19;
     private string _csvFilePath = "Assets/Data/CSV/AreaData.csv"; // csvファイルのパス
     private string _outputPath = "Assets/Data/AreaData/"; // スクリプタブルオブジェクトを出力する先のファイル
+    private string _outputUIDataPath = "Assets/Data/AreaViewData/"; // View用のデータを出力する先のファイル
 
     [MenuItem("Creeping Red/AreaCsvReader")]
     public static void ShowWindow()
@@ -27,6 +28,7 @@ public class AreaCsvReader : EditorWindow
         
         _csvFilePath = EditorGUILayout.TextField("CSVファイルのパス", _csvFilePath);
         _outputPath = EditorGUILayout.TextField("出力フォルダ", _outputPath);
+        _outputUIDataPath = EditorGUILayout.TextField("UI用データの出力フォルダ", _outputUIDataPath);
         
         EditorGUILayout.Space();
         
@@ -47,15 +49,16 @@ public class AreaCsvReader : EditorWindow
             return;
         }
 
-        if (Directory.Exists(_outputPath))
-        {
-            Directory.Delete(_outputPath, true); // フォルダが既に存在したら一旦全て削除
-        }
+        // フォルダが既に存在したら一旦全て削除
+        if (Directory.Exists(_outputPath))　Directory.Delete(_outputPath, true); //実行用データフォルダ
+        if (Directory.Exists(_outputUIDataPath))　Directory.Delete(_outputUIDataPath, true); // UI用データフォルダ
         
         Directory.CreateDirectory(_outputPath); // フォルダを再作成
+        Directory.CreateDirectory(_outputUIDataPath); // フォルダを再作成
         
         string[] lines = File.ReadAllLines(_csvFilePath);
         List<AreaSettingsSO> createdAreas = new List<AreaSettingsSO>();
+        List<AreaViewSettingsSO> createdUIAreas = new List<AreaViewSettingsSO>();
         
         // 縦横共にヘッダー行列があるので、その部分は読み飛ばす
         // 19エリア分を処理
@@ -71,6 +74,7 @@ public class AreaCsvReader : EditorWindow
 
             try
             {
+                // 実行用ScriptableObjectの生成
                 AreaSettingsSO areaSettings = CreateInstance<AreaSettingsSO>();
                 areaSettings.X = int.Parse(values[1]);
                 areaSettings.Y = int.Parse(values[2]);
@@ -90,6 +94,16 @@ public class AreaCsvReader : EditorWindow
                 string assetPath = $"{_outputPath}{areaSettings.Name.ToString()}.asset";
                 AssetDatabase.CreateAsset(areaSettings, assetPath);
                 createdAreas.Add(areaSettings);
+                
+                // UI用ScriptableObjectの生成
+                AreaViewSettingsSO areaViewSettings = CreateInstance<AreaViewSettingsSO>();
+                areaViewSettings.Name = ConversionSectionName(values[3]);
+                areaViewSettings.Explaination = values[4];
+                areaViewSettings.Category = ConversionCategoryName(values[5]);
+
+                string uiAssetPath = $"{_outputUIDataPath}{areaViewSettings.Name.ToString()}.asset";
+                AssetDatabase.CreateAsset(areaViewSettings, uiAssetPath);
+                createdUIAreas.Add(areaViewSettings);
             }
             catch (Exception ex) when (ex is FormatException || ex is OverflowException)
             {
@@ -99,7 +113,9 @@ public class AreaCsvReader : EditorWindow
         
         AssetDatabase.SaveAssets();
         AssetDatabase.Refresh();
+        
         AssignAreasToSimulator(createdAreas); // 自動アサイン
+        AssignAreasToSimulator(createdUIAreas);
 
         Debug.Log("ScriptableObjectの生成が完了しました！");
     }
@@ -107,9 +123,24 @@ public class AreaCsvReader : EditorWindow
     /// <summary>
     /// SimulatorクラスのAreaSettingsのリストに自動アサインする
     /// </summary>
+    private void AssignAreasToSimulator(List<AreaViewSettingsSO> createdAreas)
+    {
+        UITestSimulator simulator = FindObjectOfType<UITestSimulator>();
+        if (simulator == null)
+        {
+            Debug.LogWarning("シーン内にSimulatorが見つかりません！");
+            return;
+        }
+        simulator.RegisterAreas(createdAreas);
+        Debug.Log($"Simulatorに {createdAreas.Count} 個の区域を登録しました。");
+    }
+    
+    /// <summary>
+    /// SimulatorクラスのAreaSettingsのリストに自動アサインする
+    /// </summary>
     private void AssignAreasToSimulator(List<AreaSettingsSO> createdAreas)
     {
-        TestSimulator simulator = FindObjectOfType<TestSimulator>();
+        UITestSimulator simulator = FindObjectOfType<UITestSimulator>();
         if (simulator == null)
         {
             Debug.LogWarning("シーン内にSimulatorが見つかりません！");

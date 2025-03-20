@@ -10,6 +10,9 @@ public class TestSimulator : ViewBase, ISimulator
 {
     [SerializeField] private List<AreaSettingsSO> _areaSettings = new List<AreaSettingsSO>();
     public List<AreaSettingsSO> AreaSettings => _areaSettings;
+    
+    [SerializeField] private List<AreaViewSettingsSO> _uiAreaSettings = new List<AreaViewSettingsSO>();
+    public List<AreaViewSettingsSO> AreaUISettings => _uiAreaSettings;
     private Simulation _simulation;
     private ITimeObservable _timeManager;
     public ITimeObservable TimeManager => _timeManager;
@@ -31,5 +34,14 @@ public class TestSimulator : ViewBase, ISimulator
     {
         _areaSettings.Clear();
         _areaSettings.AddRange(newAreas);
+    }
+    
+    /// <summary>
+    /// エリアUIのスクリプタブルオブジェクトを登録する
+    /// </summary>
+    public void RegisterAreas(List<AreaViewSettingsSO> newAreas)
+    {
+        _uiAreaSettings.Clear();
+        _uiAreaSettings.AddRange(newAreas);
     }
 }
