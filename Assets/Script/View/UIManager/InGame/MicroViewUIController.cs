@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using UnityEngine;
-using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 /// <summary>
@@ -69,8 +68,14 @@ public class MicroViewUIController : ViewBase, IWindow
     /// <summary>
     /// 前後のエリアに移動する
     /// </summary>
-    private void ChangeArea(int operation)
+    private async UniTask ChangeArea(int operation)
     {
+        float fadeDuration = 0.5f;
+        _nameText.DOFade(0, fadeDuration);
+        _explainText.DOFade(0, fadeDuration);
+        
+        await UniTask.WaitForSeconds(fadeDuration);
+        
         _selectedArea += operation;
         _selectedArea %= 19;
         ShowMicroView(_selectedArea);
