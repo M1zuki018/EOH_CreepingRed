@@ -37,6 +37,7 @@ public class SkillTreeUIController : ViewBase, IWindow
     public event Action OnUnlock;
 
     public int Resource { get; set; } = 150; // 仮コスト
+    public int Detection { get; set; } = 0; // 仮発覚率
         
     public override UniTask OnUIInitialize()
     {
@@ -89,9 +90,9 @@ public class SkillTreeUIController : ViewBase, IWindow
     public void UpdateUnderGauges()
     {
         _pointText.text = Resource.ToString();
-        _spreadSlider.value = InfectionParameters.InfectionRange;
-        _detectionSlider.value = 1;
-        _lethalitySlider.value = InfectionParameters.InfectionRange;
+        _spreadSlider.value = InfectionParameters.BaseRate;
+        _detectionSlider.value = Detection;
+        _lethalitySlider.value = InfectionParameters.LethalityRate;
     }
 
     /// <summary>

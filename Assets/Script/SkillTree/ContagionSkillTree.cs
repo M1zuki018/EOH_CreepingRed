@@ -65,12 +65,12 @@ public class ContagionSkillTree : SkillBase
         _currentSkillButton.Unlock();
         _skillTreeUIController.Resource -= _currentSkillButton.SkillData.Cost; // 自分の解放ポイントを減らす
         InfectionParameters.BaseRate += _currentSkillButton.SkillData.SpreadRate; // 拡散性
-        //TODO: 発覚率
+        _skillTreeUIController.Detection += (int) _currentSkillButton.SkillData.DetectionRate; // 発覚率（仮置き）
         InfectionParameters.LethalityRate += _currentSkillButton.SkillData.LethalityRate; // 致死率
         //TODO: その他の効果についても
         
         _skillTreeUIController.UpdateUnderGauges();
-        Debug.Log($"拡散性{InfectionParameters.BaseRate}/ 致死率{InfectionParameters.LethalityRate}");
+        Debug.Log($"スキル解放　現在の 拡散性{InfectionParameters.BaseRate}/ 致死率{InfectionParameters.LethalityRate}");
     }
 
     /// <summary>
