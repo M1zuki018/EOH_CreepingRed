@@ -25,7 +25,7 @@ public class MicroViewUIController : ViewBase, IWindow
     [SerializeField, HighlightIfNull] private Text _explainText;
     
     private List<AreaSettingsSO> _areaSettings;
-    private int _selectedArea; // 現在表示中のエリアの参照
+    private int _selectedArea; // 現在表示中のエリアのIndex
     private CanvasGroup _canvasGroup;
     public event Action OnMacroView;
         
@@ -34,8 +34,8 @@ public class MicroViewUIController : ViewBase, IWindow
         _canvasGroup = GetComponent<CanvasGroup>();
     
         _closeButton.onClick.AddListener(() => OnMacroView?.Invoke()); // 閉じるボタンを押したら全体ビューへ
-        _nextButton.onClick.AddListener(() => ChangeArea(1));
-        _backButton.onClick.AddListener(() => ChangeArea(-1));
+        _nextButton.onClick.AddListener(() => ChangeArea(1).Forget());
+        _backButton.onClick.AddListener(() => ChangeArea(-1).Forget());
         
         return base.OnUIInitialize();
     }
@@ -71,13 +71,15 @@ public class MicroViewUIController : ViewBase, IWindow
     private async UniTask ChangeArea(int operation)
     {
         float fadeDuration = 0.5f;
+        
+        // フェードアウト処理
         _nameText.DOFade(0, fadeDuration);
         _explainText.DOFade(0, fadeDuration);
         
         await UniTask.WaitForSeconds(fadeDuration);
         
-        _selectedArea += operation;
-        _selectedArea %= 19;
+        _selectedArea = (_selectedArea + operation) % 19; // 19エリアで循環するようにする
+        if (_selectedArea < 0) _selectedArea += 19; // 負のインデックスを防ぐ
         ShowMicroView(_selectedArea);
     }
     
