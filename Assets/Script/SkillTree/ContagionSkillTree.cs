@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
@@ -8,15 +9,24 @@ using UnityEngine;
 public class ContagionSkillTree : SkillBase
 {
     [SerializeField] private List<SkillButton> _skillButtons = new List<SkillButton>();
+    private Dictionary<SkillEnum, SkillButton> _skillButtonDictionary = new Dictionary<SkillEnum, SkillButton>();
     private SkillTreeUIController _skillTreeUIController;
     private SkillButton _currentSkillButton; // 押されているスキルボタンの情報を保持しておく
 
     public override UniTask OnBind()
     {
-        // 各ボタンのクリックイベントを購読
         foreach (SkillButton skillButton in _skillButtons)
         {
-            skillButton.OnClick += HandleClick;
+            skillButton.OnClick += HandleClick;　// 各ボタンのクリックイベントを購読
+            
+            if (Enum.TryParse(skillButton.SkillData.name, out SkillEnum skillEnum))
+            {
+                _skillButtonDictionary[skillEnum] = skillButton; // 辞書にスキル名のenumと対応するボタンをセットで登録
+            }
+            else
+            {
+                Debug.LogWarning($"Enumに変換できないスキル名: {skillButton.SkillData.name}");
+            }
         }
 
         if (_skillTreeUIController != null)
@@ -35,6 +45,21 @@ public class ContagionSkillTree : SkillBase
         UIUpdate(skill); // UI更新
         _currentSkillButton = skill;
     }
+
+    /// <summary>
+    /// 前提スキルが全て解放されているか確かめる
+    /// </summary>
+    private bool CheckPrerequisiteSkill(List<SkillEnum> prerequisiteSkills)
+    {
+        foreach (var prerequisiteSkill in prerequisiteSkills)
+        {
+            if (!_skillButtonDictionary[prerequisiteSkill].IsUnlocked)
+            {
+                return false; // 未開放のスキルがあればその時点でfalseを返す
+            }
+        }
+        return true; // 全て解放されていたらtrueを返す
+    }
     
     /// <summary>
     /// 受け取ったスキルデータに合わせてUIを更新する
@@ -43,9 +68,11 @@ public class ContagionSkillTree : SkillBase
     {
         _skillTreeUIController.SkillTextsUpdate(button.SkillData.Name, button.SkillData.Description,button.SkillData.Cost.ToString());
         
-        if (!button.IsUnlocked && _skillTreeUIController.Resource > button.SkillData.Cost)
+        if (!button.IsUnlocked && // 自身がアンロックされていない
+            CheckPrerequisiteSkill(button.SkillData.PrerequisiteSkillsEnum) && // 前提スキルが全て解除されている
+            _skillTreeUIController.Resource > button.SkillData.Cost) // コストが足りている
         {
-            _skillTreeUIController.ChangeUnlockButton(true); // コストが足りていたらActivateボタンをインタラクティブできるように設定
+            _skillTreeUIController.ChangeUnlockButton(true); // Activateボタンをインタラクティブできるように設定
         }
         else
         {
