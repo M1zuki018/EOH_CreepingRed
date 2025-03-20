@@ -3,24 +3,28 @@ using UnityEditor;
 using UnityEngine;
 
 /// <summary>
-/// 感染スキルデータのcsvファイルを読み込み
-/// 対応するScriptableObjectにデータを自動入力する拡張
+/// スキルデータの入力補助をする拡張
 /// </summary>
-public class ContagionCsvReader : EditorWindow
+public class SkillCsvReader : EditorWindow
 {
     private string _csvFilePath = "Assets/Data/CSV/ContagionData.csv"; // csvファイルのパス
     private string _searchFilePath = "Assets/Data/SkillData/"; // 検索を行うファイルのパス
+    private GameObject _prefabToCreate; // 自動生成するスキルボタンのPrefab
+    private GameObject _parentObject; // 生成の親オブジェクト
 
-    [MenuItem("Creeping Red/ContagionCsvReader")]
+    [MenuItem("Creeping Red/SkillCsvReader")]
     public static void ShowWindow()
     {
-        GetWindow<ContagionCsvReader>("ContagionCsvReader");
+        GetWindow<SkillCsvReader>("SkillCsvReader");
     }
 
     private void OnGUI()
     {
-        GUILayout.Label("感染スキルデータのcsvファイルを読み込み\n" +
-                        "対応するScriptableObjectにデータを自動入力する", EditorStyles.boldLabel);
+        GUILayout.Label("スキルデータ入力補助をする拡張", EditorStyles.boldLabel);
+        
+        EditorGUILayout.Space();
+        
+        GUILayout.Label("csvデータをScriptableObject.nameをもとにデータを自動入力する");
         
         EditorGUILayout.Space();
         
@@ -33,8 +37,63 @@ public class ContagionCsvReader : EditorWindow
         {
             ImportSkillData();
         }
+        
+        EditorGUILayout.Space();
+        
+        GUILayout.Label("Prefab配置から全て自動で行う");
+        
+        EditorGUILayout.Space();
+        
+        _prefabToCreate = (GameObject)EditorGUILayout
+            .ObjectField("Prefab to Create", _prefabToCreate, typeof(GameObject), false);
+        _parentObject = (GameObject)EditorGUILayout
+            .ObjectField("Parent Object", _parentObject, typeof(GameObject), true); // SceneObejectを選択できるように
+        
+        EditorGUILayout.Space();
+        
+        if (GUILayout.Button("スキルボタンを自動作成する"))
+        {
+            CreateSkillButtons();
+        }
     }
 
+    /// <summary>
+    /// スキルボタンを自動作成する
+    /// </summary>
+    private void CreateSkillButtons()
+    {
+        if (string.IsNullOrEmpty(_csvFilePath) || _prefabToCreate == null || _parentObject == null)
+        {
+            Debug.LogError("CSVファイルのパス/生成するPrefab/親オブジェクトの設定が完了していません");
+            return;
+        }
+        
+        SkillButtonEditor skillButtonEditor = new SkillButtonEditor();
+        string[] lines = File.ReadAllLines(_csvFilePath);
+
+        for (int i = 1; i < lines.Length; i++) // ヘッダー行は読み飛ばす
+        {
+            GameObject skillButton = Instantiate(_prefabToCreate, _parentObject.transform); // Prefabを作成
+            
+            // スクリプタブルオブジェクト自動作成と自動アサイン
+            SkillButton skillButtonScript = skillButton.GetComponent<SkillButton>();
+            skillButtonEditor.CreateAndAssignSkillData(skillButtonScript);
+            
+            SkillBase skillBase = _parentObject.GetComponent<SkillBase>();
+            if (skillBase != null)
+            {
+                skillBase.SkillButtons.Add(skillButtonScript);
+            }
+            else
+            {
+                Debug.LogError("親オブジェクトに指定されたオブジェクトからSkillBaseが取得できませんでした");
+            }
+        }
+        
+        AssetDatabase.SaveAssets();
+        Debug.Log("スキルボタンの作成が完了しました！");
+    }
+    
     /// <summary>
     /// スキルデータをImportする
     /// </summary>

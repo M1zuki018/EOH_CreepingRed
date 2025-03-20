@@ -8,14 +8,13 @@ using UnityEngine;
 /// </summary>
 public class ContagionSkillTree : SkillBase
 {
-    [SerializeField] private List<SkillButton> _skillButtons = new List<SkillButton>();
     private readonly Dictionary<SkillEnum, SkillButton> _skillButtonDic = new Dictionary<SkillEnum, SkillButton>();
     private SkillTreeUIController _uiController;
     private SkillButton _selectedSkillButton; // 押されているスキルボタンの情報を保持しておく
 
     public override UniTask OnBind()
     {
-        foreach (SkillButton skillButton in _skillButtons)
+        foreach (SkillButton skillButton in SkillButtons)
         {
             skillButton.OnClick += OnSkillButtonClick;　// 各ボタンのクリックイベントを購読
             

@@ -28,7 +28,7 @@ public class SkillButtonEditor : Editor
     /// <summary>
     /// スキルデータSOを自動作成しアサインする
     /// </summary>
-    private void CreateAndAssignSkillData(SkillButton skillButton)
+    public void CreateAndAssignSkillData(SkillButton skillButton)
     {
         string folderPath = "Assets/Data/SkillData/";
         if (!Directory.Exists(folderPath))
