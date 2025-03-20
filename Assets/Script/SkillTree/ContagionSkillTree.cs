@@ -9,29 +9,29 @@ using UnityEngine;
 public class ContagionSkillTree : SkillBase
 {
     [SerializeField] private List<SkillButton> _skillButtons = new List<SkillButton>();
-    private Dictionary<SkillEnum, SkillButton> _skillButtonDictionary = new Dictionary<SkillEnum, SkillButton>();
-    private SkillTreeUIController _skillTreeUIController;
-    private SkillButton _currentSkillButton; // 押されているスキルボタンの情報を保持しておく
+    private readonly Dictionary<SkillEnum, SkillButton> _skillButtonDic = new Dictionary<SkillEnum, SkillButton>();
+    private SkillTreeUIController _uiController;
+    private SkillButton _selectedSkillButton; // 押されているスキルボタンの情報を保持しておく
 
     public override UniTask OnBind()
     {
         foreach (SkillButton skillButton in _skillButtons)
         {
-            skillButton.OnClick += HandleClick;　// 各ボタンのクリックイベントを購読
+            skillButton.OnClick += OnSkillButtonClick;　// 各ボタンのクリックイベントを購読
             
             if (Enum.TryParse(skillButton.SkillData.name, out SkillEnum skillEnum))
             {
-                _skillButtonDictionary[skillEnum] = skillButton; // 辞書にスキル名のenumと対応するボタンをセットで登録
+                _skillButtonDic[skillEnum] = skillButton; // 辞書にスキル名のenumと対応するボタンをセットで登録
             }
             else
             {
-                Debug.LogWarning($"Enumに変換できないスキル名: {skillButton.SkillData.name}");
+                Debug.LogWarning($"無効なスキル名: {skillButton.SkillData.name}");
             }
         }
 
-        if (_skillTreeUIController != null)
+        if (_uiController != null)
         {
-            _skillTreeUIController.OnUnlock += HandleUnlock;
+            _uiController.OnUnlock += UnlockSkill;
         }
         
         return base.OnBind();
@@ -40,20 +40,20 @@ public class ContagionSkillTree : SkillBase
     /// <summary>
     /// 各スキルのボタンが押された時の処理
     /// </summary>
-    private void HandleClick(SkillButton skill)
+    private void OnSkillButtonClick(SkillButton skill)
     {
-        UIUpdate(skill); // UI更新
-        _currentSkillButton = skill;
+        _selectedSkillButton = skill;
+        UpdateSkillUI(skill); // UI更新
     }
 
     /// <summary>
     /// 前提スキルが全て解放されているか確かめる
     /// </summary>
-    private bool CheckPrerequisiteSkill(List<SkillEnum> prerequisiteSkills)
+    private bool ArePrerequisiteSkillsUnlocked(List<SkillEnum> prerequisiteSkills)
     {
         foreach (var prerequisiteSkill in prerequisiteSkills)
         {
-            if (!_skillButtonDictionary[prerequisiteSkill].IsUnlocked)
+            if (!_skillButtonDic[prerequisiteSkill].IsUnlocked)
             {
                 return false; // 未開放のスキルがあればその時点でfalseを返す
             }
@@ -64,39 +64,34 @@ public class ContagionSkillTree : SkillBase
     /// <summary>
     /// 受け取ったスキルデータに合わせてUIを更新する
     /// </summary>
-    private void UIUpdate(SkillButton button)
+    private void UpdateSkillUI(SkillButton button)
     {
-        _skillTreeUIController.SkillTextsUpdate(button.SkillData.Name, button.SkillData.Description,button.SkillData.Cost.ToString());
+        _uiController.SkillTextsUpdate(button.SkillData.Name, button.SkillData.Description,button.SkillData.Cost.ToString());
         
-        if (!button.IsUnlocked && // 自身がアンロックされていない
-            CheckPrerequisiteSkill(button.SkillData.PrerequisiteSkillsEnum) && // 前提スキルが全て解除されている
-            _skillTreeUIController.Resource > button.SkillData.Cost) // コストが足りている
-        {
-            _skillTreeUIController.ChangeUnlockButton(true); // Activateボタンをインタラクティブできるように設定
-        }
-        else
-        {
-            _skillTreeUIController.ChangeUnlockButton(false);
-        }
+        bool canUnlock = !button.IsUnlocked && // 自身がアンロックされていない
+                         ArePrerequisiteSkillsUnlocked(button.SkillData.PrerequisiteSkillsEnum) && // 前提スキルが全て解除されている
+                         _uiController.Resource >= button.SkillData.Cost; // コストが足りている
+        _uiController.ToggleUnlockButton(canUnlock);
     }
     
     /// <summary>
     /// アンロックボタンが押されたときの処理
     /// </summary>
-    private void HandleUnlock()
+    private void UnlockSkill()
     {
-        if(_currentSkillButton.IsUnlocked) return; // 既にアンロック済みなら以降の処理を行わない（二度押し対策）
+        // 選択中のボタンがない もしくは 既にアンロック済みなら以降の処理を行わない（二度押し対策）
+        if (_selectedSkillButton == null || _selectedSkillButton.IsUnlocked) return;
         
-        _skillTreeUIController.ChangeUnlockButton(false); // Activateボタンをインタラクティブ出来ないようにする
+        _uiController.ToggleUnlockButton(false); // Activateボタンをインタラクティブ出来ないようにする
+        _selectedSkillButton.Unlock();
+        _uiController.Resource -= _selectedSkillButton.SkillData.Cost; // 自分の解放ポイントを減らす
         
-        _currentSkillButton.Unlock();
-        _skillTreeUIController.Resource -= _currentSkillButton.SkillData.Cost; // 自分の解放ポイントを減らす
-        InfectionParameters.BaseRate += _currentSkillButton.SkillData.SpreadRate; // 拡散性
-        _skillTreeUIController.Detection += (int) _currentSkillButton.SkillData.DetectionRate; // 発覚率（仮置き）
-        InfectionParameters.LethalityRate += _currentSkillButton.SkillData.LethalityRate; // 致死率
+        InfectionParameters.BaseRate += _selectedSkillButton.SkillData.SpreadRate; // 拡散性
+        _uiController.Detection += (int) _selectedSkillButton.SkillData.DetectionRate; // 発覚率（仮置き）
+        InfectionParameters.LethalityRate += _selectedSkillButton.SkillData.LethalityRate; // 致死率
         //TODO: その他の効果についても
         
-        _skillTreeUIController.UpdateUnderGauges();
+        _uiController.UpdateUnderGauges();
         Debug.Log($"スキル解放　現在の 拡散性{InfectionParameters.BaseRate}/ 致死率{InfectionParameters.LethalityRate}");
     }
 
@@ -105,6 +100,6 @@ public class ContagionSkillTree : SkillBase
     /// </summary>
     public override void SetUIController(SkillTreeUIController skillTreeUIController)
     {
-        _skillTreeUIController = skillTreeUIController;
+        _uiController = skillTreeUIController;
     }
 }

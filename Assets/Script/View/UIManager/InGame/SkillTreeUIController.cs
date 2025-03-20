@@ -58,7 +58,7 @@ public class SkillTreeUIController : ViewBase, IWindow
         SkillTextsUpdate(" ", " ", " "); // 説明エリアの初期化
         InitializeSlider(); // SliderのMaxValueを変更
         UpdateUnderGauges(); // 下のバーの初期化
-        ChangeUnlockButton(false); // UnlockButtonをインタラクティブできないように
+        ToggleUnlockButton(false); // UnlockButtonをインタラクティブできないように
         
         return base.OnUIInitialize();
     }
@@ -98,7 +98,7 @@ public class SkillTreeUIController : ViewBase, IWindow
     /// <summary>
     /// スキルの解放ボタンにインタラクティブできるかどうかを切り替える
     /// </summary>
-    public void ChangeUnlockButton(bool isUnlock)
+    public void ToggleUnlockButton(bool isUnlock)
     {
         _unlockButton.interactable = isUnlock;
     }
