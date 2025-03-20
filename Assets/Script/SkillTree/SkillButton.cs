@@ -8,18 +8,31 @@ using UnityEngine.UI;
 /// </summary>
 public class SkillButton　: ViewBase
 {
+    /// <summary>
+    /// スキルデータ
+    /// </summary>
     [SerializeField, Expandable] private SkillDataSO _skillData;
     public SkillDataSO SkillData => _skillData;
-    private bool _isUnlocked = false; // 解放済みか
+    
+    /// <summary>
+    /// 解放済みかどうかのフラグ
+    /// </summary>
+    private bool _isUnlocked = false;
     public bool IsUnlocked => _isUnlocked;
-    private Button _button;
+    
+    private Button _button; // 自身のボタンコンポーネント
+    private Color _defaultColor; // ボタンの初期色
     
     public event Action<SkillButton> OnClick; 
 
     public override UniTask OnUIInitialize()
     {
         _button = GetComponent<Button>();
-        _button.onClick.AddListener(() => OnClick?.Invoke(this));
+        _button.onClick.AddListener(() => OnClick?.Invoke(this)); // クリックイベントを登録
+        
+        // ボタンUIの調整
+        _defaultColor = _button.image.color; // 初期色を保存
+        _button.image.color = new Color(_defaultColor.r - 0.4f, _defaultColor.g - 0.4f, _defaultColor.b - 0.4f); // 色を少し暗めに変更
         
         return base.OnUIInitialize();
     }
@@ -38,6 +51,7 @@ public class SkillButton　: ViewBase
     public void Unlock()
     {
         _isUnlocked = true;
+        _button.image.color = _defaultColor;
     }
     
     private void OnDestroy()
