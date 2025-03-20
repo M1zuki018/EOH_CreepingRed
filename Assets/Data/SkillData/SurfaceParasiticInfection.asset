@@ -13,10 +13,10 @@ MonoBehaviour:
   m_Name: SurfaceParasiticInfection
   m_EditorClassIdentifier: 
   _icon: {fileID: 0}
-  _name: New Skill
-  _description: Skill Description
-  _cost: 1
-  _spreadRate: 0
-  _detectionRate: 0
+  _name: "\u4F53\u8868\u5BC4\u751F\u611F\u67D3"
+  _description: "\u7591\u4F3C\u8D64\u8840\u7403\u304C\u5730\u3092\u9019\u3044\u5BBF\u4E3B\u3092\u63A2\u3057\u306B\u884C\u304F\u3088\u3046\u306B\u306A\u308B\u3002"
+  _cost: 18
+  _spreadRate: 50
+  _detectionRate: 25
   _lethalityRate: 0
   _prerequisiteSkillsEnum: 

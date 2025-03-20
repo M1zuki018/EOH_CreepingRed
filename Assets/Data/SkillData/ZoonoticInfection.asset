@@ -13,10 +13,10 @@ MonoBehaviour:
   m_Name: ZoonoticInfection
   m_EditorClassIdentifier: 
   _icon: {fileID: 0}
-  _name: New Skill
-  _description: Skill Description
-  _cost: 1
-  _spreadRate: 0
-  _detectionRate: 0
+  _name: "\u52D5\u7269\u5A92\u4ECB\u611F\u67D3"
+  _description: "\u52D5\u7269\uFF08\u72AC\u3084\u30CD\u30BA\u30DF\u306A\u3069\uFF09\u304C\u611F\u67D3\u6E90\u3068\u306A\u308A\u3001\u565B\u307F\u3064\u304D\u306A\u3069\u306B\u3088\u3063\u3066\u611F\u67D3\u304C\u5E83\u304C\u308B\u3002"
+  _cost: 14
+  _spreadRate: 35
+  _detectionRate: 18
   _lethalityRate: 0
   _prerequisiteSkillsEnum: 

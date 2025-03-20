@@ -13,10 +13,10 @@ MonoBehaviour:
   m_Name: BloodsuckerMediatedInfection
   m_EditorClassIdentifier: 
   _icon: {fileID: 0}
-  _name: New Skill
-  _description: Skill Description
-  _cost: 1
-  _spreadRate: 0
-  _detectionRate: 0
+  _name: "\u5438\u8840\u751F\u7269\u5A92\u4ECB\u611F\u67D3"
+  _description: "\u5438\u8840\u751F\u7269\uFF08\u868A\u3084\u30C0\u30CB\uFF09\u304C\u611F\u67D3\u6E90\u3068\u306A\u308A\u3001\u523A\u54AC\u6642\u306B\u30A6\u30A4\u30EB\u30B9\u3092\u4F1D\u64AD\u3059\u308B\u3002"
+  _cost: 10
+  _spreadRate: 30
+  _detectionRate: 12
   _lethalityRate: 0
   _prerequisiteSkillsEnum: 

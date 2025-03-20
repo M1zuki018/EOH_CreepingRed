@@ -13,10 +13,10 @@ MonoBehaviour:
   m_Name: AerosolizedInfection
   m_EditorClassIdentifier: 
   _icon: {fileID: 0}
-  _name: New Skill
-  _description: Skill Description
-  _cost: 1
-  _spreadRate: 0
-  _detectionRate: 0
+  _name: "\u5FAE\u7C92\u5B50\u6563\u5E03\u611F\u67D3"
+  _description: "\u30EA\u30BF\u81EA\u8EAB\u304C\u81EA\u3089\u306E\u8840\u6DB2\u3092\u5FAE\u7D30\u306A\u7C92\u5B50\u72B6\u306B\u6563\u5E03\u3057\u3001\u7A7A\u6C17\u4E2D\u3067\u611F\u67D3\u3092\u5E83\u3052\u308B\u3002"
+  _cost: 20
+  _spreadRate: 60
+  _detectionRate: 30
   _lethalityRate: 0
   _prerequisiteSkillsEnum: 
