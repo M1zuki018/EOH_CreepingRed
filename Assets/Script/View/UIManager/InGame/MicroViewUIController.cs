@@ -1,5 +1,6 @@
 using System;
 using Cysharp.Threading.Tasks;
+using DG.Tweening;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -38,7 +39,14 @@ public class MicroViewUIController : ViewBase, IWindow
     public void ShowMicroView(AreaSettingsSO areaSettings)
     {
         _selectedArea = areaSettings;
-        _nameText.text = StateExtensions.ToJapanese(areaSettings.Name);
+        
+        _nameText.text = StateExtensions.ToJapanese(areaSettings.Name); // エリア名
+        _explainText.text = areaSettings.Explaination; // エリアの説明
+        
+        // アニメーション
+        _nameText.DOFade(1, 0.5f);
+        _explainText.DOFade(1, 0.5f);
+        
         Show();
     }
     
@@ -50,6 +58,8 @@ public class MicroViewUIController : ViewBase, IWindow
     public void Hide()
     {
         CanvasVisibilityController.Hide(_canvasGroup);
+        _nameText.DOFade(0, 0.5f);
+        _explainText.DOFade(0, 0.5f);
     }
     
     public void Block()
