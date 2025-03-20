@@ -4,10 +4,12 @@ using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 /// <summary>
-/// 感染スキルのツリー
+/// スキルツリークラス
 /// </summary>
-public class ContagionSkillTree : SkillBase
+public class SkillTree : ViewBase
 {
+    [SerializeField] private List<SkillButton> _skillButtons;
+    public List<SkillButton> SkillButtons => _skillButtons;
     private readonly Dictionary<SkillEnum, SkillButton> _skillButtonDic = new Dictionary<SkillEnum, SkillButton>();
     private SkillTreeUIController _uiController;
     private SkillButton _selectedSkillButton; // 押されているスキルボタンの情報を保持しておく
@@ -97,7 +99,7 @@ public class ContagionSkillTree : SkillBase
     /// <summary>
     /// スキルツリーの参照を得る
     /// </summary>
-    public override void SetUIController(SkillTreeUIController skillTreeUIController)
+    public void SetUIController(SkillTreeUIController skillTreeUIController)
     {
         _uiController = skillTreeUIController;
     }

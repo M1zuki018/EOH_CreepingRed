@@ -19,4 +19,4 @@ MonoBehaviour:
   _spreadRate: 35
   _detectionRate: 15
   _lethalityRate: 0
-  _prerequisiteSkillsEnum: 0a000000
+  _prerequisiteSkillsEnum: 25000000

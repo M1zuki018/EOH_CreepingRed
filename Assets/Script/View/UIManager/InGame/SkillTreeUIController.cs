@@ -18,7 +18,7 @@ public class SkillTreeUIController : ViewBase, IWindow
     [SerializeField, HighlightIfNull] private Button _closeButton;
     
     [Header("スキルツリーのためのセットアップ")]
-    [SerializeField] private List<SkillBase> _skillTrees = new List<SkillBase>();
+    [SerializeField] private List<SkillTree> _skillTrees = new List<SkillTree>();
     [SerializeField, HighlightIfNull, Comment("スキル名のエリア")] private Text _skillName;
     [SerializeField, HighlightIfNull, Comment("スキル説明のエリア")] private Text _skillDescription;
     [SerializeField, HighlightIfNull, Comment("解放コストのエリア")] private Text _point;

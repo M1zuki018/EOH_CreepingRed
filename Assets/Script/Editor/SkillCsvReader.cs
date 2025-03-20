@@ -47,7 +47,7 @@ public class SkillCsvReader : EditorWindow
         _prefabToCreate = (GameObject)EditorGUILayout
             .ObjectField("Prefab to Create", _prefabToCreate, typeof(GameObject), false);
         _parentObject = (GameObject)EditorGUILayout
-            .ObjectField("Parent Object", _parentObject, typeof(GameObject), true); // SceneObejectを選択できるように
+            .ObjectField("Parent Object", _parentObject, typeof(GameObject), true); // SceneObjectを選択できるように
         
         EditorGUILayout.Space();
         
@@ -87,10 +87,10 @@ public class SkillCsvReader : EditorWindow
             ImportSkillData();
             
             // リストに自動アサイン
-            SkillBase skillBase = _parentObject.GetComponent<SkillBase>();
-            if (skillBase != null)
+            SkillTree skillTree = _parentObject.GetComponent<SkillTree>();
+            if (skillTree != null)
             {
-                skillBase.SkillButtons.Add(skillButtonScript);
+                skillTree.SkillButtons.Add(skillButtonScript);
             }
             else
             {
