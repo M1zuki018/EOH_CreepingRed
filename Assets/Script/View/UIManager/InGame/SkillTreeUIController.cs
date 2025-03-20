@@ -24,28 +24,53 @@ public class SkillTreeUIController : ViewBase, IWindow
     [SerializeField, HighlightIfNull, Comment("解放コストのエリア")] private Text _point;
     [SerializeField, HighlightIfNull, Comment("解放ボタン")] private Button _unlockButton;
     [SerializeField, HighlightIfNull, Comment("エゼキエルのスキルツリーボタン")] private Button _ezechielButton;
+
+    [Header("フッター部分の参照")] 
+    [SerializeField, HighlightIfNull, Comment("解放ポイント")] private Text _pointText;
+    [SerializeField, HighlightIfNull, Comment("拡散性スライダー")] private Slider _spreadSlider;
+    [SerializeField, HighlightIfNull, Comment("発覚率スライダー")] private Slider _detectionSlider;
+    [SerializeField, HighlightIfNull, Comment("致死率スライダー")] private Slider _lethalitySlider;
     
     private CanvasGroup _canvasGroup;
     public event Action OnClose;
     public event Action OnShowEzechielTree;
     public event Action OnUnlock;
+
+    public int Resource { get; set; } = 150; // 仮コスト
         
     public override UniTask OnUIInitialize()
     {
         _canvasGroup = GetComponent<CanvasGroup>();
-        _closeButton.onClick.AddListener(() => OnClose?.Invoke());
-        _ezechielButton.onClick.AddListener(() => OnShowEzechielTree?.Invoke());
+        
+        // 各ボタンにイベントを登録
+        _closeButton.onClick.AddListener(() => OnClose?.Invoke()); // 閉じる
+        _ezechielButton.onClick.AddListener(() => OnShowEzechielTree?.Invoke()); //  エゼキエルのスキルツリーを開く
+        _unlockButton.onClick.AddListener(() => OnUnlock?.Invoke()); // スキルアンロック
 
+        // 各スキルツリークラスに自身の参照を渡す
         foreach (var skillTree in _skillTrees)
         {
             skillTree.SetUIController(this);
         }
         
-        SkillTextsUpdate(" ", " ", " ");
-        ChangeUnlockButton(false);
-        _unlockButton.onClick.AddListener(UnlockedSkill);
+        // UI表示の初期化
+        SkillTextsUpdate(" ", " ", " "); // 説明エリアの初期化
+        InitializeSlider(); // SliderのMaxValueを変更
+        UpdateUnderGauges(); // 下のバーの初期化
+        ChangeUnlockButton(false); // UnlockButtonをインタラクティブできないように
         
         return base.OnUIInitialize();
+    }
+
+    /// <summary>
+    /// スライダーの最大値の初期化
+    /// </summary>
+    private void InitializeSlider()
+    {
+        int maxValue = 110;
+        _spreadSlider.maxValue = maxValue;
+        _detectionSlider.maxValue = maxValue;
+        _lethalitySlider.maxValue = maxValue;
     }
 
     /// <summary>
@@ -59,20 +84,22 @@ public class SkillTreeUIController : ViewBase, IWindow
     }
 
     /// <summary>
+    /// 解放コスト/拡散性/発覚率/致死率のスライダーのUIを更新する
+    /// </summary>
+    public void UpdateUnderGauges()
+    {
+        _pointText.text = Resource.ToString();
+        _spreadSlider.value = InfectionParameters.InfectionRange;
+        _detectionSlider.value = 1;
+        _lethalitySlider.value = InfectionParameters.InfectionRange;
+    }
+
+    /// <summary>
     /// スキルの解放ボタンにインタラクティブできるかどうかを切り替える
     /// </summary>
     public void ChangeUnlockButton(bool isUnlock)
     {
         _unlockButton.interactable = isUnlock;
-    }
-
-    /// <summary>
-    /// スキルを解放する
-    /// </summary>
-    public void UnlockedSkill()
-    {
-        OnUnlock?.Invoke();
-        Debug.Log("スキル解放");
     }
     
     public void Show()

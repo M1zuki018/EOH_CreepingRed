@@ -10,7 +10,6 @@ public class ContagionSkillTree : SkillBase
     [SerializeField] private List<SkillButton> _skillButtons = new List<SkillButton>();
     private SkillTreeUIController _skillTreeUIController;
     private SkillButton _currentSkillButton; // 押されているスキルボタンの情報を保持しておく
-    private int _resource = 150;
 
     public override UniTask OnBind()
     {
@@ -44,7 +43,7 @@ public class ContagionSkillTree : SkillBase
     {
         _skillTreeUIController.SkillTextsUpdate(button.SkillData.Name, button.SkillData.Description,button.SkillData.Cost.ToString());
         
-        if (!button.IsUnlocked && _resource > button.SkillData.Cost)
+        if (!button.IsUnlocked && _skillTreeUIController.Resource > button.SkillData.Cost)
         {
             _skillTreeUIController.ChangeUnlockButton(true); // コストが足りていたらActivateボタンをインタラクティブできるように設定
         }
@@ -64,11 +63,13 @@ public class ContagionSkillTree : SkillBase
         _skillTreeUIController.ChangeUnlockButton(false); // Activateボタンをインタラクティブ出来ないようにする
         
         _currentSkillButton.Unlock();
-        _resource -= _currentSkillButton.SkillData.Cost; // 自分の解放ポイントを減らす
+        _skillTreeUIController.Resource -= _currentSkillButton.SkillData.Cost; // 自分の解放ポイントを減らす
         InfectionParameters.BaseRate += _currentSkillButton.SkillData.SpreadRate; // 拡散性
         //TODO: 発覚率
         InfectionParameters.LethalityRate += _currentSkillButton.SkillData.LethalityRate; // 致死率
         //TODO: その他の効果についても
+        
+        _skillTreeUIController.UpdateUnderGauges();
         Debug.Log($"拡散性{InfectionParameters.BaseRate}/ 致死率{InfectionParameters.LethalityRate}");
     }
 
@@ -78,6 +79,5 @@ public class ContagionSkillTree : SkillBase
     public override void SetUIController(SkillTreeUIController skillTreeUIController)
     {
         _skillTreeUIController = skillTreeUIController;
-        Debug.Log(_skillTreeUIController);
     }
 }
