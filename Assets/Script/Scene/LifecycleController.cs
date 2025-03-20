@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
@@ -15,13 +16,13 @@ public class LifecycleController : MonoBehaviour
     
     [Header("設定")]
     [SerializeField] private List<GameObject> _prefabsToInstantiate = new List<GameObject>();
-    private List<ViewBase> _instantiatedViews = new List<ViewBase>();
+    private readonly List<ViewBase> _instantiatedViews = new List<ViewBase>();
     
     private async void Start()
     {
         if (!_debugMode && SceneManager.GetActiveScene().name != "Title")
         {
-            Debug.Log($"本番モード：本番用Titleシーンに遷移します");
+            Debug.Log($"\ud83d\udd34 本番環境: Titleシーンに強制遷移します");
             SceneManager.LoadScene("Title");
             return;
         }
@@ -33,7 +34,7 @@ public class LifecycleController : MonoBehaviour
         await ExecuteLifecycleStep(view => view.OnBind());
         await ExecuteLifecycleStep(view => view.OnStart());
         
-        DebugLogHelper.LogImportant("生成終了");
+        DebugLogHelper.LogImportant("\u2705 全てのオブジェクトの初期化が完了しました");
     }
 
     /// <summary>
@@ -46,79 +47,84 @@ public class LifecycleController : MonoBehaviour
             if (prefab == null) continue;
 
             // 推測されるコンポーネントの型を取得
-            Type inferredType = FindViewBaseType(prefab);
+            Type viewType = GetViewBaseType(prefab);
 
-            if (inferredType == null)
+            if (viewType == null)
             {
                 Debug.LogWarning($"{prefab.name} のコンポーネントの型が特定できません。スキップします");
                 return;
             }
 
             // 既存インスタンスを確認
-            var existingInstance = FindObjectOfType(inferredType) as ViewBase;
+            var existingInstance = FindObjectOfType(viewType) as ViewBase;
             if (existingInstance != null)
             {
                 Debug.Log($"{prefab.name} の既存インスタンスが見つかったため、再生成しません");
-                _instantiatedViews.Add(existingInstance);
-                FindChildViewBase(existingInstance);
+                RegisterViewBase(existingInstance);
             }
             else // 既存インスタンスがなかったら作成する
             {
-                // `GameObjectUtility.Instantiate<T>(プレハブ名)` を自動実行
-                MethodInfo instantiateMethod = typeof(GameObjectUtility).GetMethod("Instantiate")
-                    ?.MakeGenericMethod(inferredType);
-                
-                if (instantiateMethod != null)
-                {
-                    var newInstance = instantiateMethod.Invoke(null, new object[] { prefab }) as ViewBase;
-                
-                    if (newInstance != null)
-                    {
-                        _instantiatedViews.Add(newInstance);
-                        FindChildViewBase(newInstance);
-                    }
-                }
-
-                Debug.Log($"{prefab.name} ({inferredType.Name}) を自動生成しました！");
+                CreateAndRegisterInstance(viewType, prefab);
             }
         }
         
         await UniTask.CompletedTask;
     }
-    
-    // プレハブの最初の `ViewBase` 派生コンポーネントの型を取得
-    private Type FindViewBaseType(GameObject prefab)
+
+    /// <summary>
+    /// 新しいインスタンスを生成し登録
+    /// GameObjectUtility.Instantiate<T>(プレハブ名)を自動実行する
+    /// </summary>
+    private void CreateAndRegisterInstance(Type viewType, GameObject prefab)
     {
-        Component[] components = prefab.GetComponents<Component>();
-        foreach (Component component in components)
+        try
         {
-            if (component is ViewBase)
+            MethodInfo instantiateMethod =
+                typeof(GameObjectUtility).GetMethod("Instantiate")?.MakeGenericMethod(viewType);
+
+            if (instantiateMethod != null)
             {
-                return component.GetType();
+                var newInstance = instantiateMethod.Invoke(null, new object[] { prefab }) as ViewBase;
+                if (newInstance != null)
+                {
+                    RegisterViewBase(newInstance);
+                }
             }
+
+            Debug.Log($"{prefab.name} ({viewType.Name}) を自動生成しました！");
         }
-        return null;
+        catch (Exception ex)
+        {
+            Debug.LogError($"❌ {prefab.name}: 生成中にエラー発生 - {ex.Message}");
+        }
+        
+    }
+
+    /// <summary>
+    /// プレハブから ViewBase を取得
+    /// </summary>
+    private Type GetViewBaseType(GameObject prefab)
+    {
+        return prefab.GetComponents<Component>().FirstOrDefault(c => c is ViewBase)?.GetType();
     }
     
     /// <summary>
-    /// 生成したインスタンスの子オブジェクトのViewBaseを取得する
+    /// ViewBase を登録し、子オブジェクトに対しても検索を行う
     /// </summary>
-    private void FindChildViewBase(ViewBase existingInstance)
+    private void RegisterViewBase(ViewBase existingInstance)
     {
+        _instantiatedViews.Add(existingInstance);
         foreach (Transform child in existingInstance.transform)
         {
-            var childViewBase = child.GetComponent<ViewBase>();
-            if (childViewBase != null)
+            if (child.TryGetComponent(out ViewBase childViewBase))
             {
-                _instantiatedViews.Add(childViewBase);
-                // 子オブジェクトがさらに子を持つ可能性があるので再帰的に呼び出す
-                FindChildViewBase(childViewBase);
+                RegisterViewBase(childViewBase); // 子オブジェクトがさらに子を持つ可能性があるので再帰的に呼び出す
             }
         }
     }
     
     /// <summary>
-    /// 取得したviewに対して、Awake、Startなどのそれぞれの処理を実行する
+    /// 各ライフサイクルメソッドを全ビューに適用
     /// </summary>
     private async UniTask ExecuteLifecycleStep(Func<ViewBase, UniTask> lifecycleMethod)
     {
