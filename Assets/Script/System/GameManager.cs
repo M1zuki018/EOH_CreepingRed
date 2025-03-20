@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 
@@ -11,7 +10,7 @@ public class GameManager : ViewBase
     
     public override UniTask OnAwake()
     {
-        ISimulator simulator = FindActiveSimulator();
+        var simulator = FindActiveSimulator();
         TimeManager = simulator.TimeManager;
         if (TimeManager == null)
         {
