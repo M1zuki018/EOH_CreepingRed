@@ -71,14 +71,22 @@ public class SkillCsvReader : EditorWindow
         SkillButtonEditor skillButtonEditor = new SkillButtonEditor();
         string[] lines = File.ReadAllLines(_csvFilePath);
 
-        for (int i = 1; i < lines.Length; i++) // ヘッダー行は読み飛ばす
+        for (int i = 2; i < lines.Length; i++) // ヘッダー行は読み飛ばす
         {
+            // 分割
+            string[] values = lines[i].Split(',');
+            
             GameObject skillButton = Instantiate(_prefabToCreate, _parentObject.transform); // Prefabを作成
+            skillButton.name = values[0];
             
             // スクリプタブルオブジェクト自動作成と自動アサイン
             SkillButton skillButtonScript = skillButton.GetComponent<SkillButton>();
             skillButtonEditor.CreateAndAssignSkillData(skillButtonScript);
             
+            // データをImport
+            ImportSkillData();
+            
+            // リストに自動アサイン
             SkillBase skillBase = _parentObject.GetComponent<SkillBase>();
             if (skillBase != null)
             {
@@ -110,6 +118,8 @@ public class SkillCsvReader : EditorWindow
         {
             // 分割
             string[] values = lines[i].Split(',');
+            
+            if(values.Length > 7) continue;
             
             // スキル名に基づいてスクリプタブルオブジェクトを検索
             SkillDataSO skillData = FindSkillDataByName(values[0]);
