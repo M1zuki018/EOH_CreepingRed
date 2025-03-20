@@ -13,6 +13,7 @@ public class LifecycleController : MonoBehaviour
 {
     [Header("Debug")]
     [SerializeField] private bool _debugMode = true;
+    [SerializeField] private bool _isLoggingEnabled = true;
     
     [Header("設定")]
     [SerializeField] private List<GameObject> _prefabsToInstantiate = new List<GameObject>();
@@ -26,6 +27,8 @@ public class LifecycleController : MonoBehaviour
             SceneManager.LoadScene("Title");
             return;
         }
+        
+        DebugLogHelper.IsLoggingEnabled = _isLoggingEnabled;
         
         await AutoInstantiate(); // インスタンス化
         

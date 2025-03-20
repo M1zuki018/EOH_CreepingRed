@@ -1,4 +1,3 @@
-using System;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 
@@ -10,36 +9,36 @@ public abstract class ViewBase : MonoBehaviour
     /// <summary>
     /// 他クラスに干渉しない処理
     /// </summary>
-    public virtual async UniTask OnAwake()
+    public virtual UniTask OnAwake()
     {
-        Debug.Log($"{gameObject.name} の Awake 実行");
-        await UniTask.CompletedTask;
+        DebugLogHelper.LogFormat("[ViewBase] {0} の Awake 実行", gameObject.name);
+        return UniTask.CompletedTask;
     }
 
     /// <summary>
     /// UI表示の初期化
     /// </summary>
-    public virtual async UniTask OnUIInitialize()
+    public virtual UniTask OnUIInitialize()
     {
-        Debug.Log($"{gameObject.name} の UI 初期化 実行");
-        await UniTask.CompletedTask;
+        DebugLogHelper.LogFormat("[ViewBase] {0} の Awake 実行", gameObject.name);
+        return UniTask.CompletedTask;
     }
 
     /// <summary>
     /// event Actionの登録など他のクラスと干渉する処理
     /// </summary>
-    public virtual async UniTask OnBind()
+    public virtual UniTask OnBind()
     {
-        Debug.Log($"{gameObject.name} の Bind 実行");
-        await UniTask.CompletedTask;
+        DebugLogHelper.LogFormat("[ViewBase] {0} の Bind 実行", gameObject.name);
+        return UniTask.CompletedTask;
     }
 
     /// <summary>
     /// ゲーム開始前最後に実行される処理
     /// </summary>
-    public virtual async UniTask OnStart()
+    public virtual UniTask OnStart()
     {
-        Debug.Log($"{gameObject.name} の Start 実行");
-        await UniTask.CompletedTask;
+        DebugLogHelper.LogFormat("[ViewBase] {0} の Start 実行", gameObject.name);
+        return UniTask.CompletedTask;
     }
 }
