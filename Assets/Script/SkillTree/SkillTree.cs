@@ -60,6 +60,8 @@ public class SkillTree : ViewBase, IWindow
     /// </summary>
     private bool ArePrerequisiteSkillsUnlocked(List<SkillEnum> prerequisiteSkills)
     {
+        if (prerequisiteSkills == null) return true; // 前提スキルがなければtrueを返す
+        
         foreach (var prerequisiteSkill in prerequisiteSkills)
         {
             if (!_skillButtonDic[prerequisiteSkill].IsUnlocked)
