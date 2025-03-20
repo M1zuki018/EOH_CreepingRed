@@ -1,4 +1,5 @@
 using Cysharp.Threading.Tasks;
+using UnityEngine;
 using UnityEngine.SceneManagement;
 
 /// <summary>
@@ -6,16 +7,33 @@ using UnityEngine.SceneManagement;
 /// </summary>
 public abstract class UIManagerBase : ViewBase
 {
-    public override UniTask OnAwake() { return base.OnAwake(); }
+    public override UniTask OnAwake()
+    {
+        SetCanvas();
+        return base.OnAwake();
+    }
     
-    public override UniTask OnBind() { return base.OnBind(); }
-    
-    public override UniTask OnStart() { return base.OnStart(); }
+    /// <summary>
+    /// Canvasの設定を行う
+    /// </summary>
+    private void SetCanvas()
+    {
+        Canvas canvas = GetComponent<Canvas>();
+        if (canvas != null)
+        {
+            canvas.renderMode = RenderMode.ScreenSpaceCamera;
+            canvas.worldCamera = Camera.main;
+        }
+        else
+        {
+            Debug.LogError($"{nameof(UIManagerBase)} Canvasが見つかりませんでした");
+        }
+    }
     
     /// <summary>
     /// 画面遷移
     /// </summary>
-    protected void TransitionView<T>(T show, T hide) where T : IWindow
+    protected void TransitionView(IWindow show, IWindow hide)
     {
         show.Show();
         hide.Hide();
@@ -24,7 +42,7 @@ public abstract class UIManagerBase : ViewBase
     /// <summary>
     /// オーバーレイとしての画面表示
     /// </summary>
-    protected void OverlayView<T>(T show, T block) where T : IWindow
+    protected void OverlayView(IWindow show, IWindow block)
     {
         show.Show();
         block.Block();

@@ -16,16 +16,6 @@ public class InGameSceneUIManager : UIManagerBase
     [SerializeField, HighlightIfNull] private SkillTreeUIController _skillTree;
     [SerializeField, HighlightIfNull] private EzechielSkillTreeUIController _ezechielSkillTree;
     [SerializeField, HighlightIfNull] private List<AreaViewSettingsSO> _areaUISettings = new List<AreaViewSettingsSO>();
-    
-    public override UniTask OnAwake()
-    {
-        // Canvasコンポーネントの設定
-        Canvas canvas = GetComponent<Canvas>();
-        canvas.renderMode = RenderMode.ScreenSpaceCamera;
-        canvas.worldCamera = Camera.main;
-        
-        return base.OnAwake();
-    }
 
     public override UniTask OnBind()
     {
@@ -40,19 +30,19 @@ public class InGameSceneUIManager : UIManagerBase
         _microView.Initialize(_areaUISettings);
         
         // イベント登録
-        _baseView.OnMacroView += () => TransitionView<IWindow>(_macroView, _baseView);
+        _baseView.OnMacroView += () => TransitionView(_macroView, _baseView);
         
-        _macroView.OnSkillTree += () => TransitionView<IWindow>(_skillTree, _macroView);
+        _macroView.OnSkillTree += () => TransitionView(_skillTree, _macroView);
         _macroView.OnArea += TransitionAreaView;
-        _macroView.OnClose += () => TransitionView<IWindow>(_baseView, _macroView);
+        _macroView.OnClose += () => TransitionView(_baseView, _macroView);
         
-        _microView.OnMacroView += () => TransitionView<IWindow>(_macroView, _microView);
+        _microView.OnMacroView += () => TransitionView(_macroView, _microView);
         
-        _skillTree.OnClose += () => TransitionView<IWindow>(_macroView, _skillTree);
-        _skillTree.OnShowEzechielTree += () => TransitionView<IWindow>(_ezechielSkillTree, _skillTree);
+        _skillTree.OnClose += () => TransitionView(_macroView, _skillTree);
+        _skillTree.OnShowEzechielTree += () => TransitionView(_ezechielSkillTree, _skillTree);
         
-        _ezechielSkillTree.OnClose += () => TransitionView<IWindow>(_macroView, _ezechielSkillTree);
-        _ezechielSkillTree.OnShowRitaTree += () => TransitionView<IWindow>(_skillTree, _ezechielSkillTree);
+        _ezechielSkillTree.OnClose += () => TransitionView(_macroView, _ezechielSkillTree);
+        _ezechielSkillTree.OnShowRitaTree += () => TransitionView(_skillTree, _ezechielSkillTree);
         
         return base.OnBind();
     }
@@ -66,14 +56,6 @@ public class InGameSceneUIManager : UIManagerBase
         _ezechielSkillTree.Hide();
         
         return base.OnStart();
-    }
-    
-    /// <summary>
-    /// シーン遷移
-    /// </summary>
-    private void TransitionScene()
-    {
-        TransitionScene("Dev_Result");
     }
 
     /// <summary>

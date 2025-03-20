@@ -11,25 +11,15 @@ public class TitleSceneUIManager : UIManagerBase
     [SerializeField, HighlightIfNull] private DifficultySelectionUIController _difficultySelection;
     [SerializeField, HighlightIfNull] private StartBonusSelectionUIController _startBonusSelection;
     [SerializeField, HighlightIfNull] private BaseSelectionUIController _baseSelection;
-    
-    public override UniTask OnAwake()
-    {
-        // Canvasコンポーネントの設定
-        Canvas canvas = GetComponent<Canvas>();
-        canvas.renderMode = RenderMode.ScreenSpaceCamera;
-        canvas.worldCamera = Camera.main;
-        
-        return base.OnAwake();
-    }
 
     public override UniTask OnBind()
     {
-        _title.OnGameStart += () => TransitionView<IWindow>(_difficultySelection, _title);
-        _title.OnGameSettings += () => OverlayView<IWindow>(_gameSettings, _title);
+        _title.OnGameStart += () => TransitionView(_difficultySelection, _title);
+        _title.OnGameSettings += () => OverlayView(_gameSettings, _title);
         
-        _difficultySelection.OnSelect += () => TransitionView<IWindow>(_startBonusSelection, _difficultySelection);
+        _difficultySelection.OnSelect += () => TransitionView(_startBonusSelection, _difficultySelection);
         
-        _startBonusSelection.OnSelect += () => TransitionView<IWindow>(_baseSelection, _startBonusSelection);
+        _startBonusSelection.OnSelect += () => TransitionView(_baseSelection, _startBonusSelection);
         
         _baseSelection.OnGameStart += TransitionScene;
         
