@@ -1,4 +1,6 @@
+using System;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 /// <summary>
 /// GameObjectに関するUtilityクラス
@@ -12,19 +14,26 @@ public static class GameObjectUtility
     {
         if (prefab == null)
         {
-            Debug.LogError("Prefabがnullです");
+            Debug.LogException(new ArgumentNullException(nameof(prefab), "⛔ Prefabがnullです"));
             return null;
         }
-        
-        var instance= Object.Instantiate(prefab); // インスタンス生成
-        var viewBase = instance.GetComponent<T>(); // T型のコンポーネント取得
-        
-        if (viewBase == null)
+
+        try
         {
-            Debug.LogError($"Prefabに {typeof(T).Name} のコンポーネントがアタッチされていません");
+            var instance= Object.Instantiate(prefab); // インスタンス生成
+            var viewBase = instance.GetComponent<T>(); // T型のコンポーネント取得
+        
+            if (viewBase == null)
+            {
+                throw new InvalidOperationException($"⛔ {prefab.name} に {typeof(T).Name} のコンポーネントがアタッチされていません");
+            }
+            
+            return viewBase;
+        }
+        catch (Exception ex)
+        {
+            Debug.LogException(ex);
             return null;
         }
-        
-        return viewBase.GetComponent<T>();
     } 
 }
