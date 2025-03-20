@@ -34,7 +34,7 @@ public enum SkillEnum
     WaterborneInfection,
     FoodborneInfection,
     ZoonoticInfection,
-    Bloodsucker_MediatedInfection,
+    BloodsuckerMediatedInfection,
     SurfaceParasiticInfection,
     AerosolizedInfection,
     DirectContactInfection,

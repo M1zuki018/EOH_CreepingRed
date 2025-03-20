@@ -10346,7 +10346,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8813719897871548401, guid: 9a85962852f38d449bce7fd880952087, type: 3}
       propertyPath: m_Name
-      value: Bloodsucker-MediatedInfection
+      value: BloodsuckerMediatedInfection
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
