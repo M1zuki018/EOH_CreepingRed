@@ -1,4 +1,5 @@
 using System;
+using DG.Tweening;
 using R3;
 using UnityEngine.UI;
 
@@ -23,11 +24,17 @@ public class TimeView : IDisposable
     
     /// <summary>
     /// 時間表示のUIを書き換える
+    /// フェードでぼんやり切り替わるようなアニメーションつき
     /// </summary>
     private void UpdateTimeView()
     {
         _currentTime = _currentTime.AddHours(2); // _currentTimeを更新
-        _timeText.text = _currentTime.ToString("yyyy-MM-dd\nHH:mm"); // フォーマットを整えて書き換え
+        _timeText.DOFade(0.5f, 0.4f)
+            .OnComplete(() =>
+            {
+                _timeText.text = _currentTime.ToString("yyyy-MM-dd\nHH:mm"); // フォーマットを整えて書き換え
+                _timeText.DOFade(1, 0.4f);
+            });
     }
 
     public void Dispose()
