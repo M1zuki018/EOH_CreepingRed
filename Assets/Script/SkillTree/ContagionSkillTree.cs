@@ -44,7 +44,7 @@ public class ContagionSkillTree : SkillBase
     {
         _skillTreeUIController.SkillTextsUpdate(button.SkillData.Name, button.SkillData.Description,button.SkillData.Cost.ToString());
         
-        if (_resource > button.SkillData.Cost)
+        if (!button.IsUnlocked && _resource > button.SkillData.Cost)
         {
             _skillTreeUIController.ChangeUnlockButton(true); // コストが足りていたらActivateボタンをインタラクティブできるように設定
         }
@@ -59,6 +59,10 @@ public class ContagionSkillTree : SkillBase
     /// </summary>
     private void HandleUnlock()
     {
+        if(_currentSkillButton.IsUnlocked) return; // 既にアンロック済みなら以降の処理を行わない（二度押し対策）
+        
+        _skillTreeUIController.ChangeUnlockButton(false); // Activateボタンをインタラクティブ出来ないようにする
+        
         _currentSkillButton.Unlock();
         _resource -= _currentSkillButton.SkillData.Cost; // 自分の解放ポイントを減らす
         InfectionParameters.BaseRate += _currentSkillButton.SkillData.SpreadRate; // 拡散性
