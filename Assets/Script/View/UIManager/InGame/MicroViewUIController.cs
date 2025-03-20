@@ -1,7 +1,9 @@
 using System;
+using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 /// <summary>
@@ -15,13 +17,16 @@ using UnityEngine.UI;
 public class MicroViewUIController : ViewBase, IWindow
 {
     [Header("UIパネルとしての設定")]
+    [SerializeField, HighlightIfNull] private Button _closeButton;
+    [SerializeField, HighlightIfNull] private Button _nextButton;
     [SerializeField, HighlightIfNull] private Button _backButton;
-
+    
     [Header("MicroViewの設定")] 
     [SerializeField, HighlightIfNull] private Text _nameText;
     [SerializeField, HighlightIfNull] private Text _explainText;
     
-    private AreaSettingsSO _selectedArea; // 現在表示中のエリアの参照
+    private List<AreaSettingsSO> _areaSettings;
+    private int _selectedArea; // 現在表示中のエリアの参照
     private CanvasGroup _canvasGroup;
     public event Action OnMacroView;
         
@@ -29,25 +34,46 @@ public class MicroViewUIController : ViewBase, IWindow
     {
         _canvasGroup = GetComponent<CanvasGroup>();
     
-        _backButton.onClick.AddListener(() => OnMacroView?.Invoke());
+        _closeButton.onClick.AddListener(() => OnMacroView?.Invoke()); // 閉じるボタンを押したら全体ビューへ
+        _nextButton.onClick.AddListener(() => ChangeArea(1));
+        _backButton.onClick.AddListener(() => ChangeArea(-1));
+        
         return base.OnUIInitialize();
     }
 
     /// <summary>
+    /// 初期化処理
+    /// </summary>
+    public void Initialize(List<AreaSettingsSO> areaSettings)
+    {
+        _areaSettings = areaSettings; // areaSettingsリストを受け取り
+    }
+    
+    /// <summary>
     /// 指定エリアのビューを開く
     /// </summary>
-    public void ShowMicroView(AreaSettingsSO areaSettings)
+    public void ShowMicroView(int index)
     {
-        _selectedArea = areaSettings;
+        _selectedArea = index;
         
-        _nameText.text = StateExtensions.ToJapanese(areaSettings.Name); // エリア名
-        _explainText.text = areaSettings.Explaination; // エリアの説明
+        _nameText.text = StateExtensions.ToJapanese(_areaSettings[index].Name); // エリア名
+        _explainText.text = _areaSettings[index].Explaination; // エリアの説明
         
         // アニメーション
         _nameText.DOFade(1, 0.5f);
         _explainText.DOFade(1, 0.5f);
         
         Show();
+    }
+
+    /// <summary>
+    /// 前後のエリアに移動する
+    /// </summary>
+    private void ChangeArea(int operation)
+    {
+        _selectedArea += operation;
+        _selectedArea %= 19;
+        ShowMicroView(_selectedArea);
     }
     
     public void Show()

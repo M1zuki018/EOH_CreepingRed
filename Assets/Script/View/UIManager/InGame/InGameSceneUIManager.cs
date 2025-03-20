@@ -1,3 +1,4 @@
+using System;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
@@ -33,23 +34,24 @@ public class InGameSceneUIManager : UIManagerBase
         new TimeView(_timeText, timeManager);
         new TimeScaleView(_timeScaleButtons, timeManager);
         
-        // 都市全体ビューの初期化
+        // 各ビューの初期化
         _macroView.Initialize(gameManager.AreaSettings);
+        _microView.Initialize(gameManager.AreaSettings);
         
         // イベント登録
         _baseView.OnMacroView += () => TransitionView<IWindow>(_macroView, _baseView);
         
         _macroView.OnSkillTree += () => TransitionView<IWindow>(_skillTree, _macroView);
-        _macroView.OnArea += setting => TransitionAreaView(_microView, _macroView, setting);
+        _macroView.OnArea += TransitionAreaView;
         _macroView.OnClose += () => TransitionView<IWindow>(_baseView, _macroView);
+        
+        _microView.OnMacroView += () => TransitionView<IWindow>(_macroView, _microView);
         
         _skillTree.OnClose += () => TransitionView<IWindow>(_macroView, _skillTree);
         _skillTree.OnShowEzechielTree += () => TransitionView<IWindow>(_ezechielSkillTree, _skillTree);
         
         _ezechielSkillTree.OnClose += () => TransitionView<IWindow>(_macroView, _ezechielSkillTree);
         _ezechielSkillTree.OnShowRitaTree += () => TransitionView<IWindow>(_skillTree, _ezechielSkillTree);
-        
-        _microView.OnMacroView += () => TransitionView<IWindow>(_macroView, _microView);
         
         return base.OnBind();
     }
@@ -76,9 +78,9 @@ public class InGameSceneUIManager : UIManagerBase
     /// <summary>
     /// 区域ビューへの遷移
     /// </summary>
-    private void TransitionAreaView(MicroViewUIController microView, IWindow window, AreaSettingsSO areaSettings)
+    private void TransitionAreaView(int index)
     {
-        microView.ShowMicroView(areaSettings);
-        window.Hide();
+        _microView.ShowMicroView(index);
+        _macroView.Hide();
     }
 }
