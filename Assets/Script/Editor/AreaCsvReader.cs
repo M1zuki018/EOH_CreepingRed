@@ -125,14 +125,14 @@ public class AreaCsvReader : EditorWindow
     /// </summary>
     private void AssignAreasToSimulator(List<AreaViewSettingsSO> createdAreas)
     {
-        UITestSimulator simulator = FindObjectOfType<UITestSimulator>();
-        if (simulator == null)
+        InGameSceneUIManager uiManager = FindObjectOfType<InGameSceneUIManager>();
+        if (uiManager == null)
         {
-            Debug.LogWarning("シーン内にSimulatorが見つかりません！");
+            Debug.LogWarning("シーン内にUIManagerが見つかりません！");
             return;
         }
-        simulator.RegisterAreas(createdAreas);
-        Debug.Log($"Simulatorに {createdAreas.Count} 個の区域を登録しました。");
+        uiManager.RegisterAreas(createdAreas);
+        Debug.Log($"UIManagerに {createdAreas.Count} 個の区域を登録しました。");
     }
     
     /// <summary>

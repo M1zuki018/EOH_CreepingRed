@@ -8,14 +8,10 @@ using UnityEngine;
 public class GameManager : ViewBase
 {
     public ITimeObservable TimeManager { get; private set; }
-    public List<AreaSettingsSO> AreaSettings { get; private set; }
-    public List<AreaViewSettingsSO> AreaUISettings { get; private set; }
     
     public override UniTask OnAwake()
     {
         ISimulator simulator = FindActiveSimulator();
-        AreaSettings = simulator.AreaSettings;
-        AreaUISettings = simulator.AreaUISettings;
         TimeManager = simulator.TimeManager;
         if (TimeManager == null)
         {

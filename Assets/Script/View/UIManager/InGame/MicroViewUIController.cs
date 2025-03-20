@@ -60,8 +60,12 @@ public class MicroViewUIController : ViewBase, IWindow
         
         _nameText.text = StateExtensions.ToJapanese(_areaSettings[index].Name); // エリア名
         _explainText.text = _areaSettings[index].Explaination; // エリアの説明
-        _backgroundImage.sprite = _areaSettings[index].Background; // 背景変更
-        Dev(_areaSettings[index].Background); // TODO: あとで消す
+        
+        if (_areaSettings[index].Background != null)
+        {
+            _backgroundImage.sprite = _areaSettings[index]?.Background; // 背景変更
+            Dev(_areaSettings[index].Background); // TODO: あとで消す
+        }
         
         // アニメーション
         _nameText.DOFade(1, 0.5f);

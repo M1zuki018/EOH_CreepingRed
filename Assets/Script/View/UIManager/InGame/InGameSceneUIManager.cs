@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
@@ -14,6 +15,7 @@ public class InGameSceneUIManager : UIManagerBase
     [SerializeField, HighlightIfNull] private MicroViewUIController _microView;
     [SerializeField, HighlightIfNull] private SkillTreeUIController _skillTree;
     [SerializeField, HighlightIfNull] private EzechielSkillTreeUIController _ezechielSkillTree;
+    [SerializeField, HighlightIfNull] private List<AreaViewSettingsSO> _areaUISettings = new List<AreaViewSettingsSO>();
     
     public override UniTask OnAwake()
     {
@@ -34,8 +36,8 @@ public class InGameSceneUIManager : UIManagerBase
         new TimeScaleView(_timeScaleButtons, timeManager);
         
         // 各ビューの初期化
-        _macroView.Initialize(gameManager.AreaUISettings);
-        _microView.Initialize(gameManager.AreaUISettings);
+        _macroView.Initialize(_areaUISettings);
+        _microView.Initialize(_areaUISettings);
         
         // イベント登録
         _baseView.OnMacroView += () => TransitionView<IWindow>(_macroView, _baseView);
@@ -81,5 +83,14 @@ public class InGameSceneUIManager : UIManagerBase
     {
         _microView.ShowMicroView(index);
         _macroView.Hide();
+    }
+    
+    /// <summary>
+    /// エリアUIのスクリプタブルオブジェクトを登録する
+    /// </summary>
+    public void RegisterAreas(List<AreaViewSettingsSO> newAreas)
+    {
+        _areaUISettings.Clear();
+        _areaUISettings.AddRange(newAreas);
     }
 }

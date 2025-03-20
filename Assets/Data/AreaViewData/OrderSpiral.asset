@@ -15,4 +15,4 @@ MonoBehaviour:
   Name: 12
   Explaination: "\u884C\u653F\u6A5F\u95A2\u3084\u4E3B\u8981\u306A\u65BD\u8A2D\u304C\u307E\u3068\u307E\u3063\u305F\u5730\u533A"
   Category: 3
-  Background: {fileID: 21300000, guid: 0fe1fba02f77da44897766079401a229, type: 3}
+  Background: {fileID: 0}
