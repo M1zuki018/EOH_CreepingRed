@@ -31,6 +31,14 @@ public class SkillButton　: ViewBase
     {
         _skillData = skillData;
     }
+
+    /// <summary>
+    /// スキルをアンロックする
+    /// </summary>
+    public void Unlock()
+    {
+        _isUnlocked = true;
+    }
     
     private void OnDestroy()
     {

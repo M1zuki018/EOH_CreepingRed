@@ -7488,7 +7488,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b68e4dc28267e274b9c4baf9a2ae4e20, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _closeButton: {fileID: 5467533970319128947}
   _ritaTreeButton: {fileID: 8252501971034364666}
+--- !u!114 &5467533970319128947 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5010709301245001742, guid: 182dc3690ad67534a94295a10a7c040f, type: 3}
+  m_PrefabInstance: {fileID: 1038370682157988221}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &8252501971034364666 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 9002641177421423495, guid: 182dc3690ad67534a94295a10a7c040f, type: 3}
