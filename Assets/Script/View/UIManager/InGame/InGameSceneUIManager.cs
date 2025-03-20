@@ -40,7 +40,7 @@ public class InGameSceneUIManager : UIManagerBase
         _baseView.OnMacroView += () => TransitionView<IWindow>(_macroView, _baseView);
         
         _macroView.OnSkillTree += () => TransitionView<IWindow>(_skillTree, _macroView);
-        _macroView.OnArea += () => TransitionView<IWindow>(_microView, _macroView);
+        _macroView.OnArea += setting => TransitionAreaView(_microView, _macroView, setting);
         _macroView.OnClose += () => TransitionView<IWindow>(_baseView, _macroView);
         
         _skillTree.OnClose += () => TransitionView<IWindow>(_macroView, _skillTree);
@@ -71,5 +71,14 @@ public class InGameSceneUIManager : UIManagerBase
     private void TransitionScene()
     {
         TransitionScene("Dev_Result");
+    }
+
+    /// <summary>
+    /// 区域ビューへの遷移
+    /// </summary>
+    private void TransitionAreaView(MicroViewUIController microView, IWindow window, AreaSettingsSO areaSettings)
+    {
+        microView.ShowMicroView(areaSettings);
+        window.Hide();
     }
 }

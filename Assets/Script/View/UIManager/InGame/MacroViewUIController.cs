@@ -21,7 +21,7 @@ public class MacroViewUIController : ViewBase, IWindow
     private CanvasGroup _canvasGroup;
     private List<AreaSettingsSO> _areaSettings;
     public event Action OnSkillTree;
-    public event Action OnArea;
+    public event Action<AreaSettingsSO> OnArea;
     public event Action OnClose;
         
     public override UniTask OnUIInitialize()
@@ -33,7 +33,8 @@ public class MacroViewUIController : ViewBase, IWindow
 
         for (int i = 0; i < _areaButton.Length; i++)
         {
-            _areaButton[i].onClick.AddListener(() => OnArea?.Invoke());
+            var index = i;
+            _areaButton[i].onClick.AddListener(() => OnArea?.Invoke(_areaSettings[index]));
         }
         
         return base.OnUIInitialize();
@@ -44,7 +45,7 @@ public class MacroViewUIController : ViewBase, IWindow
     /// </summary>
     public void Initialize(List<AreaSettingsSO> areaSettings)
     {
-        _areaSettings = areaSettings;
+        _areaSettings = areaSettings; // areaSettingsリストを受け取り
         SetText();
     }
 

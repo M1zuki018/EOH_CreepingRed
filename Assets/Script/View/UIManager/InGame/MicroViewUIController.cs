@@ -13,8 +13,14 @@ using UnityEngine.UI;
 [RequireComponent(typeof(CanvasGroup))]
 public class MicroViewUIController : ViewBase, IWindow
 {
+    [Header("UIパネルとしての設定")]
     [SerializeField, HighlightIfNull] private Button _backButton;
+
+    [Header("MicroViewの設定")] 
+    [SerializeField, HighlightIfNull] private Text _nameText;
+    [SerializeField, HighlightIfNull] private Text _explainText;
     
+    private AreaSettingsSO _selectedArea; // 現在表示中のエリアの参照
     private CanvasGroup _canvasGroup;
     public event Action OnMacroView;
         
@@ -24,6 +30,16 @@ public class MicroViewUIController : ViewBase, IWindow
     
         _backButton.onClick.AddListener(() => OnMacroView?.Invoke());
         return base.OnUIInitialize();
+    }
+
+    /// <summary>
+    /// 指定エリアのビューを開く
+    /// </summary>
+    public void ShowMicroView(AreaSettingsSO areaSettings)
+    {
+        _selectedArea = areaSettings;
+        _nameText.text = StateExtensions.ToJapanese(areaSettings.Name);
+        Show();
     }
     
     public void Show()
