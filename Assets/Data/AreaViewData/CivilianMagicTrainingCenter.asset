@@ -15,4 +15,4 @@ MonoBehaviour:
   Name: 18
   Explaination: "\u5B98\u55B6\u306E\u9B54\u6CD5\u8A13\u7DF4\u6240\u3002\u30DB\u30ED\u30A6\u304B\u3089\u5F37\u5236\u9023\u884C\u306E\u306E\u3061\u3001\u3053\u306E\u5834\u6240\u3067\u8A13\u7DF4\u3092\u5F37\u5236\u3055\u308C\u308B\u3053\u3068\u3082"
   Category: 5
-  Background: {fileID: 0}
+  Background: {fileID: 21300000, guid: 0fe1fba02f77da44897766079401a229, type: 3}

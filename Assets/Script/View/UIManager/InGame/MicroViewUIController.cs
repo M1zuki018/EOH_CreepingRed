@@ -21,8 +21,11 @@ public class MicroViewUIController : ViewBase, IWindow
     [SerializeField, HighlightIfNull] private Button _backButton;
     
     [Header("MicroViewの設定")] 
+    [SerializeField, HighlightIfNull] private Image _backgroundImage;
     [SerializeField, HighlightIfNull] private Text _nameText;
     [SerializeField, HighlightIfNull] private Text _explainText;
+
+    [Header("開発中オンリー")] [SerializeField] private Text _day;
     
     private List<AreaViewSettingsSO> _areaSettings;
     private int _selectedArea; // 現在表示中のエリアのIndex
@@ -57,6 +60,8 @@ public class MicroViewUIController : ViewBase, IWindow
         
         _nameText.text = StateExtensions.ToJapanese(_areaSettings[index].Name); // エリア名
         _explainText.text = _areaSettings[index].Explaination; // エリアの説明
+        _backgroundImage.sprite = _areaSettings[index].Background; // 背景変更
+        Dev(_areaSettings[index].Background); // TODO: あとで消す
         
         // アニメーション
         _nameText.DOFade(1, 0.5f);
@@ -98,5 +103,13 @@ public class MicroViewUIController : ViewBase, IWindow
     public void Block()
     {
         CanvasVisibilityController.Block(_canvasGroup);
+    }
+
+    /// <summary>
+    /// 開発中の悪ノリ処理
+    /// </summary>
+    private void Dev(Sprite sprite)
+    {
+        _day.gameObject.SetActive(sprite.name == "tmp");
     }
 }

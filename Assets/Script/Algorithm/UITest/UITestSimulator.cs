@@ -11,7 +11,7 @@ public class UITestSimulator : ViewBase, ISimulator
     [SerializeField, HighlightIfNull] private List<AreaSettingsSO> _areaSettings;
     public List<AreaSettingsSO> AreaSettings => _areaSettings;
     
-    [SerializeField] private List<AreaViewSettingsSO> _uiAreaSettings = new List<AreaViewSettingsSO>();
+    [SerializeField, Expandable] private List<AreaViewSettingsSO> _uiAreaSettings = new List<AreaViewSettingsSO>();
     public List<AreaViewSettingsSO> AreaUISettings => _uiAreaSettings;
     private ITimeObservable _timeManager;
     public ITimeObservable TimeManager => _timeManager;
