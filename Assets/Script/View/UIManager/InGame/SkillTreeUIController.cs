@@ -24,6 +24,11 @@ public class SkillTreeUIController : ViewBase, IWindow
     [SerializeField, HighlightIfNull, Comment("解放コストのエリア")] private Text _point;
     [SerializeField, HighlightIfNull, Comment("解放ボタン")] private Button _unlockButton;
     [SerializeField, HighlightIfNull, Comment("エゼキエルのスキルツリーボタン")] private Button _ezechielButton;
+    
+    [Header("スキルカテゴリの変更")]
+    [SerializeField, HighlightIfNull, Comment("感染")] private Button _contagionButton;
+    [SerializeField, HighlightIfNull, Comment("症状")] private Button _symptomsButton;
+    [SerializeField, HighlightIfNull, Comment("能力")] private Button _abilityButton;
 
     [Header("フッター部分の参照")] 
     [SerializeField, HighlightIfNull, Comment("解放ポイント")] private Text _pointText;
@@ -59,8 +64,32 @@ public class SkillTreeUIController : ViewBase, IWindow
         InitializeSlider(); // SliderのMaxValueを変更
         UpdateUnderGauges(); // 下のバーの初期化
         ToggleUnlockButton(false); // UnlockButtonをインタラクティブできないように
+
+        // スキルツリーパネルの操作
+        ShowSkillTree(0);
+        _contagionButton.onClick.AddListener(() => ShowSkillTree(0));
+        _symptomsButton.onClick.AddListener(() => ShowSkillTree(1));
+        _abilityButton.onClick.AddListener(() => ShowSkillTree(2));
         
         return base.OnUIInitialize();
+    }
+
+    /// <summary>
+    /// 指定されたIndexのスキルツリーパネルを表示する
+    /// </summary>
+    private void ShowSkillTree(int index)
+    {
+        for (int i = 0; i < _skillTrees.Count; i++)
+        {
+            if (index == i)
+            {
+                _skillTrees[i].Show();
+            }
+            else
+            {
+                _skillTrees[i].Hide();
+            }
+        }
     }
 
     /// <summary>

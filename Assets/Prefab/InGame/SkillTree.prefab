@@ -3219,6 +3219,7 @@ GameObject:
   - component: {fileID: 701967360115751788}
   - component: {fileID: 1081763110216937082}
   - component: {fileID: 7032933848617434329}
+  - component: {fileID: 1125082659802164776}
   m_Layer: 5
   m_Name: Symptoms
   m_TagString: Untagged
@@ -3352,6 +3353,18 @@ MonoBehaviour:
   - {fileID: 9102036889021247486}
   - {fileID: 771382388935482346}
   - {fileID: 5380229257287923921}
+--- !u!225 &1125082659802164776
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3213271793071202429}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1 &3312920963757439907
 GameObject:
   m_ObjectHideFlags: 0
@@ -3442,6 +3455,8 @@ GameObject:
   - component: {fileID: 3916678843384373009}
   - component: {fileID: 2017585043016525529}
   - component: {fileID: 2579682022822660776}
+  - component: {fileID: 7145668936913011348}
+  - component: {fileID: 5202184957248463547}
   m_Layer: 5
   m_Name: Ability
   m_TagString: Untagged
@@ -3506,6 +3521,31 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!225 &7145668936913011348
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3403082293586591350}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
+--- !u!114 &5202184957248463547
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3403082293586591350}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3d9d33d03dec84244a20c9b268794489, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _skillButtons: []
 --- !u!1 &3462061528250798520
 GameObject:
   m_ObjectHideFlags: 0
@@ -4052,6 +4092,7 @@ GameObject:
   - component: {fileID: 448502594629804516}
   - component: {fileID: 2718093051502605544}
   - component: {fileID: 4180181739549434941}
+  - component: {fileID: 1379478036828627819}
   m_Layer: 5
   m_Name: Contagion
   m_TagString: Untagged
@@ -4153,6 +4194,18 @@ MonoBehaviour:
   - {fileID: 8114354208177655252}
   - {fileID: 6184547062416094390}
   - {fileID: 5330468339237630955}
+--- !u!225 &1379478036828627819
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4204781718348862947}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1 &4257583865481404622
 GameObject:
   m_ObjectHideFlags: 0
@@ -5739,11 +5792,15 @@ MonoBehaviour:
   _skillTrees:
   - {fileID: 4180181739549434941}
   - {fileID: 7032933848617434329}
+  - {fileID: 5202184957248463547}
   _skillName: {fileID: 3950296807812335975}
   _skillDescription: {fileID: 3171136553583311733}
   _point: {fileID: 9115752403926943611}
   _unlockButton: {fileID: 7959919924920857238}
   _ezechielButton: {fileID: 3317838850751256957}
+  _contagionButton: {fileID: 4668756017501502313}
+  _symptomsButton: {fileID: 3598184312465348339}
+  _abilityButton: {fileID: 8233578532987771217}
   _pointText: {fileID: 1907509128073133579}
   _spreadSlider: {fileID: 9200942919030210575}
   _detectionSlider: {fileID: 5562510346950480502}

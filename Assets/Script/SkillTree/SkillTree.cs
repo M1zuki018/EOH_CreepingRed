@@ -6,13 +6,21 @@ using UnityEngine;
 /// <summary>
 /// スキルツリークラス
 /// </summary>
-public class SkillTree : ViewBase
+[RequireComponent(typeof(CanvasGroup))]
+public class SkillTree : ViewBase, IWindow
 {
     [SerializeField] private List<SkillButton> _skillButtons;
     public List<SkillButton> SkillButtons => _skillButtons;
     private readonly Dictionary<SkillEnum, SkillButton> _skillButtonDic = new Dictionary<SkillEnum, SkillButton>();
     private SkillTreeUIController _uiController;
     private SkillButton _selectedSkillButton; // 押されているスキルボタンの情報を保持しておく
+    private CanvasGroup _canvasGroup;
+
+    public override UniTask OnAwake()
+    {
+        _canvasGroup = GetComponent<CanvasGroup>();
+        return base.OnAwake();
+    }
 
     public override UniTask OnBind()
     {
@@ -102,5 +110,20 @@ public class SkillTree : ViewBase
     public void SetUIController(SkillTreeUIController skillTreeUIController)
     {
         _uiController = skillTreeUIController;
+    }
+
+    public void Show()
+    {
+        CanvasVisibilityController.Show(_canvasGroup);
+    }
+    
+    public void Hide()
+    {
+        CanvasVisibilityController.Hide(_canvasGroup);
+    }
+    
+    public void Block()
+    {
+        CanvasVisibilityController.Block(_canvasGroup);
     }
 }
