@@ -125,9 +125,9 @@ public class AreaCsvReader : EditorWindow
         AreaSettingsSO areaSettings = CreateInstance<AreaSettingsSO>();
         areaSettings.X = int.Parse(values[1]);
         areaSettings.Y = int.Parse(values[2]);
-        areaSettings.Name = ConversionSectionName(values[3]);
+        areaSettings.Name = ExtensionsUtility.ToSectionEnum(values[3]);
         areaSettings.Explaination = values[4];
-        areaSettings.Category = ConversionCategoryName(values[5]);
+        areaSettings.Category = ExtensionsUtility.ToCategoryEnum(values[5]);
         areaSettings.Population = int.Parse(values[6]);
         areaSettings.CitizenPopulation = int.Parse(values[7]);
         areaSettings.MagicSoldierPopulation = int.Parse(values[8]);
@@ -146,9 +146,9 @@ public class AreaCsvReader : EditorWindow
     private AreaViewSettingsSO AreaViewSettingsSO(string[] values)
     {
         AreaViewSettingsSO areaViewSettings = CreateInstance<AreaViewSettingsSO>();
-        areaViewSettings.Name = ConversionSectionName(values[3]);
+        areaViewSettings.Name = ExtensionsUtility.ToSectionEnum(values[3]);
         areaViewSettings.Explaination = values[4];
-        areaViewSettings.Category = ConversionCategoryName(values[5]);
+        areaViewSettings.Category = ExtensionsUtility.ToCategoryEnum(values[5]);
         return areaViewSettings;
     }
 
@@ -190,56 +190,5 @@ public class AreaCsvReader : EditorWindow
         }
         
         Debug.Log($"Simulatorに {createdAreas.Count} 個の区域を登録しました。");
-    }
-
-    /// <summary>
-    /// 日本語区域名をEnumに変換する
-    /// </summary>
-    private SectionEnum ConversionSectionName(string sectionName)
-    {
-        SectionEnum sectionEnum = sectionName switch
-        {
-            "魔法技術研究区" => SectionEnum.MagicTechnologyResearchArea,
-            "魔法士訓練所" => SectionEnum.MagicianTrainingCenter,
-            "セントラル・タワー" => SectionEnum.CentralTower,
-            "上級階級用邸宅街" => SectionEnum.UpperClassResidentialDistrict,
-            "湾岸倉庫" => SectionEnum.BaysideWarehouse,
-            "特別階級用高級居住区" => SectionEnum.LuxuryResidentialDistrictForTheSpecialClass,
-            "中流階級北区" => SectionEnum.MiddleClassNorthDistrict,
-            "セントラル・トランスポートハブ" => SectionEnum.CentralTransportHub,
-            "アルテリア・アリーナ" => SectionEnum.AltriaArena,
-            "バイオ・リサーチセンター" => SectionEnum.BioResearchCenter,
-            "ユーティリティー管理センター" => SectionEnum.UtilityManagementCenter,
-            "中流階級南区" => SectionEnum.MiddleClassSouthDistrict,
-            "オーダー・スパイラル" => SectionEnum.OrderSpiral,
-            "オーダー・バザール" => SectionEnum.OrderBazaar,
-            "ホロウ" => SectionEnum.Hollow,
-            "水循環管理プラント" => SectionEnum.WaterCycleManagementPlant,
-            "アルテリア農業ドーム" => SectionEnum.AltriaAgriculturalDome,
-            "アルテリア配給センター" => SectionEnum.AltriaDistributionCenter,
-            "民間人魔法訓練所" => SectionEnum.CivilianMagicTrainingCenter,
-            "海" => SectionEnum.Sea,
-            _ => throw new ArgumentException($"無効な区域名: {sectionName}") // 例外処理
-        }; 
-        return sectionEnum;
-    }
-
-    /// <summary>
-    /// 日本語区域名をEnumに変換する
-    /// </summary>
-    private AreaCategoryEnum ConversionCategoryName(string categoryName)
-    {
-        AreaCategoryEnum areaCategoryEnum = categoryName switch
-        {
-            "アルカナ・エンパイア管理区" => AreaCategoryEnum.ArcanaEmpireManagementDistrict,
-            "上級階級特区" => AreaCategoryEnum.SeniorClassifiedZone,
-            "居住区" => AreaCategoryEnum.ResidentialDistrict,
-            "中央支配区" => AreaCategoryEnum.CentralDistrict,
-            "環境管理区" => AreaCategoryEnum.EnvironmentalManagementZone,
-            "治安崩壊区域" => AreaCategoryEnum.DisruptionZone,
-            _ => throw new ArgumentException($"無効な区域名: {categoryName}") // 例外処理
-        };
-        
-        return areaCategoryEnum;
     }
 }

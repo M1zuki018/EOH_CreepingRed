@@ -61,7 +61,7 @@ public class MicroViewUIController : UIControllerBase
         
         var area = _areaSettings[index];
         
-        _nameText.text = StateExtensionsUtility.ToJapanese(area.Name); // エリア名
+        _nameText.text = ExtensionsUtility.SectionEnumToJapanese(area.Name); // エリア名
         _explainText.text = area.Explaination; // エリアの説明
         
         if (area.Background != null)

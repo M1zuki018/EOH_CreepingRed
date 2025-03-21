@@ -13,6 +13,6 @@ MonoBehaviour:
   m_Name: MagicTechnologyResearchArea
   m_EditorClassIdentifier: 
   Name: 0
-  Explaination: "\u30A2\u30EB\u30AB\u30CA\u30FB\u30A8\u30F3\u30D1\u30A4\u30A2\u304C\u7BA1\u7406\u3059\u308B\u9B54\u6CD5\u6280\u8853\u7814\u7A76\u65BD\u8A2D\u7FA4"
-  Category: 0
+  Explaination: "\u96FB\u529B\u30FB\u30AC\u30B9\u30FB\u6C34\u9053\u306A\u3069\u90FD\u5E02\u30A4\u30F3\u30D5\u30E9\u306E\u7D71\u62EC\u65BD\u8A2D"
+  Category: 4
   Background: {fileID: 0}
