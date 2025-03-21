@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
 using Debug = UnityEngine.Debug;
@@ -68,36 +67,33 @@ public class MiniGrid
     {
         _totalStateCount.ResetStateCount(); // 一度リセットする
         
-        Stopwatch stopwatch = new Stopwatch();
-        stopwatch.Start();
-        
-        // バッチ処理で追加
-        int totalHealthy = 0, totalInfected = 0, totalNearDeath = 0;
-        int totalGhost = 0, totalPerished = 0, totalMagicSoldiers = 0;
-
-        for (int x = 0; x < _areas.GetLength(0); x++)
+        StopwatchHelper.Measure(() =>
         {
-            for (int y = 0; y < _areas.GetLength(1); y++)
+            // バッチ処理で追加
+            int totalHealthy = 0, totalInfected = 0, totalNearDeath = 0;
+            int totalGhost = 0, totalPerished = 0, totalMagicSoldiers = 0;
+
+            for (int x = 0; x < _areas.GetLength(0); x++)
             {
-                var area = _areas[x, y];
-                if (area == null) continue;
+                for (int y = 0; y < _areas.GetLength(1); y++)
+                {
+                    var area = _areas[x, y];
+                    if (area == null) continue;
 
-                totalHealthy += area.AreaStateCount.Healthy;
-                totalInfected += area.AreaStateCount.Infected;
-                totalNearDeath += area.AreaStateCount.NearDeath;
-                totalGhost += area.AreaStateCount.Ghost;
-                totalPerished += area.AreaStateCount.Perished;
-                totalMagicSoldiers += area.AreaStateCount.MagicSoldiers;
+                    totalHealthy += area.AreaStateCount.Healthy;
+                    totalInfected += area.AreaStateCount.Infected;
+                    totalNearDeath += area.AreaStateCount.NearDeath;
+                    totalGhost += area.AreaStateCount.Ghost;
+                    totalPerished += area.AreaStateCount.Perished;
+                    totalMagicSoldiers += area.AreaStateCount.MagicSoldiers;
+                }
             }
-        }
 
-        _totalStateCount.UpdateStateCount(
-            totalHealthy, totalInfected, totalNearDeath, 
-            totalGhost, totalPerished, totalMagicSoldiers
-        );
-        
-        stopwatch.Stop();
-        DebugLogHelper.LogImportant($"StateCount集計速度　{stopwatch.ElapsedMilliseconds}ms");
+            _totalStateCount.UpdateStateCount(
+                totalHealthy, totalInfected, totalNearDeath, 
+                totalGhost, totalPerished, totalMagicSoldiers
+            );
+        }, "StateCount集計速度");
         
         // Gridの集計データをUIに反映
         Debug.Log($"[Grid 集計結果] 健常者: {_totalStateCount.Healthy} 感染者: {_totalStateCount.Infected} 仮死状態: {_totalStateCount.NearDeath} " +
