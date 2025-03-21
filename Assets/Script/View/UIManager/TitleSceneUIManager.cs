@@ -5,6 +5,7 @@ using UnityEngine;
 /// </summary>
 public class TitleSceneUIManager : UIManagerBase
 {
+    [Header("UIControllerの登録")]
     [SerializeField, HighlightIfNull] private TitleUIController _title;
     [SerializeField, HighlightIfNull] private GameSettingsUIController _gameSettings;
     [SerializeField, HighlightIfNull] private DifficultySelectionUIController _difficultySelection;
@@ -14,17 +15,17 @@ public class TitleSceneUIManager : UIManagerBase
     protected override void RegisterEvents()
     {
         // タイトル画面
-        _title.OnGameStart += () => TransitionView(_difficultySelection, _title);
-        _title.OnGameSettings += () => OverlayView(_gameSettings, _title);
+        _title.OnGameStart += OnTitleGameStart;
+        _title.OnGameSettings += OnTitleGameSettings;
         
         // 難易度選択画面
-        _difficultySelection.OnSelect += () => TransitionView(_startBonusSelection, _difficultySelection);
+        _difficultySelection.OnSelect += OnDifficultySelect;
         
         // スタートボーナス選択画面
-        _startBonusSelection.OnSelect += () => TransitionView(_baseSelection, _startBonusSelection);
+        _startBonusSelection.OnSelect += OnStartBonusSelect;
         
         // 拠点選択画面
-        _baseSelection.OnGameStart += TransitionScene;
+        _baseSelection.OnGameStart += OnBaseSelectionGameStart;
     }
 
     protected override void InitializePanel()
@@ -43,4 +44,23 @@ public class TitleSceneUIManager : UIManagerBase
     {
         TransitionScene("Dev_InGame");
     }
+    
+    protected override void UnregisterEvents()
+    {
+        _title.OnGameStart -= OnTitleGameStart;
+        _title.OnGameSettings -= OnTitleGameSettings;
+        _difficultySelection.OnSelect -= OnDifficultySelect;
+        _startBonusSelection.OnSelect -= OnStartBonusSelect;
+        _baseSelection.OnGameStart -= OnBaseSelectionGameStart;
+    }
+    
+    #region イベントハンドラー
+    
+    private void OnTitleGameStart() => TransitionView(_difficultySelection, _title);
+    private void OnTitleGameSettings() => OverlayView(_gameSettings, _title);
+    private void OnDifficultySelect() => TransitionView(_startBonusSelection, _difficultySelection);
+    private void OnStartBonusSelect() => TransitionView(_baseSelection, _startBonusSelection);
+    private void OnBaseSelectionGameStart() => TransitionScene();
+    
+    #endregion
 }

@@ -1,3 +1,4 @@
+using System;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -24,7 +25,12 @@ public abstract class UIManagerBase : ViewBase
         InitializePanel();
         return base.OnStart();
     }
-    
+
+    public void OnDestroy()
+    {
+        UnregisterEvents();
+    }
+
     /// <summary>
     /// Canvasの設定を行う
     /// </summary>
@@ -46,6 +52,11 @@ public abstract class UIManagerBase : ViewBase
     /// イベント登録を行う（各UIManagerで実装する）
     /// </summary>
     protected abstract void RegisterEvents();
+    
+    /// <summary>
+    /// イベント解除を行う（各UIManagerで実装する）
+    /// </summary>
+    protected abstract void UnregisterEvents();
     
     /// <summary>
     /// 各画面の表示/非表示の初期設定を行う（各UIManagerで実装する）
