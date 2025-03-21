@@ -35,7 +35,7 @@ public class SkillCsvReader : EditorWindow
         
         if (GUILayout.Button("ScriptableObjectに自動入力"))
         {
-            ImportSkillData();
+            ImportSkillsData();
         }
         
         EditorGUILayout.Space();
@@ -58,6 +58,44 @@ public class SkillCsvReader : EditorWindow
     }
 
     /// <summary>
+    /// スキルデータをImportする
+    /// </summary>
+    private void ImportSkillsData()
+    {
+        if (!File.Exists(_csvFilePath))
+        {
+            Debug.LogWarning($"CSVファイルが見つかりません : {_csvFilePath}");
+            return;
+        }
+        
+        string[] lines = File.ReadAllLines(_csvFilePath);
+        for(int i = 1; i < lines.Length; i++) // ヘッダー行は飛ばす
+        {
+            string[] values = lines[i].Split(',');
+            
+            if(values.Length > 7) return;
+            
+            // スキル名に基づいてスクリプタブルオブジェクトを検索
+            SkillDataSO skillData = FindSkillDataByName(values[0]);
+
+            if (skillData != null)
+            {
+                skillData.SetData(values[1], values[2], int.Parse(values[3]), 
+                    float.Parse(values[4]), float.Parse(values[5]), float.Parse(values[6]));
+            }
+            else
+            {
+                Debug.LogWarning($"{values[0]} のScriptableObjectデータが見つかりませんでした");
+            }
+        }
+        
+        AssetDatabase.SaveAssets();
+        AssetDatabase.Refresh();
+        
+        Debug.Log("Skillデータの自動入力が完了しました！");
+    }
+    
+    /// <summary>
     /// スキルボタンを自動作成する
     /// </summary>
     private void CreateSkillButtons()
@@ -68,12 +106,11 @@ public class SkillCsvReader : EditorWindow
             return;
         }
         
-        SkillButtonEditor skillButtonEditor = new SkillButtonEditor();
+        SkillButtonEditor skillButtonEditor = CreateInstance<SkillButtonEditor>();
         string[] lines = File.ReadAllLines(_csvFilePath);
 
         for (int i = 2; i < lines.Length; i++) // ヘッダー行は読み飛ばす
         {
-            // 分割
             string[] values = lines[i].Split(',');
             
             GameObject skillButton = Instantiate(_prefabToCreate, _parentObject.transform); // Prefabを作成
@@ -83,8 +120,7 @@ public class SkillCsvReader : EditorWindow
             SkillButton skillButtonScript = skillButton.GetComponent<SkillButton>();
             skillButtonEditor.CreateAndAssignSkillData(skillButtonScript);
             
-            // データをImport
-            ImportSkillData();
+            ImportSkillsData();
             
             // リストに自動アサイン
             SkillTreePanelUIController skillTreePanelUIController = _parentObject.GetComponent<SkillTreePanelUIController>();
@@ -99,47 +135,27 @@ public class SkillCsvReader : EditorWindow
         }
         
         AssetDatabase.SaveAssets();
+        OverridePrefab();  // ボタンリストのプレハブをオーバーライド
+        
         Debug.Log("スキルボタンの作成が完了しました！");
     }
     
     /// <summary>
-    /// スキルデータをImportする
+    /// スキルボタンのプレハブをオーバーライド
     /// </summary>
-    private void ImportSkillData()
+    private void OverridePrefab()
     {
-        if (!File.Exists(_csvFilePath))
+        if (PrefabUtility.IsPartOfPrefabAsset(_parentObject))
         {
-            Debug.LogWarning($"CSVファイルが見つかりません : {_csvFilePath}");
-            return;
+            PrefabUtility.ApplyPrefabInstance(_parentObject, InteractionMode.UserAction);
+            Debug.Log($"プレハブ {_parentObject.name} をオーバーライドしました");
         }
-        
-        string[] lines = File.ReadAllLines(_csvFilePath);
-        for(int i = 1; i < lines.Length; i++) // ヘッダー行は飛ばす
+        else
         {
-            // 分割
-            string[] values = lines[i].Split(',');
-            
-            if(values.Length > 7) continue;
-            
-            // スキル名に基づいてスクリプタブルオブジェクトを検索
-            SkillDataSO skillData = FindSkillDataByName(values[0]);
-
-            if (skillData == null)
-            {
-                Debug.LogWarning($"{values[0]} のScriptableObjectデータが見つかりませんでした");
-                continue;
-            }
-            
-            skillData.SetData(values[1], values[2], int.Parse(values[3]), 
-                float.Parse(values[4]), float.Parse(values[5]), float.Parse(values[6]));
+            Debug.LogWarning($"プレハブではないオブジェクト {_parentObject.name} に対してオーバーライドは行われません");
         }
-        
-        AssetDatabase.SaveAssets();
-        AssetDatabase.Refresh();
-        
-        Debug.Log("Skillデータの自動入力が完了しました！");
     }
-
+    
     /// <summary>
     /// スキルデータを探す
     /// </summary>
