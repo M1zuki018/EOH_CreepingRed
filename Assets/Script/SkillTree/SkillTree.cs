@@ -1,30 +1,23 @@
 using System;
 using System.Collections.Generic;
-using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 /// <summary>
 /// スキルツリークラス
 /// </summary>
-[RequireComponent(typeof(CanvasGroup))]
-public class SkillTree : ViewBase, IWindow
+public class SkillTree : UIControllerBase
 {
     [SerializeField] private List<SkillButton> _skillButtons;
     public List<SkillButton> SkillButtons => _skillButtons;
     private readonly Dictionary<SkillEnum, SkillButton> _skillButtonDic = new Dictionary<SkillEnum, SkillButton>();
     private SkillTreeUIController _uiController;
     private SkillButton _selectedSkillButton; // 押されているスキルボタンの情報を保持しておく
-    private CanvasGroup _canvasGroup;
-
-    public override UniTask OnAwake()
+    
+    protected override void RegisterEvents()
     {
-        _canvasGroup = GetComponent<CanvasGroup>();
-        return base.OnAwake();
-    }
-
-    public override UniTask OnBind()
-    {
-        foreach (SkillButton skillButton in SkillButtons)
+        DebugLogHelper.LogImportant($"{_uiController}");
+        _uiController.OnUnlock += UnlockSkill;
+        foreach (SkillButton skillButton in _skillButtons)
         {
             skillButton.OnClick += OnSkillButtonClick;　// 各ボタンのクリックイベントを購読
             
@@ -37,13 +30,19 @@ public class SkillTree : ViewBase, IWindow
                 Debug.LogWarning($"無効なスキル名: {skillButton.SkillData.name}");
             }
         }
+    }
+
+    protected override void UnregisterEvents()
+    {
+        foreach (SkillButton skillButton in _skillButtons)
+        {
+            skillButton.OnClick -= OnSkillButtonClick;　// 各ボタンのクリックイベントを購読
+        }
 
         if (_uiController != null)
         {
-            _uiController.OnUnlock += UnlockSkill;
+            _uiController.OnUnlock -= UnlockSkill;
         }
-        
-        return base.OnBind();
     }
     
     /// <summary>
@@ -107,25 +106,14 @@ public class SkillTree : ViewBase, IWindow
     }
 
     /// <summary>
-    /// スキルツリーの参照を得る
+    /// スキルツリーの参照を受け取る
     /// </summary>
     public void SetUIController(SkillTreeUIController skillTreeUIController)
     {
         _uiController = skillTreeUIController;
     }
 
-    public void Show()
-    {
-        CanvasVisibilityController.Show(_canvasGroup);
-    }
-    
-    public void Hide()
-    {
-        CanvasVisibilityController.Hide(_canvasGroup);
-    }
-    
-    public void Block()
-    {
-        CanvasVisibilityController.Block(_canvasGroup);
-    }
+    public override void Show() => CanvasVisibilityController.Show(_canvasGroup);
+    public override void Hide() => CanvasVisibilityController.Hide(_canvasGroup);
+    public override void Block() => CanvasVisibilityController.Block(_canvasGroup);
 }

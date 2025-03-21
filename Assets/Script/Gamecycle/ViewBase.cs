@@ -20,7 +20,7 @@ public abstract class ViewBase : MonoBehaviour
     /// </summary>
     public virtual UniTask OnUIInitialize()
     {
-        DebugLogHelper.LogFormat("[ViewBase] {0} の Awake 実行", gameObject.name);
+        DebugLogHelper.LogFormat("[ViewBase] {0} の UIInitialize 実行", gameObject.name);
         return UniTask.CompletedTask;
     }
 

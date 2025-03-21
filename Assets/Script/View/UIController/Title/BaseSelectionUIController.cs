@@ -10,34 +10,23 @@ using UnityEngine.UI;
 /// ②Unityとの連結を担当
 /// ③具体的な処理は上位のManagerクラスに任せる
 /// </summary>
-[RequireComponent(typeof(CanvasGroup))]
-public class BaseSelectionUIController : ViewBase, IWindow
+public class BaseSelectionUIController : UIControllerBase
 {
     [SerializeField, HighlightIfNull] private Button _gameStartButton;
     
-    private CanvasGroup _canvasGroup;
     public event Action OnGameStart;
-        
-    public override UniTask OnUIInitialize()
+
+    protected override void RegisterEvents()
     {
-        _canvasGroup = GetComponent<CanvasGroup>();
-    
         _gameStartButton.onClick.AddListener(() => OnGameStart?.Invoke());
-        return base.OnUIInitialize();
     }
-    
-    public void Show()
+
+    protected override void UnregisterEvents()
     {
-        CanvasVisibilityController.Show(_canvasGroup);
+        _gameStartButton.onClick.RemoveListener(() => OnGameStart?.Invoke());
     }
-    
-    public void Hide()
-    {
-        CanvasVisibilityController.Hide(_canvasGroup);
-    }
-    
-    public void Block()
-    {
-        CanvasVisibilityController.Block(_canvasGroup);
-    }
+
+    public override void Show() => CanvasVisibilityController.Show(_canvasGroup);
+    public override void Hide() => CanvasVisibilityController.Hide(_canvasGroup);
+    public override void Block() => CanvasVisibilityController.Block(_canvasGroup);
 }

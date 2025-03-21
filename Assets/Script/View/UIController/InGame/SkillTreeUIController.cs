@@ -11,8 +11,7 @@ using UnityEngine.UI;
 /// ②Unityとの連結を担当
 /// ③具体的な処理は上位のManagerクラスに任せる
 /// </summary>
-[RequireComponent(typeof(CanvasGroup))]
-public class SkillTreeUIController : ViewBase, IWindow
+public class SkillTreeUIController : UIControllerBase
 {
     [Header("InGameViewとしてのセットアップ")]
     [SerializeField, HighlightIfNull] private Button _closeButton;
@@ -36,29 +35,46 @@ public class SkillTreeUIController : ViewBase, IWindow
     [SerializeField, HighlightIfNull, Comment("発覚率スライダー")] private Slider _detectionSlider;
     [SerializeField, HighlightIfNull, Comment("致死率スライダー")] private Slider _lethalitySlider;
     
-    private CanvasGroup _canvasGroup;
     public event Action OnClose;
     public event Action OnShowEzechielTree;
     public event Action OnUnlock;
 
     public int Resource { get; set; } = 150; // 仮コスト
     public int Detection { get; set; } = 0; // 仮発覚率
-        
-    public override UniTask OnUIInitialize()
+    
+    public override UniTask OnAwake()
     {
-        _canvasGroup = GetComponent<CanvasGroup>();
-        
-        // 各ボタンにイベントを登録
-        _closeButton.onClick.AddListener(() => OnClose?.Invoke()); // 閉じる
-        _ezechielButton.onClick.AddListener(() => OnShowEzechielTree?.Invoke()); //  エゼキエルのスキルツリーを開く
-        _unlockButton.onClick.AddListener(() => OnUnlock?.Invoke()); // スキルアンロック
-
         // 各スキルツリークラスに自身の参照を渡す
         foreach (var skillTree in _skillTrees)
         {
             skillTree.SetUIController(this);
         }
         
+        return base.OnAwake();
+    }
+    
+    protected override void RegisterEvents()
+    {
+        _closeButton.onClick.AddListener(() => OnClose?.Invoke()); // 閉じる
+        _ezechielButton.onClick.AddListener(() => OnShowEzechielTree?.Invoke()); //  エゼキエルのスキルツリーを開く
+        _unlockButton.onClick.AddListener(() => OnUnlock?.Invoke()); // スキルアンロック
+        _contagionButton.onClick.AddListener(() => ShowSkillTree(0));
+        _symptomsButton.onClick.AddListener(() => ShowSkillTree(1));
+        _abilityButton.onClick.AddListener(() => ShowSkillTree(2));
+    }
+    
+    protected override void UnregisterEvents()
+    {
+        _closeButton.onClick.RemoveListener(() => OnClose?.Invoke()); // 閉じる
+        _ezechielButton.onClick.RemoveListener(() => OnShowEzechielTree?.Invoke()); //  エゼキエルのスキルツリーを開く
+        _unlockButton.onClick.RemoveListener(() => OnUnlock?.Invoke()); // スキルアンロック
+        _contagionButton.onClick.RemoveListener(() => ShowSkillTree(0));
+        _symptomsButton.onClick.RemoveListener(() => ShowSkillTree(1));
+        _abilityButton.onClick.RemoveListener(() => ShowSkillTree(2));
+    }
+
+    public override UniTask OnBind()
+    {
         // UI表示の初期化
         SkillTextsUpdate(" ", " ", " "); // 説明エリアの初期化
         InitializeSlider(); // SliderのMaxValueを変更
@@ -67,11 +83,8 @@ public class SkillTreeUIController : ViewBase, IWindow
 
         // スキルツリーパネルの操作
         ShowSkillTree(0);
-        _contagionButton.onClick.AddListener(() => ShowSkillTree(0));
-        _symptomsButton.onClick.AddListener(() => ShowSkillTree(1));
-        _abilityButton.onClick.AddListener(() => ShowSkillTree(2));
         
-        return base.OnUIInitialize();
+        return base.OnBind();
     }
 
     /// <summary>
@@ -131,27 +144,8 @@ public class SkillTreeUIController : ViewBase, IWindow
     {
         _unlockButton.interactable = isUnlock;
     }
-    
-    public void Show()
-    {
-        CanvasVisibilityController.Show(_canvasGroup);
-    }
-    
-    public void Hide()
-    {
-        CanvasVisibilityController.Hide(_canvasGroup);
-    }
-    
-    public void Block()
-    {
-        CanvasVisibilityController.Block(_canvasGroup);
-    }
 
-    private void OnDestroy()
-    {
-        // 登録解除
-        _unlockButton.onClick.RemoveAllListeners(); 
-        _closeButton.onClick.RemoveAllListeners();
-        _ezechielButton.onClick.RemoveAllListeners();
-    }
+    public override void Show() => CanvasVisibilityController.Show(_canvasGroup);
+    public override void Hide() => CanvasVisibilityController.Hide(_canvasGroup);
+    public override void Block() => CanvasVisibilityController.Block(_canvasGroup);
 }
