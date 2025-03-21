@@ -19,32 +19,73 @@ public class InGameSceneUIManager : UIManagerBase
 
     public override UniTask OnBind()
     {
-        // タイマー系（日付・倍速）の初期化
-        GameManager gameManager = FindAnyObjectByType<GameManager>();
-        ITimeObservable timeManager = gameManager.TimeManager;
-        new TimeView(_timeText, timeManager);
-        new TimeScaleView(_timeScaleButtons, timeManager);
-        
-        // 各ビューの初期化
-        _macroView.Initialize(_areaUISettings);
-        _microView.Initialize(_areaUISettings);
-        
+        InitializeTimeView();
+        InitializeView();
+
         return base.OnBind();
     }
 
     protected override void RegisterEvents()
     {
-        // 拠点画面
+        RegisterBaseViewEvents(); // 拠点画面
+        RegisterMacroViewEvents(); // 全体画面
+        RegisterMicroViewEvents(); // 区画画面
+        RegisterSkillTreeEvents(); // スキルツリー
+    }
+
+    /// <summary>
+    /// タイマー系（日付・倍速）の初期化
+    /// </summary>
+    private void InitializeTimeView()
+    {
+        GameManager gameManager = FindAnyObjectByType<GameManager>();
+        ITimeObservable timeManager = gameManager.TimeManager;
+        new TimeView(_timeText, timeManager);
+        new TimeScaleView(_timeScaleButtons, timeManager);
+    }
+    
+    /// <summary>
+    /// 画面の初期化処理
+    /// </summary>
+    private void InitializeView()
+    {
+        _macroView.Initialize(_areaUISettings);
+        _microView.Initialize(_areaUISettings);
+    }
+
+    #region Registerメソッド
+
+    /// <summary>
+    /// 拠点画面のイベント登録
+    /// </summary>
+    private void RegisterBaseViewEvents()
+    {
         _baseView.OnMacroView += () => TransitionView(_macroView, _baseView);
-        
-        // 全体画面
+    }
+    
+    /// <summary>
+    /// 全体画面のイベント登録
+    /// </summary>
+    private void RegisterMacroViewEvents()
+    {
         _macroView.OnSkillTree += () => TransitionView(_skillTree, _macroView);
         _macroView.OnArea += TransitionAreaView;
         _macroView.OnClose += () => TransitionView(_baseView, _macroView);
-        
-        // 区画画面
+    }
+    
+    /// <summary>
+    /// 区画画面のイベント登録
+    /// </summary>
+    private void RegisterMicroViewEvents()
+    {
         _microView.OnMacroView += () => TransitionView(_macroView, _microView);
-        
+    }
+    
+    /// <summary>
+    /// スキルツリー画面のイベント登録
+    /// </summary>
+    private void RegisterSkillTreeEvents()
+    {
         // リタのスキルツリー
         _skillTree.OnClose += () => TransitionView(_macroView, _skillTree);
         _skillTree.OnShowEzechielTree += () => TransitionView(_ezechielSkillTree, _skillTree);
@@ -53,6 +94,8 @@ public class InGameSceneUIManager : UIManagerBase
         _ezechielSkillTree.OnClose += () => TransitionView(_macroView, _ezechielSkillTree);
         _ezechielSkillTree.OnShowRitaTree += () => TransitionView(_skillTree, _ezechielSkillTree);
     }
+
+    #endregion
 
     protected override void InitializePanel()
     {
