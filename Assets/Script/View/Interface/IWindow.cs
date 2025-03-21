@@ -1,5 +1,3 @@
-using UnityEngine;
-
 /// <summary>
 /// UI画面が継承するインターフェース
 /// </summary>

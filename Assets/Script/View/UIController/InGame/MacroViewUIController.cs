@@ -46,13 +46,13 @@ public class MacroViewUIController : ViewBase, IWindow
     public void Initialize(List<AreaViewSettingsSO> areaSettings)
     {
         _areaSettings = areaSettings; // areaSettingsリストを受け取り
-        SetText();
+        SetAreaButtonText();
     }
 
     /// <summary>
     /// ボタンのテキストを変更する
     /// </summary>
-    private void SetText()
+    private void SetAreaButtonText()
     {
         for (int i = 0; i < _areaSettings.Count; i++)
         {
