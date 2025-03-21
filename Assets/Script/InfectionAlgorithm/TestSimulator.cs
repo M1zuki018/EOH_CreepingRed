@@ -34,4 +34,8 @@ public class TestSimulator : ViewBase, ISimulator
         _areaSettings.AddRange(newAreas);
     }
 #endif
+    public void Initialize(ITimeObservable timeManager)
+    {
+        throw new System.NotImplementedException();
+    }
 }

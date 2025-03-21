@@ -3,5 +3,5 @@
 /// </summary>
 public interface ISimulator
 {
-    ITimeObservable TimeManager { get; }
+    public void Initialize(ITimeObservable timeManager);
 }

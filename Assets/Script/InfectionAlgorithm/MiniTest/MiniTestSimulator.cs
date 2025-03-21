@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 /// <summary>
@@ -8,18 +7,13 @@ using UnityEngine;
 public class MiniTestSimulator : ViewBase, ISimulator
 {
     [SerializeField] private List<AreaSettingsSO> _areaSettings = new List<AreaSettingsSO>();
-    public List<AreaSettingsSO> AreaSettings => _areaSettings;
     private MiniSimulation _simulation;
-    private ITimeObservable _timeManager;
-    public ITimeObservable TimeManager => _timeManager;
 
-    public override UniTask OnAwake()
+    /// <summary>
+    /// 初期化
+    /// </summary>
+    public void Initialize(ITimeObservable timeManager)
     {
-        _timeManager = new TimeManager();
-        // ヨコ5マス×タテ4マスのグリッド
-        // 人口は9,130万人
-        _simulation = new MiniSimulation(_areaSettings, _timeManager);
-        
-        return base.OnAwake();
+        _simulation = new MiniSimulation(_areaSettings, timeManager);
     }
 }

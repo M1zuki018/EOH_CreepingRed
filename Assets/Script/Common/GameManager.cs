@@ -6,17 +6,20 @@ using UnityEngine;
 /// </summary>
 public class GameManager : ViewBase
 {
-    public ITimeObservable TimeManager { get; private set; }
+    private ITimeObservable _timeManager;
+    public ITimeObservable TimeManager => _timeManager;
     
     public override UniTask OnAwake()
     {
+        _timeManager = new TimeManager();
         var simulator = FindActiveSimulator();
-        TimeManager = simulator.TimeManager;
-        if (TimeManager == null)
+        if (simulator != null)
         {
-            // Simulatorクラスを生成したあとに呼ばないとnullになるので注意
-            Debug.LogError("\u274c\u274c\u274c GameManager : TimeManagerが取得できませんでした \u274c\u274c\u274c" +
-                           "\ud83d\udea8 実行順がSimulator -> GameManagerであることを確認してください\ud83d\udea8");
+            simulator.Initialize(_timeManager);
+        }
+        else
+        {
+            Debug.LogError("\u274c\u274c\u274c GameManager : Simulatorクラスの初期化が完了していません \u274c\u274c\u274c");
         }
         
         return base.OnAwake();
