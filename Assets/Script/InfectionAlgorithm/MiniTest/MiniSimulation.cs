@@ -4,7 +4,7 @@ using R3;
 using Debug = UnityEngine.Debug;
 
 /// <summary>
-/// 縮小テスト用のサイクルを管理する
+/// 縮小テスト用のサイクルを管理する。更新を行う人
 /// </summary>
 public class MiniSimulation : IDisposable
 {

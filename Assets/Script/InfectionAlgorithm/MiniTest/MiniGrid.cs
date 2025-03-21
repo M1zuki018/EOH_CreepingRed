@@ -1,20 +1,21 @@
-#nullable enable
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
-using UnityEngine;
+using Debug = UnityEngine.Debug;
 
 /// <summary>
-/// 縮小テスト用の感染シミュレーション全体を管理するクラス
+/// 縮小テスト用のグリッドを管理するクラス
 /// </summary>
 public class MiniGrid
 {
-    public MiniArea[,] Areas { get; } = new MiniArea[1 ,1]; 
-    public AgentStateCount TotalStateCount { get; private set; } // ゲーム内に存在するエージェントの累計
+    private readonly MiniArea[,] _areas = new MiniArea[1 ,1]; // エリアデータの二次元配列
+    private readonly AgentStateCount _totalStateCount; // ゲーム内に存在するエージェントの累計
+    private readonly List<Task> _tasks = new List<Task>();
     
      public MiniGrid(List<AreaSettingsSO> areaSettings)
     {
-        TotalStateCount = new AgentStateCount();
+        _totalStateCount = new AgentStateCount();
         InitializeAreas(areaSettings);
     }
 
@@ -29,15 +30,15 @@ public class MiniGrid
             int y = areaSetting.Y;
             
             // Areasの範囲を超えないかチェック
-            if (x >= 0 && x < Areas.GetLength(0) && y >= 0 && y < Areas.GetLength(1))
+            if (x >= 0 && x < _areas.GetLength(0) && y >= 0 && y < _areas.GetLength(1))
             {
                 // SOで設定した座標に基づいてエリアを配置
-                Areas[x, y] = new MiniArea(areaSetting);
+                _areas[x, y] = new MiniArea(areaSetting);
                 Debug.Log($"エリア作成 ({x}, {y}) : {areaSetting.Name.ToString()}");
             }
             else
             {
-                Debug.LogWarning($"Invalid area coordinates ({x}, {y}) for area: {areaSetting.Name}");
+                Debug.LogWarning($" MiniGrid：{areaSetting.Name}　({x}, {y}) は無効な座標です");
             }
         }
         Debug.Log($"グリッドの初期化完了");
@@ -48,41 +49,58 @@ public class MiniGrid
     /// </summary>
     public async UniTask SimulateInfectionAsync()
     {
-        List<Task> tasks = new List<Task>();
-        foreach (var area in Areas)
+        _tasks.Clear(); // 最初にTaskのリストをクリアして再利用
+        
+        foreach (var area in _areas)
         {
-            tasks.Add(Task.Run(() => area.SimulateInfectionAsync()));
+            _tasks.Add(Task.Run(() => area.SimulateInfectionAsync()));
         }
         
-        await Task.WhenAll(tasks);  // すべてのタスクが完了するまで待機
+        await Task.WhenAll(_tasks);  // すべてのタスクが完了するまで待機
+        
         UpdateStateCount();
     }
 
+    /// <summary>
+    /// 各エリアが保持しているTotalStateCountを集計して、自身のTotalStateCountを更新する
+    /// </summary>
     private void UpdateStateCount()
     {
-        TotalStateCount.ResetStateCount(); // 一度リセットする
+        _totalStateCount.ResetStateCount(); // 一度リセットする
         
-        foreach (var area in Areas)
+        Stopwatch stopwatch = new Stopwatch();
+        stopwatch.Start();
+        
+        // バッチ処理で追加
+        int totalHealthy = 0, totalInfected = 0, totalNearDeath = 0;
+        int totalGhost = 0, totalPerished = 0, totalMagicSoldiers = 0;
+
+        for (int x = 0; x < _areas.GetLength(0); x++)
         {
-            TotalStateCount.UpdateStateCount(area.AreaStateCount.Healthy, area.AreaStateCount.Infected,
-                area.AreaStateCount.NearDeath, area.AreaStateCount.Ghost, area.AreaStateCount.Perished,
-                area.AreaStateCount.MagicSoldiers);
+            for (int y = 0; y < _areas.GetLength(1); y++)
+            {
+                var area = _areas[x, y];
+                if (area == null) continue;
+
+                totalHealthy += area.AreaStateCount.Healthy;
+                totalInfected += area.AreaStateCount.Infected;
+                totalNearDeath += area.AreaStateCount.NearDeath;
+                totalGhost += area.AreaStateCount.Ghost;
+                totalPerished += area.AreaStateCount.Perished;
+                totalMagicSoldiers += area.AreaStateCount.MagicSoldiers;
+            }
         }
+
+        _totalStateCount.UpdateStateCount(
+            totalHealthy, totalInfected, totalNearDeath, 
+            totalGhost, totalPerished, totalMagicSoldiers
+        );
+        
+        stopwatch.Stop();
+        DebugLogHelper.LogImportant($"StateCount集計速度　{stopwatch.ElapsedMilliseconds}ms");
         
         // Gridの集計データをUIに反映
-        Debug.Log($"健常者: {TotalStateCount.Healthy} 感染者: {TotalStateCount.Infected} 仮死状態: {TotalStateCount.NearDeath} " +
-                  $"亡霊: {TotalStateCount.Ghost} 完全死亡状態: {TotalStateCount.Perished} 魔法士: {TotalStateCount.MagicSoldiers}");
-    }
-    
-    /// <summary>
-    /// エリアデータを取得する（範囲外なら null）
-    /// </summary>
-    public MiniArea? GetArea(int x, int y)
-    {
-        if (x < 0 || x >= Areas.GetLength(0) || y < 0 || y >= Areas.GetLength(1))
-        {
-            return null; // 範囲外なら null を返す
-        }
-        return Areas[x, y];
+        Debug.Log($"[Grid 集計結果] 健常者: {_totalStateCount.Healthy} 感染者: {_totalStateCount.Infected} 仮死状態: {_totalStateCount.NearDeath} " +
+                  $"亡霊: {_totalStateCount.Ghost} 完全死亡状態: {_totalStateCount.Perished} 魔法士: {_totalStateCount.MagicSoldiers}");
     }
 }
