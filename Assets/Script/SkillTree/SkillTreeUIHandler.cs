@@ -1,9 +1,11 @@
+using System;
+using UnityEngine;
 using UnityEngine.UI;
 
 /// <summary>
 /// スキルツリー画面のUI更新を補助するクラス
 /// </summary>
-public class SkillTreeUIHandler : ISkillTreeUIHandler
+public class SkillTreeUIHandler : ISkillTreeUIHandler, IDisposable
 {
     // スキル説明エリア部分
     private readonly Text _skillName;
@@ -16,6 +18,8 @@ public class SkillTreeUIHandler : ISkillTreeUIHandler
     private readonly Slider _spreadSlider; // 拡散性スライダー
     private readonly Slider _detectionSlider; // 発覚率スライダー
     private readonly Slider _lethalitySlider; // 致死率スライダー
+    
+    public event Action OnUnlock;
 
     public SkillTreeUIHandler(
         Text skillName, Text skillDescription, Text point, Button unlockButton,
@@ -29,6 +33,8 @@ public class SkillTreeUIHandler : ISkillTreeUIHandler
         _spreadSlider = spreadSlider;
         _detectionSlider = detectionSlider;
         _lethalitySlider = lethalitySlider;
+        
+        _unlockButton.onClick.AddListener(HandleUnlock); // スキルアンロック
         
         Initialize();
     }
@@ -72,6 +78,8 @@ public class SkillTreeUIHandler : ISkillTreeUIHandler
         _spreadSlider.value = InfectionParameters.BaseRate;
         _detectionSlider.value = ParametersOtherThanInfectionLogic.DetectionRate;
         _lethalitySlider.value = InfectionParameters.LethalityRate;
+        
+        Debug.Log($"スキル解放　現在の 拡散性{InfectionParameters.BaseRate}/ 致死率{InfectionParameters.LethalityRate}");
     }
     
     /// <summary>
@@ -81,4 +89,11 @@ public class SkillTreeUIHandler : ISkillTreeUIHandler
     {
         _unlockButton.interactable = isInteractable;
     }
+    
+    public void Dispose()
+    {
+        _unlockButton.onClick.RemoveListener(HandleUnlock);
+    }
+    
+    private void HandleUnlock() => OnUnlock?.Invoke();
 }

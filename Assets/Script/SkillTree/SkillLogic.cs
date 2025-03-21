@@ -28,19 +28,19 @@ public class SkillLogic
     /// <summary>
     /// アンロックボタンが押されたときの処理
     /// </summary>
-    public void UnlockSkill(SkillButton button, SkillTreeUIController uiController)
+    public void UnlockSkill(SkillButton button)
     {
-        ApplySkillEffects(button, uiController);
-        uiController.Resource -= button.SkillData.Cost; // コストを消費
+        ApplySkillEffects(button);
+        ParametersOtherThanInfectionLogic.Resource -= button.SkillData.Cost; // コストを消費
     }
 
     /// <summary>
     /// スキルによるパラメータ変更を適用
     /// </summary>
-    private void ApplySkillEffects(SkillButton button, SkillTreeUIController uiController)
+    private void ApplySkillEffects(SkillButton button)
     {
         InfectionParameters.BaseRate += button.SkillData.SpreadRate; // 拡散性
-        uiController.Detection += (int) button.SkillData.DetectionRate; // 発覚率（仮置き）
+        ParametersOtherThanInfectionLogic.DetectionRate += (int) button.SkillData.DetectionRate; // 発覚率（仮置き）
         InfectionParameters.LethalityRate += button.SkillData.LethalityRate; // 致死率
         // TODO: その他のスキル効果もここに追加
     }
@@ -48,11 +48,11 @@ public class SkillLogic
     /// <summary>
     /// スキルがアンロック可能か判断する
     /// </summary>
-    public bool CanUnlockSkill(SkillButton button, int availableResource)
+    public bool CanUnlockSkill(SkillButton button)
     {
         return !button.IsUnlocked && // 自身がアンロックされていない
                ArePrerequisiteSkillsUnlocked(button.SkillData.PrerequisiteSkillsEnum) && // 前提スキルが全て解除されている
-               availableResource >= button.SkillData.Cost; // コストが足りている
+               ParametersOtherThanInfectionLogic.Resource >= button.SkillData.Cost; // コストが足りている
     }
 
     /// <summary>

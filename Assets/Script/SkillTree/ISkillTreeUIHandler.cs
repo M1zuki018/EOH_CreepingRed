@@ -1,3 +1,5 @@
+using System;
+
 /// <summary>
 /// SkillTreeUIUpdaterのインターフェース
 /// </summary>
@@ -27,4 +29,6 @@ public interface ISkillTreeUIHandler
     /// スキルの解放ボタンにインタラクティブできるかどうかを切り替える
     /// </summary>
     public void SetUnlockButtonState(bool isInteractable);
+    
+    public event Action OnUnlock;
 }
