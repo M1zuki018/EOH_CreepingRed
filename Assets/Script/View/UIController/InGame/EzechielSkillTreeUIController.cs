@@ -1,5 +1,4 @@
 using System;
-using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -10,8 +9,7 @@ using UnityEngine.UI;
 /// ②Unityとの連結を担当
 /// ③具体的な処理は上位のManagerクラスに任せる
 /// </summary>
-[RequireComponent(typeof(CanvasGroup))]
-public class EzechielSkillTreeUIController : ViewBase, IWindow
+public class EzechielSkillTreeUIController : UIControllerBase
 {
     [Header("InGameViewとしてのセットアップ")]
     [SerializeField, HighlightIfNull] private Button _closeButton;
@@ -19,37 +17,22 @@ public class EzechielSkillTreeUIController : ViewBase, IWindow
     [Header("スキルツリーのためのセットアップ")]
     [SerializeField, HighlightIfNull, Comment("リタのスキルツリーボタン")] private Button _ritaTreeButton;
     
-    private CanvasGroup _canvasGroup;
     public event Action OnClose;
     public event Action OnShowRitaTree;
-        
-    public override UniTask OnUIInitialize()
+
+    protected override void UnregisterEvents()
     {
-        _canvasGroup = GetComponent<CanvasGroup>();
         _closeButton.onClick.AddListener(() => OnClose?.Invoke());
         _ritaTreeButton.onClick.AddListener(() => OnShowRitaTree?.Invoke());
-        return base.OnUIInitialize();
     }
     
-    public void Show()
+    protected override void RegisterEvents()
     {
-        CanvasVisibilityController.Show(_canvasGroup);
-    }
-    
-    public void Hide()
-    {
-        CanvasVisibilityController.Hide(_canvasGroup);
-    }
-    
-    public void Block()
-    {
-        CanvasVisibilityController.Block(_canvasGroup);
+        _closeButton.onClick.RemoveListener(() => OnClose?.Invoke());
+        _ritaTreeButton.onClick.RemoveListener(() => OnShowRitaTree?.Invoke());
     }
 
-    private void OnDestroy()
-    {
-        // 登録解除
-        _closeButton.onClick.RemoveAllListeners();
-        _ritaTreeButton.onClick.RemoveAllListeners();
-    }
+    public override void Show() => CanvasVisibilityController.Show(_canvasGroup);
+    public override void Hide() => CanvasVisibilityController.Hide(_canvasGroup);
+    public override void Block() => CanvasVisibilityController.Block(_canvasGroup);
 }
