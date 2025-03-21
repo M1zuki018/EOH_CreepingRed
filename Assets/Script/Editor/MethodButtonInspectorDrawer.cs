@@ -3,7 +3,8 @@ using UnityEngine;
 using System.Reflection;
 
 /// <summary>
-/// インスペクターにボタンを表示し、メソッドを実行できるようにします
+/// インスペクターにボタンを表示しメソッドを実行できるようにする
+/// （ContextMenuの代わりなどに）
 /// </summary>
 [CustomEditor(typeof(MonoBehaviour), true)]
 public class MethodButtonInspectorDrawer : Editor

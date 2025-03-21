@@ -2,8 +2,7 @@ using UnityEngine;
 using System;
 
 /// <summary>
-/// インスペクターにボタンを表示し、メソッドを実行できるようにする属性
-/// （継承可能・同じメソッドに複数付けられない）
+/// インスペクターにボタンを表示しメソッドを実行できるようにする属性
 /// </summary>
 [AttributeUsage(AttributeTargets.Method, Inherited = true, AllowMultiple = false)]
 public class MethodButtonInspectorAttribute : PropertyAttribute
