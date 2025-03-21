@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using Cysharp.Threading.Tasks;
 using Unity.Jobs;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
@@ -34,7 +35,7 @@ public class MiniCell
     /// <summary>
     /// 感染シミュレーション
     /// </summary>
-    public void SimulateInfection()
+    public async UniTask SimulateInfection()
     {
         Stopwatch stopwatch = new Stopwatch();
         stopwatch.Start();
@@ -50,6 +51,8 @@ public class MiniCell
         Debug.Log($"シミュレーション更新:{_id} {stopwatch.ElapsedMilliseconds} ミリ秒");
         // ここでエージェントの状態をカウント
         UpdateStateCount();
+
+        await UniTask.CompletedTask;
     }
     
     /// <summary>

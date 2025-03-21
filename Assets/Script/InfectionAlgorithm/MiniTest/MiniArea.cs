@@ -115,23 +115,21 @@ public class MiniArea
     /// </summary>
     public async UniTask SimulateInfectionAsync()
     {
-        List<Task> tasks = new List<Task>();
+        List<UniTask> tasks = new List<UniTask>();
         foreach (var cell in _cells)
         {
-            tasks.Add(Task.Run(() => cell.SimulateInfection()));
+            tasks.Add(cell.SimulateInfection());
         }
         
-        await Task.WhenAll(tasks);
+        await UniTask.WhenAll(tasks);
         
-        tasks.Add(Task.Run(UpdateStateCount));
-        
-        await Task.WhenAll(tasks);
+        await UpdateStateCount();
     }
     
     /// <summary>
     /// AgentStateCountを更新する
     /// </summary>
-    private void UpdateStateCount()
+    private UniTask UpdateStateCount()
     {
         AreaStateCount.ResetStateCount();
         foreach (var cell in _cells)
@@ -140,5 +138,7 @@ public class MiniArea
                 cell.StateCount.Healthy, cell.StateCount.Infected, cell.StateCount.NearDeath,
                 cell.StateCount.Ghost, cell.StateCount.Perished, cell.StateCount.MagicSoldiers);
         }
+        
+        return UniTask.CompletedTask;
     }
 }

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
 using Debug = UnityEngine.Debug;
@@ -10,7 +11,7 @@ public class MiniGrid
 {
     private readonly MiniArea[,] _areas = new MiniArea[1 ,1]; // エリアデータの二次元配列
     private readonly AgentStateCount _totalStateCount; // ゲーム内に存在するエージェントの累計
-    private readonly List<Task> _tasks = new List<Task>();
+    private readonly List<UniTask> _tasks = new List<UniTask>();
     
      public MiniGrid(List<AreaSettingsSO> areaSettings)
     {
@@ -50,18 +51,26 @@ public class MiniGrid
     {
         _tasks.Clear(); // 最初にTaskのリストをクリアして再利用
         
-        foreach (var area in _areas)
+        for (int x = 0; x < _areas.GetLength(0); x++)
         {
-            _tasks.Add(Task.Run(() => area.SimulateInfectionAsync()));
+            for (int y = 0; y < _areas.GetLength(1); y++)
+            {
+                var area = _areas[x, y];
+                if (area != null)
+                {
+                    _tasks.Add(area.SimulateInfectionAsync());
+                }
+            }
         }
         
-        await Task.WhenAll(_tasks);  // すべてのタスクが完了するまで待機
+        await UniTask.WhenAll(_tasks);  // すべてのタスクが完了するまで待機
         
         UpdateStateCount();
     }
 
     /// <summary>
     /// 各エリアが保持しているTotalStateCountを集計して、自身のTotalStateCountを更新する
+    /// 現在バッチ処理シングルスレッドバージョン
     /// </summary>
     private void UpdateStateCount()
     {
