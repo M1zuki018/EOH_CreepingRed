@@ -12,7 +12,7 @@ public class SkillButton　: ViewBase
     /// <summary>
     /// スキルデータ
     /// </summary>
-    [SerializeField, Expandable] private SkillDataSO _skillData;
+    [SerializeField, ExpandableSO] private SkillDataSO _skillData;
     public SkillDataSO SkillData => _skillData;
     
     /// <summary>
