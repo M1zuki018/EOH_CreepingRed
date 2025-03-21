@@ -24,6 +24,7 @@ public class TestSimulator : ViewBase, ISimulator
         return base.OnAwake();
     }
 
+#if UNITY_EDITOR
     /// <summary>
     /// エリアのスクリプタブルオブジェクトを登録する
     /// </summary>
@@ -32,4 +33,5 @@ public class TestSimulator : ViewBase, ISimulator
         _areaSettings.Clear();
         _areaSettings.AddRange(newAreas);
     }
+#endif
 }

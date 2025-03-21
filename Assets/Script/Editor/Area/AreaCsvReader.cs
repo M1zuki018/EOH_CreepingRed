@@ -58,7 +58,7 @@ public class AreaCsvReader : EditorWindow
         List<AreaSettingsSO> createdAreas = new List<AreaSettingsSO>();
         List<AreaViewSettingsSO> createdUIAreas = new List<AreaViewSettingsSO>();
         
-        // 縦横共にヘッダー行列があるので、その部分は読み飛ばす。19エリア分を処理
+        // ヘッダー行をスキップ
         for (int i = 1; i < 1 + AreaCount; i++)
         {
             ProcessAreaData(lines, i, createdAreas, createdUIAreas);
@@ -67,7 +67,8 @@ public class AreaCsvReader : EditorWindow
         AssetDatabase.SaveAssets();
         AssetDatabase.Refresh();
         
-        AssignAreasToSimulator(createdAreas); // 自動アサイン
+        // 自動アサイン
+        AssignAreasToSimulator(createdAreas);
         AssignAreasToSimulator(createdUIAreas);
 
         Debug.Log("ScriptableObjectの生成が完了しました！");
@@ -100,15 +101,11 @@ public class AreaCsvReader : EditorWindow
         try
         {
             // 実行用ScriptableObjectの生成
-            var areaSettings = CreateAreaSettingsSO(values);
-            string assetPath = $"{_outputPath}{areaSettings.Name.ToString()}.asset";
-            AssetDatabase.CreateAsset(areaSettings, assetPath);
+            var areaSettings = CreateScriptableObject<AreaSettingsSO>(values, _outputPath);
             createdAreas.Add(areaSettings);
                 
             // UI用ScriptableObjectの生成
-            var areaViewSettings = AreaViewSettingsSO(values);
-            string uiAssetPath = $"{_outputUIDataPath}{areaViewSettings.Name.ToString()}.asset";
-            AssetDatabase.CreateAsset(areaViewSettings, uiAssetPath);
+            var areaViewSettings = CreateScriptableObject<AreaViewSettingsSO>(values, _outputUIDataPath);
             createdUIAreas.Add(areaViewSettings);
         }
         catch (Exception ex) when (ex is FormatException || ex is OverflowException)
@@ -118,53 +115,44 @@ public class AreaCsvReader : EditorWindow
     }
 
     /// <summary>
-    /// AreaSettingsSOを生成
+    /// 指定された値からScriptableObjectを生成し指定のパスに保存する
     /// </summary>
-    private AreaSettingsSO CreateAreaSettingsSO(string[] values)
+    private T CreateScriptableObject<T>(string[] values, string path) where T : ScriptableObject
     {
-        AreaSettingsSO areaSettings = CreateInstance<AreaSettingsSO>();
-        areaSettings.X = int.Parse(values[1]);
-        areaSettings.Y = int.Parse(values[2]);
-        areaSettings.Name = ExtensionsUtility.ToSectionEnum(values[3]);
-        areaSettings.Explaination = values[4];
-        areaSettings.Category = ExtensionsUtility.ToCategoryEnum(values[5]);
-        areaSettings.Population = int.Parse(values[6]);
-        areaSettings.CitizenPopulation = int.Parse(values[7]);
-        areaSettings.MagicSoldierPopulation = int.Parse(values[8]);
-        areaSettings.AreaSize = float.Parse(values[9]);
-        areaSettings.PopulationDensity = int.Parse(values[10]);
-        areaSettings.Security = int.Parse(values[11]);
-        areaSettings.MobilityRate = int.Parse(values[12]);
-        areaSettings.InfectionRate = int.Parse(values[13]);
-        areaSettings.Control = int.Parse(values[14]);
-        return areaSettings;
+        T scriptableObject = CreateInstance<T>();
+        PopulateScriptableObject(scriptableObject, values);
+        string assetPath = $"{path}{scriptableObject.name}.asset";
+        AssetDatabase.CreateAsset(scriptableObject, assetPath);
+        return scriptableObject;
     }
-
+    
     /// <summary>
-    /// AreaViewSettingsSOを作成
+    /// ScriptableObjectに必要なデータを設定する
     /// </summary>
-    private AreaViewSettingsSO AreaViewSettingsSO(string[] values)
+    private void PopulateScriptableObject(ScriptableObject scriptableObject, string[] values)
     {
-        AreaViewSettingsSO areaViewSettings = CreateInstance<AreaViewSettingsSO>();
-        areaViewSettings.Name = ExtensionsUtility.ToSectionEnum(values[3]);
-        areaViewSettings.Explaination = values[4];
-        areaViewSettings.Category = ExtensionsUtility.ToCategoryEnum(values[5]);
-        return areaViewSettings;
-    }
-
-    /// <summary>
-    /// SimulatorクラスのAreaSettingsのリストに自動アサインする
-    /// </summary>
-    private void AssignAreasToSimulator(List<AreaViewSettingsSO> createdAreas)
-    {
-        InGameSceneUIManager uiManager = FindObjectOfType<InGameSceneUIManager>();
-        if (uiManager == null)
+        if (scriptableObject is AreaSettingsSO areaSettings)
         {
-            Debug.LogWarning("シーン内にInGameSceneUIManagerが見つかりません！");
-            return;
+            areaSettings.X = int.Parse(values[1]);
+            areaSettings.Y = int.Parse(values[2]);
+            areaSettings.Name = ExtensionsUtility.ToSectionEnum(values[3]);
+            areaSettings.Category = ExtensionsUtility.ToCategoryEnum(values[5]);
+            areaSettings.Population = int.Parse(values[6]);
+            areaSettings.CitizenPopulation = int.Parse(values[7]);
+            areaSettings.MagicSoldierPopulation = int.Parse(values[8]);
+            areaSettings.AreaSize = float.Parse(values[9]);
+            areaSettings.PopulationDensity = int.Parse(values[10]);
+            areaSettings.Security = int.Parse(values[11]);
+            areaSettings.MobilityRate = int.Parse(values[12]);
+            areaSettings.InfectionRate = int.Parse(values[13]);
+            areaSettings.Control = int.Parse(values[14]);
         }
-        uiManager.RegisterAreas(createdAreas);
-        Debug.Log($"UIManagerに {createdAreas.Count} 個の区域を登録しました。");
+        else if (scriptableObject is AreaViewSettingsSO areaViewSettings)
+        {
+            areaViewSettings.Name = ExtensionsUtility.ToSectionEnum(values[3]);
+            areaViewSettings.Explaination = values[4];
+            areaViewSettings.Category = ExtensionsUtility.ToCategoryEnum(values[5]);
+        }
     }
     
     /// <summary>
@@ -190,5 +178,20 @@ public class AreaCsvReader : EditorWindow
         }
         
         Debug.Log($"Simulatorに {createdAreas.Count} 個の区域を登録しました。");
+    }
+    
+    /// <summary>
+    /// SimulatorクラスのAreaSettingsのリストに自動アサインする
+    /// </summary>
+    private void AssignAreasToSimulator(List<AreaViewSettingsSO> createdAreas)
+    {
+        InGameSceneUIManager uiManager = FindObjectOfType<InGameSceneUIManager>();
+        if (uiManager == null)
+        {
+            Debug.LogWarning("シーン内にInGameSceneUIManagerが見つかりません！");
+            return;
+        }
+        uiManager.RegisterAreas(createdAreas);
+        Debug.Log($"UIManagerに {createdAreas.Count} 個の区域を登録しました。");
     }
 }

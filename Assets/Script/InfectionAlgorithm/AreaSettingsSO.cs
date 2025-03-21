@@ -11,7 +11,6 @@ public class AreaSettingsSO : ScriptableObject
     public int X; // 座標
     public int Y;
     public SectionEnum Name; // 名称
-    public string Explaination; // 区域の概要
     public AreaCategoryEnum Category; // 区域の区分
     public int Population; // 総人口（万人）
     public int CitizenPopulation; // 一般市民人口
