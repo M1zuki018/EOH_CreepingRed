@@ -65,6 +65,7 @@ public class SkillTreePanelUIController : UIControllerBase
         if (_selectedSkillButton == null || _selectedSkillButton.IsUnlocked) return;
         
         _logic.UnlockSkill(_selectedSkillButton.SkillData);
+        _selectedSkillButton.Unlock();
         _skillTreeUIHandler.SetUnlockButtonState(false); // Activateボタンをインタラクティブ出来ないようにする
         _skillTreeUIHandler.UpdatePrams(); // スライダーUIを更新する
     }

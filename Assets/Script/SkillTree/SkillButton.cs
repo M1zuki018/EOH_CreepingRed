@@ -29,13 +29,19 @@ public class SkillButton　: ViewBase
     public override UniTask OnUIInitialize()
     {
         _button = GetComponent<Button>();
-        _button.onClick.AddListener(() => OnClick?.Invoke(this)); // クリックイベントを登録
-        
-        // ボタンUIの調整
+        _button.onClick.AddListener(OnButtonClick); // クリックイベントを登録
+        InitializeButtonUI();
+
+        return base.OnUIInitialize();
+    }
+
+    /// <summary>
+    /// UIの初期化
+    /// </summary>
+    private void InitializeButtonUI()
+    {
         _defaultColor = _button.image.color; // 初期色を保存
         _button.image.color = _defaultColor * 0.6f; // 色を少し暗めに変更
-        
-        return base.OnUIInitialize();
     }
 
     /// <summary>
@@ -49,8 +55,10 @@ public class SkillButton　: ViewBase
     
     private void OnDestroy()
     {
-        _button.onClick.RemoveListener(() => OnClick?.Invoke(this));
+        _button.onClick.RemoveListener(OnButtonClick);
     }
+    
+    private void OnButtonClick() => OnClick?.Invoke(this);
     
 #if UNITY_EDITOR
     /// <summary>
