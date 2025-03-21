@@ -3,6 +3,7 @@ using UnityEngine;
 
 /// <summary>
 /// 縮小シミュレーションテスト用のクラス
+/// ViewBaseを継承して、AreaSettingsSOのSerializeFieldを設定できるようにする
 /// </summary>
 public class MiniTestSimulator : ViewBase, ISimulator
 {
