@@ -9,14 +9,22 @@ public class SkillTree : UIControllerBase
 {
     [SerializeField] private List<SkillButton> _skillButtons;
     public List<SkillButton> SkillButtons => _skillButtons;
+    
     private readonly Dictionary<SkillEnum, SkillButton> _skillButtonDic = new Dictionary<SkillEnum, SkillButton>();
-    private SkillTreeUIController _uiController;
     private SkillButton _selectedSkillButton; // 押されているスキルボタンの情報を保持しておく
+    private SkillTreeUIController _uiController; // UIControllerの参照
     
     protected override void RegisterEvents()
     {
-        DebugLogHelper.LogImportant($"{_uiController}");
-        _uiController.OnUnlock += UnlockSkill;
+        if (_uiController != null)
+        {
+            _uiController.OnUnlock += UnlockSkill;
+        }
+        else
+        {
+            Debug.LogError("SkillTree : UIController がありません");
+        }
+
         foreach (SkillButton skillButton in _skillButtons)
         {
             skillButton.OnClick += OnSkillButtonClick;　// 各ボタンのクリックイベントを購読
@@ -34,14 +42,10 @@ public class SkillTree : UIControllerBase
 
     protected override void UnregisterEvents()
     {
+        _uiController.OnUnlock -= UnlockSkill;
         foreach (SkillButton skillButton in _skillButtons)
         {
-            skillButton.OnClick -= OnSkillButtonClick;　// 各ボタンのクリックイベントを購読
-        }
-
-        if (_uiController != null)
-        {
-            _uiController.OnUnlock -= UnlockSkill;
+            skillButton.OnClick -= OnSkillButtonClick;
         }
     }
     
@@ -78,12 +82,11 @@ public class SkillTree : UIControllerBase
     {
         _uiController.SkillTextsUpdate(button.SkillData.Name, button.SkillData.Description,button.SkillData.Cost.ToString());
         
-        bool canUnlock = !button.IsUnlocked && // 自身がアンロックされていない
-                         ArePrerequisiteSkillsUnlocked(button.SkillData.PrerequisiteSkillsEnum) && // 前提スキルが全て解除されている
-                         _uiController.Resource >= button.SkillData.Cost; // コストが足りている
+        var canUnlock = CanUnlockSkill(button);
         _uiController.ToggleUnlockButton(canUnlock);
     }
     
+
     /// <summary>
     /// アンロックボタンが押されたときの処理
     /// </summary>
@@ -96,15 +99,33 @@ public class SkillTree : UIControllerBase
         _selectedSkillButton.Unlock();
         _uiController.Resource -= _selectedSkillButton.SkillData.Cost; // 自分の解放ポイントを減らす
         
-        InfectionParameters.BaseRate += _selectedSkillButton.SkillData.SpreadRate; // 拡散性
-        _uiController.Detection += (int) _selectedSkillButton.SkillData.DetectionRate; // 発覚率（仮置き）
-        InfectionParameters.LethalityRate += _selectedSkillButton.SkillData.LethalityRate; // 致死率
-        //TODO: その他の効果についても
-        
+        ApplySkillEffects(); // パラメーター変更
+
         _uiController.UpdateUnderGauges();
         Debug.Log($"スキル解放　現在の 拡散性{InfectionParameters.BaseRate}/ 致死率{InfectionParameters.LethalityRate}");
     }
 
+    /// <summary>
+    /// スキルによるパラメータ変更を適用
+    /// </summary>
+    private void ApplySkillEffects()
+    {
+        InfectionParameters.BaseRate += _selectedSkillButton.SkillData.SpreadRate; // 拡散性
+        _uiController.Detection += (int) _selectedSkillButton.SkillData.DetectionRate; // 発覚率（仮置き）
+        InfectionParameters.LethalityRate += _selectedSkillButton.SkillData.LethalityRate; // 致死率
+        //TODO: その他の効果についても
+    }
+
+    /// <summary>
+    /// スキルをアンロック可能か判断する
+    /// </summary>
+    private bool CanUnlockSkill(SkillButton button)
+    {
+        return !button.IsUnlocked && // 自身がアンロックされていない
+               ArePrerequisiteSkillsUnlocked(button.SkillData.PrerequisiteSkillsEnum) && // 前提スキルが全て解除されている
+               _uiController.Resource >= button.SkillData.Cost; // コストが足りている
+    }
+    
     /// <summary>
     /// スキルツリーの参照を受け取る
     /// </summary>
