@@ -17,14 +17,14 @@ public class SkillTreeUIController : UIControllerBase
 
     [Header("InGameViewとしてのセットアップ")]
     [SerializeField, HighlightIfNull] private Button _closeButton;
+    [SerializeField, HighlightIfNull, Comment("エゼキエルのスキルツリーボタン")] private Button _ezechielTreeButton;
     
     [Header("スキルツリーのためのセットアップ")]
     [SerializeField] private List<SkillTreePanelUIController> _skillTrees = new List<SkillTreePanelUIController>();
-    [SerializeField, HighlightIfNull, Comment("スキル名のエリア")] private Text _skillName;
-    [SerializeField, HighlightIfNull, Comment("スキル説明のエリア")] private Text _skillDescription;
-    [SerializeField, HighlightIfNull, Comment("解放コストのエリア")] private Text _point;
+    [SerializeField, HighlightIfNull, Comment("スキル名のエリア")] private Text _skillNameText;
+    [SerializeField, HighlightIfNull, Comment("スキル説明のエリア")] private Text _skillDescriptionText;
+    [SerializeField, HighlightIfNull, Comment("解放コストのエリア")] private Text _unlockCostText;
     [SerializeField, HighlightIfNull, Comment("解放ボタン")] private Button _unlockButton;
-    [SerializeField, HighlightIfNull, Comment("エゼキエルのスキルツリーボタン")] private Button _ezechielButton;
     
     [Header("スキルカテゴリの変更")]
     [SerializeField, HighlightIfNull, Comment("感染")] private Button _contagionButton;
@@ -32,7 +32,7 @@ public class SkillTreeUIController : UIControllerBase
     [SerializeField, HighlightIfNull, Comment("能力")] private Button _abilityButton;
 
     [Header("フッター部分の参照")] 
-    [SerializeField, HighlightIfNull, Comment("解放ポイント")] private Text _pointText;
+    [SerializeField, HighlightIfNull, Comment("解放ポイント")] private Text _availablePointText;
     [SerializeField, HighlightIfNull, Comment("拡散性スライダー")] private Slider _spreadSlider;
     [SerializeField, HighlightIfNull, Comment("発覚率スライダー")] private Slider _detectionSlider;
     [SerializeField, HighlightIfNull, Comment("致死率スライダー")] private Slider _lethalitySlider;
@@ -44,9 +44,9 @@ public class SkillTreeUIController : UIControllerBase
     
     public override UniTask OnAwake()
     {
-        var uiHandler = new SkillTreeUIHandler(
-            _skillName, _skillDescription, _point, _unlockButton,
-            _pointText, _spreadSlider, _detectionSlider, _lethalitySlider);
+        var uiHandler = new SkillTreeUIUpdater(
+            _skillNameText, _skillDescriptionText, _unlockCostText, _unlockButton,
+            _availablePointText, _spreadSlider, _detectionSlider, _lethalitySlider);
         
         // 各スキルツリークラスにUIHandlerの参照を渡す
         foreach (var skillTree in _skillTrees)
@@ -59,8 +59,8 @@ public class SkillTreeUIController : UIControllerBase
     
     protected override void RegisterEvents()
     {
-        _closeButton.onClick.AddListener(HandleClose); // 閉じる
-        _ezechielButton.onClick.AddListener(HandleShowEzechielTree); //  エゼキエルのスキルツリーを開く
+        _closeButton.onClick.AddListener(HandleCloseClick); // 閉じる
+        _ezechielTreeButton.onClick.AddListener(HandleShowEzechielTreeClick); //  エゼキエルのスキルツリーを開く
         _contagionButton.onClick.AddListener(ShowContagionTree);
         _symptomsButton.onClick.AddListener(ShowSymptomsTree);
         _abilityButton.onClick.AddListener(ShowAbilityTree);
@@ -68,8 +68,8 @@ public class SkillTreeUIController : UIControllerBase
     
     protected override void UnregisterEvents()
     {
-        _closeButton.onClick.RemoveListener(HandleClose); // 閉じる
-        _ezechielButton.onClick.RemoveListener(HandleShowEzechielTree); //  エゼキエルのスキルツリーを開く
+        _closeButton.onClick.RemoveListener(HandleCloseClick); // 閉じる
+        _ezechielTreeButton.onClick.RemoveListener(HandleShowEzechielTreeClick); //  エゼキエルのスキルツリーを開く
         _contagionButton.onClick.RemoveListener(ShowContagionTree);
         _symptomsButton.onClick.RemoveListener(ShowSymptomsTree);
         _abilityButton.onClick.RemoveListener(ShowAbilityTree);
@@ -99,8 +99,8 @@ public class SkillTreeUIController : UIControllerBase
     public override void Hide() => CanvasVisibilityController.Hide(_canvasGroup);
     public override void Block() => CanvasVisibilityController.Block(_canvasGroup);
     
-    private void HandleClose() => OnClose?.Invoke();
-    private void HandleShowEzechielTree() => OnShowEzechielTree?.Invoke();
+    private void HandleCloseClick() => OnClose?.Invoke();
+    private void HandleShowEzechielTreeClick() => OnShowEzechielTree?.Invoke();
     private void ShowContagionTree() => ShowSkillTree(0);
     private void ShowSymptomsTree() => ShowSkillTree(1);
     private void ShowAbilityTree() => ShowSkillTree(2);

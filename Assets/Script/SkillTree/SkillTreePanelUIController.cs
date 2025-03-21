@@ -9,12 +9,12 @@ public class SkillTreePanelUIController : UIControllerBase
 {
     [SerializeField] private List<SkillButton> _skillButtons; // 自分の子のスキルボタン
     private SkillButton _selectedSkillButton; // 押されているスキルボタンの情報を保持しておく
-    private SkillLogic _logic; // スキルの解放処理を担当
-    private ISkillTreeUIHandler _skillTreeUIHandler; // スキルツリー画面全体のUI更新処理を担当
+    private SkillTreeProcessor _treeProcessor; // スキルの解放処理を担当
+    private ISkillTreeUIUpdater _skillTreeUIUpdater; // スキルツリー画面全体のUI更新処理を担当
 
     public override UniTask OnAwake()
     {
-        _logic = new SkillLogic(_skillButtons);
+        _treeProcessor = new SkillTreeProcessor(_skillButtons);
         return base.OnAwake();
     }
     
@@ -28,7 +28,7 @@ public class SkillTreePanelUIController : UIControllerBase
 
     protected override void UnregisterEvents()
     {
-        _skillTreeUIHandler.OnUnlock -= HandleUnlockSkill;
+        _skillTreeUIUpdater.OnUnlock -= HandleUnlockSkill;
         foreach (SkillButton skillButton in _skillButtons)
         {
             skillButton.OnClick -= HandleSkillButtonClick;
@@ -36,7 +36,7 @@ public class SkillTreePanelUIController : UIControllerBase
     }
     
     /// <summary>
-    /// 各スキルのボタンが押された時の処理
+    /// スキルボタンが押された時の処理
     /// </summary>
     private void HandleSkillButtonClick(SkillButton button)
     {
@@ -45,15 +45,15 @@ public class SkillTreePanelUIController : UIControllerBase
     }
     
     /// <summary>
-    /// スキルUIを更新するようにUIHandlerに指示を出す(スキル獲得前)
+    /// スキルUIを更新する処理(スキル獲得前)
     /// </summary>
     private void UpdateSkillUI()
     {
         if (_selectedSkillButton == null) return;
 
         var data = _selectedSkillButton.SkillData;
-        _skillTreeUIHandler.UpdateSkillInfo(data.Name, data.Description, data.Cost.ToString());
-        _skillTreeUIHandler.SetUnlockButtonState(_logic.CanUnlockSkill(_selectedSkillButton));
+        _skillTreeUIUpdater.UpdateSkillInfo(data.Name, data.Description, data.Cost.ToString());
+        _skillTreeUIUpdater.SetUnlockButtonState(_treeProcessor.CanUnlockSkill(_selectedSkillButton));
     }
 
     /// <summary>
@@ -64,19 +64,19 @@ public class SkillTreePanelUIController : UIControllerBase
         // 選択中のボタンがない もしくは 既にアンロック済みなら以降の処理を行わない（二度押し対策）
         if (_selectedSkillButton == null || _selectedSkillButton.IsUnlocked) return;
         
-        _logic.UnlockSkill(_selectedSkillButton.SkillData);
+        _treeProcessor.UnlockSkill(_selectedSkillButton.SkillData);
         _selectedSkillButton.Unlock();
-        _skillTreeUIHandler.SetUnlockButtonState(false); // Activateボタンをインタラクティブ出来ないようにする
-        _skillTreeUIHandler.UpdatePrams(); // スライダーUIを更新する
+        _skillTreeUIUpdater.SetUnlockButtonState(false); // Activateボタンをインタラクティブ出来ないようにする
+        _skillTreeUIUpdater.UpdateParameterSliders(); // スライダーUIを更新する
     }
 
     /// <summary>
     /// スキルツリーのUIHandlerの参照を得る
     /// </summary>
-    public void SetSkillTreeUIHandler(ISkillTreeUIHandler skillTreeUIHandler)
+    public void SetSkillTreeUIHandler(ISkillTreeUIUpdater skillTreeUIUpdater)
     {
-        _skillTreeUIHandler = skillTreeUIHandler;
-        _skillTreeUIHandler.OnUnlock += HandleUnlockSkill;
+        _skillTreeUIUpdater = skillTreeUIUpdater;
+        _skillTreeUIUpdater.OnUnlock += HandleUnlockSkill;
     }
 
     public override void Show() => CanvasVisibilityController.Show(_canvasGroup);

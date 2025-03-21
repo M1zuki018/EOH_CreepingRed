@@ -61,6 +61,7 @@ public class SkillButton　: ViewBase
     private void OnButtonClick() => OnClick?.Invoke(this);
     
 #if UNITY_EDITOR
+    
     /// <summary>
     /// 外部からスキルデータをセットする
     /// </summary>
@@ -72,9 +73,7 @@ public class SkillButton　: ViewBase
     /// <summary>
     /// スキルデータがセットされているか確認する
     /// </summary>
-    public bool SkillDataCheck()
-    {
-        return _skillData == null;
-    }
+    public bool SkillDataCheck() => _skillData== null;
+    
 #endif
 }

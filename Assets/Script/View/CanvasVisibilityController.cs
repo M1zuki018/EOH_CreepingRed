@@ -1,7 +1,7 @@
 using UnityEngine;
 
 /// <summary>
-/// CanvasGroupの表示/非表示を制御するクラス
+/// CanvasGroupの表示/非表示を制御する静的クラス
 /// </summary>
 public static class CanvasVisibilityController
 {
@@ -26,7 +26,7 @@ public static class CanvasVisibilityController
     }
 
     /// <summary>
-    /// 反応できないようにする
+    /// 反応しないようにする（オーバーレイ表示の背面となる画面向け）
     /// </summary>
     public static void Block(CanvasGroup canvasGroup)
     {

@@ -5,23 +5,17 @@ using UnityEngine;
 /// <summary>
 /// スキルツリーのロジックを担当するクラス
 /// </summary>
-public class SkillLogic
+public class SkillTreeProcessor
 {
     private readonly Dictionary<SkillEnum, SkillButton> _skillButtonDic = new Dictionary<SkillEnum, SkillButton>();
 
-    public SkillLogic(List<SkillButton> skillButtons)
+    public SkillTreeProcessor(List<SkillButton> skillButtons)
     {
         // enumとボタンを対応させるDictionaryを作成
         foreach (var button in skillButtons)
         {
-            if (Enum.TryParse(button.SkillData.name, out SkillEnum skillEnum))
-            {
-                _skillButtonDic[skillEnum] = button;
-            }
-            else
-            {
-                Debug.LogWarning($"無効なスキル名: {button.SkillData.name}");
-            }
+            if (Enum.TryParse(button.SkillData.name, out SkillEnum skillEnum)) _skillButtonDic[skillEnum] = button;
+            else Debug.LogWarning($"無効なスキル名: {button.SkillData.name}");
         }
     }
     
@@ -37,7 +31,7 @@ public class SkillLogic
     }
 
     /// <summary>
-    /// 前提スキルが全て解放されているか確かめる
+    /// 前提スキルがすべて解放されているか確かめる
     /// </summary>
     private bool ArePrerequisiteSkillsUnlocked(List<SkillEnum> prerequisiteSkills)
     {
@@ -62,7 +56,7 @@ public class SkillLogic
     }
 
     /// <summary>
-    /// スキルによるパラメータ変更を適用
+    /// スキルの効果を適用する
     /// </summary>
     private void ApplySkillEffects(SkillDataSO data)
     {
