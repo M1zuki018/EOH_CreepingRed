@@ -19,7 +19,7 @@ public class SkillTreeUIController : UIControllerBase
     [SerializeField, HighlightIfNull] private Button _closeButton;
     
     [Header("スキルツリーのためのセットアップ")]
-    [SerializeField] private List<SkillTree> _skillTrees = new List<SkillTree>();
+    [SerializeField] private List<SkillTreePanelUIController> _skillTrees = new List<SkillTreePanelUIController>();
     [SerializeField, HighlightIfNull, Comment("スキル名のエリア")] private Text _skillName;
     [SerializeField, HighlightIfNull, Comment("スキル説明のエリア")] private Text _skillDescription;
     [SerializeField, HighlightIfNull, Comment("解放コストのエリア")] private Text _point;
@@ -37,6 +37,9 @@ public class SkillTreeUIController : UIControllerBase
     [SerializeField, HighlightIfNull, Comment("発覚率スライダー")] private Slider _detectionSlider;
     [SerializeField, HighlightIfNull, Comment("致死率スライダー")] private Slider _lethalitySlider;
     
+    private ISkillTreeUIUpdater _uiUpdater;
+    public ISkillTreeUIUpdater UIUpdater => _uiUpdater;
+    
     public event Action OnClose;
     public event Action OnShowEzechielTree;
     public event Action OnUnlock;
@@ -53,6 +56,10 @@ public class SkillTreeUIController : UIControllerBase
         {
             skillTree.SetUIController(this);
         }
+        
+        _uiUpdater = (ISkillTreeUIUpdater) new SkillTreeUIUpdater(
+            _skillName, _skillDescription, _point,
+            _pointText, _spreadSlider, _detectionSlider, _lethalitySlider);
         
         return base.OnAwake();
     }
@@ -80,9 +87,9 @@ public class SkillTreeUIController : UIControllerBase
     public override UniTask OnBind()
     {
         // UI表示の初期化
-        SkillTextsUpdate(" ", " ", " "); // 説明エリアの初期化
-        InitializeSlider(); // SliderのMaxValueを変更
-        UpdateUnderGauges(); // 下のバーの初期化
+        _uiUpdater.SkillTextsUpdate(" ", " ", " "); // 説明エリアの初期化
+        _uiUpdater.InitializeSlider(); // SliderのMaxValueを変更
+        _uiUpdater.UpdateUnderGauges(); // 下のバーの初期化
         ToggleUnlockButton(false); // UnlockButtonをインタラクティブできないように
 
         // スキルツリーパネルの操作
@@ -90,39 +97,7 @@ public class SkillTreeUIController : UIControllerBase
         
         return base.OnBind();
     }
-
-    /// <summary>
-    /// スキル表示のUIを更新する
-    /// </summary>
-    public void SkillTextsUpdate(string name, string description, string point)
-    {
-        _skillName.text = name;
-        _skillDescription.text = description;
-        _point.text = point;
-    }
     
-    /// <summary>
-    /// スライダーの最大値の初期化
-    /// </summary>
-    private void InitializeSlider()
-    {
-        int maxValue = 110;
-        _spreadSlider.maxValue = maxValue;
-        _detectionSlider.maxValue = maxValue;
-        _lethalitySlider.maxValue = maxValue;
-    }
-
-    /// <summary>
-    /// 解放コスト/拡散性/発覚率/致死率のスライダーのUIを更新する
-    /// </summary>
-    public void UpdateUnderGauges()
-    {
-        _pointText.text = Resource.ToString();
-        _spreadSlider.value = InfectionParameters.BaseRate;
-        _detectionSlider.value = Detection;
-        _lethalitySlider.value = InfectionParameters.LethalityRate;
-    }
-
     /// <summary>
     /// スキルの解放ボタンにインタラクティブできるかどうかを切り替える
     /// </summary>

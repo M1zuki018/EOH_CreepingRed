@@ -87,10 +87,10 @@ public class SkillCsvReader : EditorWindow
             ImportSkillData();
             
             // リストに自動アサイン
-            SkillTree skillTree = _parentObject.GetComponent<SkillTree>();
-            if (skillTree != null)
+            SkillTreePanelUIController skillTreePanelUIController = _parentObject.GetComponent<SkillTreePanelUIController>();
+            if (skillTreePanelUIController != null)
             {
-                skillTree.SkillButtons.Add(skillButtonScript);
+                skillTreePanelUIController.SkillButtons.Add(skillButtonScript);
             }
             else
             {
