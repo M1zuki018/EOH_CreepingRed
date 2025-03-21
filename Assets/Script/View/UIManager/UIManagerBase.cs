@@ -12,6 +12,18 @@ public abstract class UIManagerBase : ViewBase
         SetCanvas();
         return base.OnAwake();
     }
+
+    public override UniTask OnBind()
+    {
+        RegisterEvents();
+        return base.OnBind();
+    }
+
+    public override UniTask OnStart()
+    {
+        InitializePanel();
+        return base.OnStart();
+    }
     
     /// <summary>
     /// Canvasの設定を行う
@@ -29,6 +41,16 @@ public abstract class UIManagerBase : ViewBase
             Debug.LogError($"{nameof(UIManagerBase)} Canvasが見つかりませんでした");
         }
     }
+    
+    /// <summary>
+    /// イベント登録を行う（各UIManagerで実装する）
+    /// </summary>
+    protected abstract void RegisterEvents();
+    
+    /// <summary>
+    /// 各画面の表示/非表示の初期設定を行う（各UIManagerで実装する）
+    /// </summary>
+    protected abstract void InitializePanel();
     
     /// <summary>
     /// 画面遷移
