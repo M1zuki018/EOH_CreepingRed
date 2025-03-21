@@ -1115,11 +1115,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 16c58aace14fc824880e011db0c474a5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _breeze: {fileID: 5101726662711799136}
-  _storm: {fileID: 428644084802009000}
-  _catastrophe: {fileID: 4135294700359081454}
-  _unknown: {fileID: 4334987992701761123}
-  _custom: {fileID: 5861668811137539849}
+  _difficultyButtons:
+  - {fileID: 5101726662711799136}
+  - {fileID: 428644084802009000}
+  - {fileID: 4135294700359081454}
+  - {fileID: 4334987992701761123}
+  - {fileID: 5861668811137539849}
 --- !u!114 &4135294700359081454 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 5995590733328394034, guid: 3b48dfa2aa56a7041b7029c68a5b85f7, type: 3}

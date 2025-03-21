@@ -1,5 +1,4 @@
 using System;
-using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -10,34 +9,23 @@ using UnityEngine.UI;
 /// ②Unityとの連結を担当
 /// ③具体的な処理は上位のManagerクラスに任せる
 /// </summary>
-[RequireComponent(typeof(CanvasGroup))]
-public class StartBonusSelectionUIController : ViewBase, IWindow
+public class StartBonusSelectionUIController : UIControllerBase
 {
     [SerializeField, HighlightIfNull] private Button _tmp;
     
-    private CanvasGroup _canvasGroup;
     public event Action OnSelect;
-        
-    public override UniTask OnUIInitialize()
-    {
-        _canvasGroup = GetComponent<CanvasGroup>();
     
+    protected override void RegisterEvents()
+    {
         _tmp.onClick.AddListener(() => OnSelect?.Invoke());
-        return base.OnUIInitialize();
     }
-    
-    public void Show()
+
+    protected override void UnregisterEvents()
     {
-        CanvasVisibilityController.Show(_canvasGroup);
+        _tmp.onClick.RemoveListener(() => OnSelect?.Invoke());
     }
-    
-    public void Hide()
-    {
-        CanvasVisibilityController.Hide(_canvasGroup);
-    }
-    
-    public void Block()
-    {
-        CanvasVisibilityController.Block(_canvasGroup);
-    }
+
+    public override void Show() => CanvasVisibilityController.Show(_canvasGroup);
+    public override void Hide() => CanvasVisibilityController.Hide(_canvasGroup);
+    public override void Block() => CanvasVisibilityController.Block(_canvasGroup);
 }
