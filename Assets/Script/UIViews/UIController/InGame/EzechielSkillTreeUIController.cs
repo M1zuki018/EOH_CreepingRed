@@ -20,13 +20,13 @@ public class EzechielSkillTreeUIController : UIControllerBase
     public event Action OnClose;
     public event Action OnShowRitaTree;
 
-    protected override void UnregisterEvents()
+    protected override void RegisterEvents()
     {
         _closeButton.onClick.AddListener(() => OnClose?.Invoke());
         _ritaTreeButton.onClick.AddListener(() => OnShowRitaTree?.Invoke());
     }
     
-    protected override void RegisterEvents()
+    protected override void UnregisterEvents()
     {
         _closeButton.onClick.RemoveListener(() => OnClose?.Invoke());
         _ritaTreeButton.onClick.RemoveListener(() => OnShowRitaTree?.Invoke());
