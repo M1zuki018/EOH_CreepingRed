@@ -58,7 +58,7 @@ public class SkillTreeUIController : UIControllerBase
         }
         
         _uiUpdater = (ISkillTreeUIUpdater) new SkillTreeUIUpdater(
-            _skillName, _skillDescription, _point,
+            _skillName, _skillDescription, _point, _unlockButton,
             _pointText, _spreadSlider, _detectionSlider, _lethalitySlider);
         
         return base.OnAwake();
@@ -90,20 +90,12 @@ public class SkillTreeUIController : UIControllerBase
         _uiUpdater.SkillTextsUpdate(" ", " ", " "); // 説明エリアの初期化
         _uiUpdater.InitializeSlider(); // SliderのMaxValueを変更
         _uiUpdater.UpdateUnderGauges(); // 下のバーの初期化
-        ToggleUnlockButton(false); // UnlockButtonをインタラクティブできないように
+        _uiUpdater.ToggleUnlockButton(false); // UnlockButtonをインタラクティブできないように
 
         // スキルツリーパネルの操作
         ShowSkillTree(0);
         
         return base.OnBind();
-    }
-    
-    /// <summary>
-    /// スキルの解放ボタンにインタラクティブできるかどうかを切り替える
-    /// </summary>
-    public void ToggleUnlockButton(bool isUnlock)
-    {
-        _unlockButton.interactable = isUnlock;
     }
     
     /// <summary>

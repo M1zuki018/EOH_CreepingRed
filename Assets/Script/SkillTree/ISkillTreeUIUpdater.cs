@@ -17,4 +17,9 @@ public interface ISkillTreeUIUpdater
     /// 解放コスト/拡散性/発覚率/致死率のスライダーのUIを更新する
     /// </summary>
     public void UpdateUnderGauges(){}
+    
+    /// <summary>
+    /// スキルの解放ボタンにインタラクティブできるかどうかを切り替える
+    /// </summary>
+    public void ToggleUnlockButton(bool isUnlock){}
 }

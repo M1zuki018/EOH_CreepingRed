@@ -6,23 +6,25 @@ using UnityEngine.UI;
 public class SkillTreeUIUpdater : ISkillTreeUIUpdater
 {
     // スキル説明エリア部分
-    private Text _skillName;
-    private Text _skillDescription;
-    private Text _point;
+    private readonly Text _skillName;
+    private readonly Text _skillDescription;
+    private readonly Text _point;
+    private readonly Button _unlockButton;
     
     // フッター部分
     private Text _pointText; // 解放ポイント
-    private Slider _spreadSlider; // 拡散性スライダー
-    private Slider _detectionSlider; // 発覚率スライダー
-    private Slider _lethalitySlider; // 致死率スライダー
+    private readonly Slider _spreadSlider; // 拡散性スライダー
+    private readonly Slider _detectionSlider; // 発覚率スライダー
+    private readonly Slider _lethalitySlider; // 致死率スライダー
 
     public SkillTreeUIUpdater(
-        Text skillName, Text skillDescription, Text point,
+        Text skillName, Text skillDescription, Text point, Button unlockButton,
         Text pointText, Slider spreadSlider, Slider detectionSlider, Slider lethalitySlider)
     {
         _skillName = skillName;
         _skillDescription = skillDescription;
         _point = point;
+        _unlockButton = unlockButton;
         _pointText = pointText;
         _spreadSlider = spreadSlider;
         _detectionSlider = detectionSlider;
@@ -59,5 +61,13 @@ public class SkillTreeUIUpdater : ISkillTreeUIUpdater
         _spreadSlider.value = InfectionParameters.BaseRate;
         //_detectionSlider.value = Detection;
         _lethalitySlider.value = InfectionParameters.LethalityRate;
+    }
+    
+    /// <summary>
+    /// スキルの解放ボタンにインタラクティブできるかどうかを切り替える
+    /// </summary>
+    public void ToggleUnlockButton(bool isUnlock)
+    {
+        _unlockButton.interactable = isUnlock;
     }
 }
