@@ -8,18 +8,17 @@ using UnityEngine.UI;
 /// </summary>
 public class InGameSceneUIManager : UIManagerBase
 {
-    [SerializeField, HighlightIfNull, Comment("日付テキスト")] private Text _timeText;
-    [SerializeField, HighlightIfNull, Comment("倍速ボタン")] private Button[] _timeScaleButtons = new Button[4];
     [SerializeField, HighlightIfNull] private BaseViewUIController _baseView;
     [SerializeField, HighlightIfNull] private MacroViewUIController _macroView;
     [SerializeField, HighlightIfNull] private MicroViewUIController _microView;
     [SerializeField, HighlightIfNull] private SkillTreeUIController _skillTree;
     [SerializeField, HighlightIfNull] private EzechielSkillTreeUIController _ezechielSkillTree;
+    [SerializeField, HighlightIfNull] private TimerUIController _timer;
+    
     [SerializeField, HighlightIfNull] private List<AreaViewSettingsSO> _areaUISettings = new List<AreaViewSettingsSO>();
 
     public override UniTask OnBind()
     {
-        InitializeTimeView();
         InitializeView();
 
         return base.OnBind();
@@ -31,17 +30,6 @@ public class InGameSceneUIManager : UIManagerBase
         RegisterMacroViewEvents(); // 全体画面
         RegisterMicroViewEvents(); // 区画画面
         RegisterSkillTreeEvents(); // スキルツリー
-    }
-
-    /// <summary>
-    /// タイマー系（日付・倍速）の初期化
-    /// </summary>
-    private void InitializeTimeView()
-    {
-        GameManager gameManager = FindAnyObjectByType<GameManager>();
-        ITimeObservable timeManager = gameManager.TimeManager;
-        new TimeView(_timeText, timeManager);
-        new TimeScaleView(_timeScaleButtons, timeManager);
     }
     
     /// <summary>
@@ -100,6 +88,7 @@ public class InGameSceneUIManager : UIManagerBase
     protected override void InitializePanel()
     {
         _baseView.Show();
+        _timer.Show();
         _macroView.Hide();
         _microView.Hide();
         _skillTree.Hide();
