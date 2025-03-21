@@ -7,7 +7,7 @@ using UnityEngine;
 /// </summary>
 public class SkillLogic
 {
-    private Dictionary<SkillEnum, SkillButton> _skillButtonDic = new Dictionary<SkillEnum, SkillButton>();
+    private readonly Dictionary<SkillEnum, SkillButton> _skillButtonDic = new Dictionary<SkillEnum, SkillButton>();
 
     public SkillLogic(List<SkillButton> skillButtons)
     {
@@ -24,29 +24,10 @@ public class SkillLogic
             }
         }
     }
-
-    /// <summary>
-    /// アンロックボタンが押されたときの処理
-    /// </summary>
-    public void UnlockSkill(SkillButton button)
-    {
-        ApplySkillEffects(button);
-        ParametersOtherThanInfectionLogic.Resource -= button.SkillData.Cost; // コストを消費
-    }
-
-    /// <summary>
-    /// スキルによるパラメータ変更を適用
-    /// </summary>
-    private void ApplySkillEffects(SkillButton button)
-    {
-        InfectionParameters.BaseRate += button.SkillData.SpreadRate; // 拡散性
-        ParametersOtherThanInfectionLogic.DetectionRate += (int) button.SkillData.DetectionRate; // 発覚率（仮置き）
-        InfectionParameters.LethalityRate += button.SkillData.LethalityRate; // 致死率
-        // TODO: その他のスキル効果もここに追加
-    }
-
+    
     /// <summary>
     /// スキルがアンロック可能か判断する
+    /// （アンロックの判定をする必要があるのでSkillButtonクラスが欲しい）
     /// </summary>
     public bool CanUnlockSkill(SkillButton button)
     {
@@ -68,5 +49,26 @@ public class SkillLogic
             }
         }
         return true;
+    }
+
+    /// <summary>
+    /// アンロックボタンが押されたときの処理
+    /// (アンロックボタンが押されたときにはパラメーターの更新だけがしたいのでSOが欲しい)
+    /// </summary>
+    public void UnlockSkill(SkillDataSO data)
+    {
+        ApplySkillEffects(data);
+        ParametersOtherThanInfectionLogic.Resource -= data.Cost; // コストを消費
+    }
+
+    /// <summary>
+    /// スキルによるパラメータ変更を適用
+    /// </summary>
+    private void ApplySkillEffects(SkillDataSO data)
+    {
+        InfectionParameters.BaseRate += data.SpreadRate; // 拡散性
+        ParametersOtherThanInfectionLogic.DetectionRate += (int) data.DetectionRate; // 発覚率（仮置き）
+        InfectionParameters.LethalityRate += data.LethalityRate; // 致死率
+        // TODO: その他のスキル効果もここに追加
     }
 }

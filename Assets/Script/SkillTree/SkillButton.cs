@@ -46,14 +46,6 @@ public class SkillButton　: ViewBase
         _isUnlocked = true;
         _button.image.color = _defaultColor;
     }
-
-    /// <summary>
-    /// 名前/説明/コストを返す
-    /// </summary>
-    public (string name, string description, string cost) GetSkillData()
-    {
-        return (_skillData.Name, _skillData.Description, _skillData.Cost.ToString());
-    }
     
     private void OnDestroy()
     {

@@ -43,6 +43,18 @@ public class SkillTreePanelUIController : UIControllerBase
         _selectedSkillButton = button;
         UpdateSkillUI();
     }
+    
+    /// <summary>
+    /// スキルUIを更新するようにUIHandlerに指示を出す(スキル獲得前)
+    /// </summary>
+    private void UpdateSkillUI()
+    {
+        if (_selectedSkillButton == null) return;
+
+        var data = _selectedSkillButton.SkillData;
+        _skillTreeUIHandler.UpdateSkillInfo(data.Name, data.Description, data.Cost.ToString());
+        _skillTreeUIHandler.SetUnlockButtonState(_logic.CanUnlockSkill(_selectedSkillButton));
+    }
 
     /// <summary>
     /// アンロックボタンが押されたときの処理
@@ -52,21 +64,9 @@ public class SkillTreePanelUIController : UIControllerBase
         // 選択中のボタンがない もしくは 既にアンロック済みなら以降の処理を行わない（二度押し対策）
         if (_selectedSkillButton == null || _selectedSkillButton.IsUnlocked) return;
         
-        _logic.UnlockSkill(_selectedSkillButton);
+        _logic.UnlockSkill(_selectedSkillButton.SkillData);
         _skillTreeUIHandler.SetUnlockButtonState(false); // Activateボタンをインタラクティブ出来ないようにする
         _skillTreeUIHandler.UpdatePrams(); // スライダーUIを更新する
-    }
-    
-    /// <summary>
-    /// スキルUIを更新するようにUIHandlerに指示を出す(スキル獲得前)
-    /// </summary>
-    private void UpdateSkillUI()
-    {
-        if (_selectedSkillButton == null) return;
-
-        var data = _selectedSkillButton.GetSkillData();
-        _skillTreeUIHandler.UpdateSkillInfo(data.name, data.description, data.cost);
-        _skillTreeUIHandler.SetUnlockButtonState(_logic.CanUnlockSkill(_selectedSkillButton));
     }
 
     /// <summary>
