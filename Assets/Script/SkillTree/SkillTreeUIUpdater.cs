@@ -76,9 +76,9 @@ public class SkillTreeUIUpdater : ISkillTreeUIUpdater, IDisposable
     /// </summary>
     public void UpdateParameterSliders()
     {
-        _availablePointText.text = ParametersOtherThanInfectionLogic.Resource.ToString();
+        _availablePointText.text = GameEventParameters.Resource.ToString();
         _spreadSlider.value = InfectionParameters.BaseRate;
-        _detectionSlider.value = ParametersOtherThanInfectionLogic.DetectionRate;
+        _detectionSlider.value = GameEventParameters.DetectionRate;
         _lethalitySlider.value = InfectionParameters.LethalityRate;
         
         Debug.Log($"スキル解放　現在の 拡散性{InfectionParameters.BaseRate}/ 致死率{InfectionParameters.LethalityRate}");

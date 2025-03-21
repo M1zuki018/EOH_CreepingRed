@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Serialization;
 
 /// <summary>
 /// プレイヤーのゲーム設定
@@ -14,7 +15,7 @@ public class GameSettings : ScriptableObject
     [SerializeField, Range(0,1)] private float _seVolume = 1.0f;
     [SerializeField, Range(0,1)] private float _ambientVolume = 1.0f;
     [SerializeField, Range(0,1)] private float _voiceVolume = 1.0f;
-    [SerializeField] private ScreenResolution _screenResolution = ScreenResolution._1920_1080; // 画面解像度を変更
+    [FormerlySerializedAs("_screenResolution")] [SerializeField] private ScreenResolutionEnum screenResolutionEnum = ScreenResolutionEnum._1920_1080; // 画面解像度を変更
     [SerializeField] private bool _fpsLimit; // フレームレートの上限
     
     /// <summary>

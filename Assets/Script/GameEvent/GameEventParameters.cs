@@ -1,7 +1,7 @@
 /// <summary>
-/// 感染シミュレーション以外でのパラメーター
+/// ゲーム進行によるイベントに関連するパラメーター
 /// </summary>
-public static class ParametersOtherThanInfectionLogic
+public static class GameEventParameters
 {
     /// <summary>解放ポイント</summary>
     public static int Resource = 100;

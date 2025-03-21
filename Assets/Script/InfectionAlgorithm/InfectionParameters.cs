@@ -1,5 +1,5 @@
 /// <summary>
-/// 感染シミュレーションに使用する変数
+/// 感染シミュレーションに使用するパラメーター
 /// </summary>
 public static class InfectionParameters
 {

@@ -3,7 +3,7 @@ using UnityEngine;
 /// <summary>
 /// CanvasGroupの表示/非表示を制御する静的クラス
 /// </summary>
-public static class CanvasVisibilityController
+public static class CanvasVisibilityUtility
 {
     /// <summary>
     /// 表示する

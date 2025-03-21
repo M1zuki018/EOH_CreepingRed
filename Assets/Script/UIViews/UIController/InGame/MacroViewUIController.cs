@@ -66,7 +66,7 @@ public class MacroViewUIController : UIControllerBase
         }
     }
     
-    public override void Show() => CanvasVisibilityController.Show(_canvasGroup);
-    public override void Hide() => CanvasVisibilityController.Hide(_canvasGroup);
-    public override void Block() => CanvasVisibilityController.Block(_canvasGroup);
+    public override void Show() => CanvasVisibilityUtility.Show(_canvasGroup);
+    public override void Hide() => CanvasVisibilityUtility.Hide(_canvasGroup);
+    public override void Block() => CanvasVisibilityUtility.Block(_canvasGroup);
 }

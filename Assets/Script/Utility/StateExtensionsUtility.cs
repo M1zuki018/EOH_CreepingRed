@@ -3,7 +3,7 @@ using System.Collections.Generic;
 /// <summary>
 /// 一部enumを日本語に変換する静的クラス
 /// </summary>
-public static class StateExtensions
+public static class StateExtensionsUtility
 {
     private static readonly Dictionary<SectionEnum, string> SectionJapaneseNames = new Dictionary<SectionEnum, string>
     {

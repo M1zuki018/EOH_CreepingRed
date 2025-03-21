@@ -61,7 +61,7 @@ public class MicroViewUIController : UIControllerBase
         
         var area = _areaSettings[index];
         
-        _nameText.text = StateExtensions.ToJapanese(area.Name); // エリア名
+        _nameText.text = StateExtensionsUtility.ToJapanese(area.Name); // エリア名
         _explainText.text = area.Explaination; // エリアの説明
         
         if (area.Background != null)
@@ -104,14 +104,14 @@ public class MicroViewUIController : UIControllerBase
         ShowMicroView(_selectedArea);
     }
     
-    public override void Show() => CanvasVisibilityController.Show(_canvasGroup);
+    public override void Show() => CanvasVisibilityUtility.Show(_canvasGroup);
     
     public override void Hide()
     {
-        CanvasVisibilityController.Hide(_canvasGroup);
+        CanvasVisibilityUtility.Hide(_canvasGroup);
         _nameText.DOFade(0, 0.5f);
         _explainText.DOFade(0, 0.5f);
     }
     
-    public override void Block() => CanvasVisibilityController.Block(_canvasGroup);
+    public override void Block() => CanvasVisibilityUtility.Block(_canvasGroup);
 }

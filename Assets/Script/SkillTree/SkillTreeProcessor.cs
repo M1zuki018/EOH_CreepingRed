@@ -27,7 +27,7 @@ public class SkillTreeProcessor
     {
         return !button.IsUnlocked && // 自身がアンロックされていない
                ArePrerequisiteSkillsUnlocked(button.SkillData.PrerequisiteSkillsEnum) && // 前提スキルが全て解除されている
-               ParametersOtherThanInfectionLogic.Resource >= button.SkillData.Cost; // コストが足りている
+               GameEventParameters.Resource >= button.SkillData.Cost; // コストが足りている
     }
 
     /// <summary>
@@ -52,7 +52,7 @@ public class SkillTreeProcessor
     public void UnlockSkill(SkillDataSO data)
     {
         ApplySkillEffects(data);
-        ParametersOtherThanInfectionLogic.Resource -= data.Cost; // コストを消費
+        GameEventParameters.Resource -= data.Cost; // コストを消費
     }
 
     /// <summary>
@@ -61,7 +61,7 @@ public class SkillTreeProcessor
     private void ApplySkillEffects(SkillDataSO data)
     {
         InfectionParameters.BaseRate += data.SpreadRate; // 拡散性
-        ParametersOtherThanInfectionLogic.DetectionRate += (int) data.DetectionRate; // 発覚率（仮置き）
+        GameEventParameters.DetectionRate += (int) data.DetectionRate; // 発覚率（仮置き）
         InfectionParameters.LethalityRate += data.LethalityRate; // 致死率
         // TODO: その他のスキル効果もここに追加
     }
