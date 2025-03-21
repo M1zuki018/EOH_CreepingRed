@@ -1,5 +1,4 @@
 using System;
-using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -10,35 +9,24 @@ using UnityEngine.UI;
 /// ②Unityとの連結を担当
 /// ③具体的な処理は上位のManagerクラスに任せる
 /// </summary>
-[RequireComponent(typeof(CanvasGroup))]
-public class BaseViewUIController : ViewBase, IWindow
+public class BaseViewUIController : UIControllerBase
 {
     [SerializeField, HighlightIfNull] private Button _macroViewButton;
     [SerializeField, HighlightIfNull] private Image _ezechielImage;
     
-    private CanvasGroup _canvasGroup;
     public event Action OnMacroView;
-        
-    public override UniTask OnUIInitialize()
+
+    protected override void RegisterEvents()
     {
-        _canvasGroup = GetComponent<CanvasGroup>();
-    
         _macroViewButton.onClick.AddListener(() => OnMacroView?.Invoke());
-        return base.OnUIInitialize();
     }
-    
-    public void Show()
+
+    protected override void UnregisterEvents()
     {
-        CanvasVisibilityController.Show(_canvasGroup);
+        _macroViewButton.onClick.RemoveListener(() => OnMacroView?.Invoke());
     }
-    
-    public void Hide()
-    {
-        CanvasVisibilityController.Hide(_canvasGroup);
-    }
-    
-    public void Block()
-    {
-        CanvasVisibilityController.Block(_canvasGroup);
-    }
+
+    public override void Show() => CanvasVisibilityController.Show(_canvasGroup);
+    public override void Hide() => CanvasVisibilityController.Hide(_canvasGroup);
+    public override void Block() => CanvasVisibilityController.Block(_canvasGroup);
 }
