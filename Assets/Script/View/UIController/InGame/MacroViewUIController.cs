@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -11,7 +10,6 @@ using UnityEngine.UI;
 /// ②Unityとの連結を担当
 /// ③具体的な処理は上位のManagerクラスに任せる
 /// </summary>
-[RequireComponent(typeof(CanvasGroup))]
 public class MacroViewUIController : UIControllerBase
 {
     [SerializeField, HighlightIfNull] private Button _skillTreeButton;
@@ -34,10 +32,17 @@ public class MacroViewUIController : UIControllerBase
             _areaButton[i].onClick.AddListener(() => OnArea?.Invoke(index));
         }
     }
-
+    
     protected override void UnregisterEvents()
     {
-        throw new NotImplementedException();
+        _skillTreeButton.onClick.RemoveListener(() => OnSkillTree?.Invoke());
+        _closeButton.onClick.RemoveListener(() => OnClose?.Invoke());
+
+        for (int i = 0; i < _areaButton.Length; i++)
+        {
+            var index = i;
+            _areaButton[i].onClick.RemoveListener(() => OnArea?.Invoke(index));
+        }
     }
 
     /// <summary>

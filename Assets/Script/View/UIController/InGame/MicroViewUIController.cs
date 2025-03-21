@@ -12,8 +12,7 @@ using UnityEngine.UI;
 /// ②Unityとの連結を担当
 /// ③具体的な処理は上位のManagerクラスに任せる
 /// </summary>
-[RequireComponent(typeof(CanvasGroup))]
-public class MicroViewUIController : ViewBase, IWindow
+public class MicroViewUIController : UIControllerBase
 {
     [Header("UIパネルとしての設定")]
     [SerializeField, HighlightIfNull] private Button _closeButton;
@@ -27,20 +26,22 @@ public class MicroViewUIController : ViewBase, IWindow
 
     [Header("開発中オンリー")] [SerializeField] private Text _day;
     
-    private List<AreaViewSettingsSO> _areaSettings;
+    private List<AreaViewSettingsSO> _areaSettings; // エリアデータの参照
     private int _selectedArea; // 現在表示中のエリアのIndex
-    private CanvasGroup _canvasGroup;
     public event Action OnMacroView;
-        
-    public override UniTask OnUIInitialize()
+
+    protected override void RegisterEvents()
     {
-        _canvasGroup = GetComponent<CanvasGroup>();
-    
         _closeButton.onClick.AddListener(() => OnMacroView?.Invoke()); // 閉じるボタンを押したら全体ビューへ
         _nextButton.onClick.AddListener(() => ChangeArea(1).Forget());
         _backButton.onClick.AddListener(() => ChangeArea(-1).Forget());
-        
-        return base.OnUIInitialize();
+    }
+
+    protected override void UnregisterEvents()
+    {
+        _closeButton.onClick.RemoveListener(() => OnMacroView?.Invoke());
+        _nextButton.onClick.RemoveListener(() => ChangeArea(1).Forget());
+        _backButton.onClick.RemoveListener(() => ChangeArea(-1).Forget());
     }
 
     /// <summary>
@@ -58,13 +59,15 @@ public class MicroViewUIController : ViewBase, IWindow
     {
         _selectedArea = index;
         
-        _nameText.text = StateExtensions.ToJapanese(_areaSettings[index].Name); // エリア名
-        _explainText.text = _areaSettings[index].Explaination; // エリアの説明
+        var area = _areaSettings[index];
         
-        if (_areaSettings[index].Background != null)
+        _nameText.text = StateExtensions.ToJapanese(area.Name); // エリア名
+        _explainText.text = area.Explaination; // エリアの説明
+        
+        if (area.Background != null)
         {
-            _backgroundImage.sprite = _areaSettings[index]?.Background; // 背景変更
-            Dev(_areaSettings[index].Background); // TODO: あとで消す
+            _backgroundImage.sprite = area.Background; // 背景変更
+            Dev(area.Background); // TODO: あとで消す
         }
         
         // アニメーション
@@ -72,6 +75,14 @@ public class MicroViewUIController : ViewBase, IWindow
         _explainText.DOFade(1, 0.5f);
         
         Show();
+    }
+    
+    /// <summary>
+    /// 開発中の悪ノリ処理
+    /// </summary>
+    private void Dev(Sprite sprite)
+    {
+        _day.gameObject.SetActive(sprite.name == "tmp");
     }
 
     /// <summary>
@@ -89,31 +100,18 @@ public class MicroViewUIController : ViewBase, IWindow
         
         _selectedArea = (_selectedArea + operation) % 19; // 19エリアで循環するようにする
         if (_selectedArea < 0) _selectedArea += 19; // 負のインデックスを防ぐ
+        
         ShowMicroView(_selectedArea);
     }
     
-    public void Show()
-    {
-        CanvasVisibilityController.Show(_canvasGroup);
-    }
+    public override void Show() => CanvasVisibilityController.Show(_canvasGroup);
     
-    public void Hide()
+    public override void Hide()
     {
         CanvasVisibilityController.Hide(_canvasGroup);
         _nameText.DOFade(0, 0.5f);
         _explainText.DOFade(0, 0.5f);
     }
     
-    public void Block()
-    {
-        CanvasVisibilityController.Block(_canvasGroup);
-    }
-
-    /// <summary>
-    /// 開発中の悪ノリ処理
-    /// </summary>
-    private void Dev(Sprite sprite)
-    {
-        _day.gameObject.SetActive(sprite.name == "tmp");
-    }
+    public override void Block() => CanvasVisibilityController.Block(_canvasGroup);
 }
