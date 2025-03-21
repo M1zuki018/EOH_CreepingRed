@@ -14,7 +14,7 @@ public class SkillTreeUIHandler : ISkillTreeUIHandler, IDisposable
     private readonly Button _unlockButton;
     
     // フッター部分
-    private Text _pointText; // 解放ポイント
+    private readonly Text _pointText; // 解放ポイント
     private readonly Slider _spreadSlider; // 拡散性スライダー
     private readonly Slider _detectionSlider; // 発覚率スライダー
     private readonly Slider _lethalitySlider; // 致死率スライダー
@@ -39,15 +39,26 @@ public class SkillTreeUIHandler : ISkillTreeUIHandler, IDisposable
         Initialize();
     }
 
-    public void Initialize()
+    private void Initialize()
     {
         // UI表示の初期化
-        UpdateSkillInfo(" ", " ", " "); // 説明エリアの初期化
         InitializeSliders(); // SliderのMaxValueを変更
+        UpdateSkillInfo(" ", " ", " "); // 説明エリアの初期化
         UpdatePrams(); // 下のバーの初期化
         SetUnlockButtonState(false); // UnlockButtonをインタラクティブできないように
     }
 
+    /// <summary>
+    /// スライダーの最大値の初期化
+    /// </summary>
+    private void InitializeSliders()
+    {
+        int maxValue = 110;
+        _spreadSlider.maxValue = maxValue;
+        _detectionSlider.maxValue = maxValue;
+        _lethalitySlider.maxValue = maxValue;
+    }
+    
     /// <summary>
     /// スキル表示のUIを更新する
     /// </summary>
@@ -56,17 +67,6 @@ public class SkillTreeUIHandler : ISkillTreeUIHandler, IDisposable
         _skillName.text = name;
         _skillDescription.text = description;
         _point.text = point;
-    }
-    
-    /// <summary>
-    /// スライダーの最大値の初期化
-    /// </summary>
-    public void InitializeSliders()
-    {
-        int maxValue = 110;
-        _spreadSlider.maxValue = maxValue;
-        _detectionSlider.maxValue = maxValue;
-        _lethalitySlider.maxValue = maxValue;
     }
     
     /// <summary>

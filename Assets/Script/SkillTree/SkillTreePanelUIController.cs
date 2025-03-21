@@ -7,9 +7,7 @@ using UnityEngine;
 /// </summary>
 public class SkillTreePanelUIController : UIControllerBase
 {
-    [SerializeField] private List<SkillButton> _skillButtons;
-    public List<SkillButton> SkillButtons => _skillButtons;
-    
+    [SerializeField] private List<SkillButton> _skillButtons; // 自分の子のスキルボタン
     private SkillButton _selectedSkillButton; // 押されているスキルボタンの情報を保持しておく
     private SkillLogic _logic; // スキルの解放処理を担当
     private ISkillTreeUIHandler _skillTreeUIHandler; // スキルツリー画面全体のUI更新処理を担当
@@ -83,4 +81,17 @@ public class SkillTreePanelUIController : UIControllerBase
     public override void Show() => CanvasVisibilityController.Show(_canvasGroup);
     public override void Hide() => CanvasVisibilityController.Hide(_canvasGroup);
     public override void Block() => CanvasVisibilityController.Block(_canvasGroup);
+    
+#if UNITY_EDITOR
+    /// <summary>
+    /// エディタ専用のスキルボタン追加メソッド（実行時には使用不可）
+    /// </summary>
+    public void AddSkillButton(SkillButton skillButton)
+    {
+        if (!_skillButtons.Contains(skillButton))
+        {
+            _skillButtons.Add(skillButton);
+        }
+    }
+#endif
 }

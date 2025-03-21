@@ -90,7 +90,7 @@ public class SkillCsvReader : EditorWindow
             SkillTreePanelUIController skillTreePanelUIController = _parentObject.GetComponent<SkillTreePanelUIController>();
             if (skillTreePanelUIController != null)
             {
-                skillTreePanelUIController.SkillButtons.Add(skillButtonScript);
+                skillTreePanelUIController.AddSkillButton(skillButtonScript);
             }
             else
             {
