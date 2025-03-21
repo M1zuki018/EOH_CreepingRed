@@ -5,6 +5,7 @@ using UnityEngine.UI;
 
 /// <summary>
 /// スキルボタン用のクラス
+/// (表示非表示を切り替える仕組みを作るとなったらUIControllerBase継承に変更してもいいかも)
 /// </summary>
 public class SkillButton　: ViewBase
 {
@@ -32,17 +33,9 @@ public class SkillButton　: ViewBase
         
         // ボタンUIの調整
         _defaultColor = _button.image.color; // 初期色を保存
-        _button.image.color = new Color(_defaultColor.r - 0.4f, _defaultColor.g - 0.4f, _defaultColor.b - 0.4f); // 色を少し暗めに変更
+        _button.image.color = _defaultColor * 0.6f; // 色を少し暗めに変更
         
         return base.OnUIInitialize();
-    }
-
-    /// <summary>
-    /// 外部からスキルデータをセットする
-    /// </summary>
-    public void SetSkillData(SkillDataSO skillData)
-    {
-        _skillData = skillData;
     }
 
     /// <summary>
@@ -56,6 +49,14 @@ public class SkillButton　: ViewBase
     
     private void OnDestroy()
     {
-        _button.onClick.RemoveAllListeners(); // 購読解除
+        _button.onClick.RemoveListener(() => OnClick?.Invoke(this));
+    }
+    
+    /// <summary>
+    /// 外部からスキルデータをセットする（現状Editor用）
+    /// </summary>
+    public void SetSkillData(SkillDataSO skillData)
+    {
+        _skillData = skillData;
     }
 }
