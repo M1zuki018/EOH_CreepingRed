@@ -12,22 +12,19 @@ using UnityEngine.UI;
 /// ③具体的な処理は上位のManagerクラスに任せる
 /// </summary>
 [RequireComponent(typeof(CanvasGroup))]
-public class MacroViewUIController : ViewBase, IWindow
+public class MacroViewUIController : UIControllerBase
 {
     [SerializeField, HighlightIfNull] private Button _skillTreeButton;
     [SerializeField, HighlightIfNull] private Button _closeButton;
     [SerializeField, HighlightIfNull] private Button[] _areaButton = new Button[19];
     
-    private CanvasGroup _canvasGroup;
     private List<AreaViewSettingsSO> _areaSettings;
     public event Action OnSkillTree;
     public event Action<int> OnArea;
     public event Action OnClose;
-        
-    public override UniTask OnUIInitialize()
-    {
-        _canvasGroup = GetComponent<CanvasGroup>();
     
+    protected override void RegisterEvents()
+    {
         _skillTreeButton.onClick.AddListener(() => OnSkillTree?.Invoke());
         _closeButton.onClick.AddListener(() => OnClose?.Invoke());
 
@@ -36,8 +33,11 @@ public class MacroViewUIController : ViewBase, IWindow
             var index = i;
             _areaButton[i].onClick.AddListener(() => OnArea?.Invoke(index));
         }
-        
-        return base.OnUIInitialize();
+    }
+
+    protected override void UnregisterEvents()
+    {
+        throw new NotImplementedException();
     }
 
     /// <summary>
@@ -61,18 +61,7 @@ public class MacroViewUIController : ViewBase, IWindow
         }
     }
     
-    public void Show()
-    {
-        CanvasVisibilityController.Show(_canvasGroup);
-    }
-    
-    public void Hide()
-    {
-        CanvasVisibilityController.Hide(_canvasGroup);
-    }
-    
-    public void Block()
-    {
-        CanvasVisibilityController.Block(_canvasGroup);
-    }
+    public override void Show() => CanvasVisibilityController.Show(_canvasGroup);
+    public override void Hide() => CanvasVisibilityController.Hide(_canvasGroup);
+    public override void Block() => CanvasVisibilityController.Block(_canvasGroup);
 }
