@@ -46,17 +46,35 @@ public class SkillButton　: ViewBase
         _isUnlocked = true;
         _button.image.color = _defaultColor;
     }
+
+    /// <summary>
+    /// 名前/説明/コストを返す
+    /// </summary>
+    public (string name, string description, string cost) GetSkillData()
+    {
+        return (_skillData.Name, _skillData.Description, _skillData.Cost.ToString());
+    }
     
     private void OnDestroy()
     {
         _button.onClick.RemoveListener(() => OnClick?.Invoke(this));
     }
     
+#if UNITY_EDITOR
     /// <summary>
-    /// 外部からスキルデータをセットする（現状Editor用）
+    /// 外部からスキルデータをセットする
     /// </summary>
     public void SetSkillData(SkillDataSO skillData)
     {
         _skillData = skillData;
     }
+
+    /// <summary>
+    /// スキルデータがセットされているか確認する
+    /// </summary>
+    public bool SkillDataCheck()
+    {
+        return _skillData == null;
+    }
+#endif
 }

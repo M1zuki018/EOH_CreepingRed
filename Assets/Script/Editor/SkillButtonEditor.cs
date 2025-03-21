@@ -16,7 +16,7 @@ public class SkillButtonEditor : Editor
         SkillButton skillButton = (SkillButton)target;
         GUI.backgroundColor = Color.red;
         
-        if (skillButton.SkillData == null)
+        if (skillButton.SkillDataCheck())
         {
             if (GUILayout.Button("スキルデータを自動作成＆アサイン"))
             {

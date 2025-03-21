@@ -64,8 +64,8 @@ public class SkillTreePanelUIController : UIControllerBase
     {
         if (_selectedSkillButton == null) return;
 
-        var data = _selectedSkillButton.SkillData;
-        _skillTreeUIHandler.UpdateSkillInfo(data.Name, data.Description,data.Cost.ToString());
+        var data = _selectedSkillButton.GetSkillData();
+        _skillTreeUIHandler.UpdateSkillInfo(data.name, data.description, data.cost);
         _skillTreeUIHandler.SetUnlockButtonState(_logic.CanUnlockSkill(_selectedSkillButton));
     }
 
