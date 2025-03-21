@@ -13,6 +13,8 @@ using UnityEngine.UI;
 /// </summary>
 public class SkillTreeUIController : UIControllerBase
 {
+    #region フィールド
+
     [Header("InGameViewとしてのセットアップ")]
     [SerializeField, HighlightIfNull] private Button _closeButton;
     
@@ -41,6 +43,8 @@ public class SkillTreeUIController : UIControllerBase
 
     public int Resource { get; set; } = 150; // 仮コスト
     public int Detection { get; set; } = 0; // 仮発覚率
+
+    #endregion
     
     public override UniTask OnAwake()
     {
@@ -88,23 +92,15 @@ public class SkillTreeUIController : UIControllerBase
     }
 
     /// <summary>
-    /// 指定されたIndexのスキルツリーパネルを表示する
+    /// スキル表示のUIを更新する
     /// </summary>
-    private void ShowSkillTree(int index)
+    public void SkillTextsUpdate(string name, string description, string point)
     {
-        for (int i = 0; i < _skillTrees.Count; i++)
-        {
-            if (index == i)
-            {
-                _skillTrees[i].Show();
-            }
-            else
-            {
-                _skillTrees[i].Hide();
-            }
-        }
+        _skillName.text = name;
+        _skillDescription.text = description;
+        _point.text = point;
     }
-
+    
     /// <summary>
     /// スライダーの最大値の初期化
     /// </summary>
@@ -114,16 +110,6 @@ public class SkillTreeUIController : UIControllerBase
         _spreadSlider.maxValue = maxValue;
         _detectionSlider.maxValue = maxValue;
         _lethalitySlider.maxValue = maxValue;
-    }
-
-    /// <summary>
-    /// スキル表示のUIを更新する
-    /// </summary>
-    public void SkillTextsUpdate(string name, string description, string point)
-    {
-        _skillName.text = name;
-        _skillDescription.text = description;
-        _point.text = point;
     }
 
     /// <summary>
@@ -143,6 +129,18 @@ public class SkillTreeUIController : UIControllerBase
     public void ToggleUnlockButton(bool isUnlock)
     {
         _unlockButton.interactable = isUnlock;
+    }
+    
+    /// <summary>
+    /// 指定されたIndexのスキルツリーパネルを表示する
+    /// </summary>
+    private void ShowSkillTree(int index)
+    {
+        for (int i = 0; i < _skillTrees.Count; i++)
+        {
+            if (index == i) _skillTrees[i].Show();
+            else　_skillTrees[i].Hide();
+        }
     }
 
     public override void Show() => CanvasVisibilityController.Show(_canvasGroup);
