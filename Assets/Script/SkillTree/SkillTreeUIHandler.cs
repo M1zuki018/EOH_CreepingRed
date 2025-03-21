@@ -29,8 +29,19 @@ public class SkillTreeUIHandler : ISkillTreeUIHandler
         _spreadSlider = spreadSlider;
         _detectionSlider = detectionSlider;
         _lethalitySlider = lethalitySlider;
+        
+        Initialize();
     }
-    
+
+    public void Initialize()
+    {
+        // UI表示の初期化
+        UpdateSkillInfo(" ", " ", " "); // 説明エリアの初期化
+        InitializeSliders(); // SliderのMaxValueを変更
+        UpdatePrams(); // 下のバーの初期化
+        SetUnlockButtonState(false); // UnlockButtonをインタラクティブできないように
+    }
+
     /// <summary>
     /// スキル表示のUIを更新する
     /// </summary>
@@ -57,9 +68,9 @@ public class SkillTreeUIHandler : ISkillTreeUIHandler
     /// </summary>
     public void UpdatePrams()
     {
-        //_pointText.text = Resource.ToString();
+        _pointText.text = ParametersOtherThanInfectionLogic.Resource.ToString();
         _spreadSlider.value = InfectionParameters.BaseRate;
-        //_detectionSlider.value = Detection;
+        _detectionSlider.value = ParametersOtherThanInfectionLogic.DetectionRate;
         _lethalitySlider.value = InfectionParameters.LethalityRate;
     }
     

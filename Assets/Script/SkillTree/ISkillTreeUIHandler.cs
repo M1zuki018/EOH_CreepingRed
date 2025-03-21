@@ -4,6 +4,11 @@
 public interface ISkillTreeUIHandler
 {
     /// <summary>
+    /// 初期化処理
+    /// </summary>
+    public void Initialize();
+    
+    /// <summary>
     /// スキル表示のUIを更新する
     /// </summary>
     public void UpdateSkillInfo(string name, string description, string point);

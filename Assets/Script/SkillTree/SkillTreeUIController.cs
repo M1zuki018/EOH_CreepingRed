@@ -57,7 +57,7 @@ public class SkillTreeUIController : UIControllerBase
             skillTree.SetUIController(this);
         }
         
-        _uiHandler = (ISkillTreeUIHandler) new SkillTreeUIHandler(
+        _uiHandler = new SkillTreeUIHandler(
             _skillName, _skillDescription, _point, _unlockButton,
             _pointText, _spreadSlider, _detectionSlider, _lethalitySlider);
         
@@ -69,9 +69,9 @@ public class SkillTreeUIController : UIControllerBase
         _closeButton.onClick.AddListener(HandleClose); // 閉じる
         _ezechielButton.onClick.AddListener(HandleShowEzechielTree); //  エゼキエルのスキルツリーを開く
         _unlockButton.onClick.AddListener(HandleUnlock); // スキルアンロック
-        _contagionButton.onClick.AddListener(() => ShowSkillTree(0));
-        _symptomsButton.onClick.AddListener(() => ShowSkillTree(1));
-        _abilityButton.onClick.AddListener(() => ShowSkillTree(2));
+        _contagionButton.onClick.AddListener(ShowContagionTree);
+        _symptomsButton.onClick.AddListener(ShowSymptomsTree);
+        _abilityButton.onClick.AddListener(ShowAbilityTree);
     }
     
     protected override void UnregisterEvents()
@@ -79,19 +79,13 @@ public class SkillTreeUIController : UIControllerBase
         _closeButton.onClick.RemoveListener(HandleClose); // 閉じる
         _ezechielButton.onClick.RemoveListener(HandleShowEzechielTree); //  エゼキエルのスキルツリーを開く
         _unlockButton.onClick.RemoveListener(HandleUnlock); // スキルアンロック
-        _contagionButton.onClick.RemoveListener(() => ShowSkillTree(0));
-        _symptomsButton.onClick.RemoveListener(() => ShowSkillTree(1));
-        _abilityButton.onClick.RemoveListener(() => ShowSkillTree(2));
+        _contagionButton.onClick.RemoveListener(ShowContagionTree);
+        _symptomsButton.onClick.RemoveListener(ShowSymptomsTree);
+        _abilityButton.onClick.RemoveListener(ShowAbilityTree);
     }
 
     public override UniTask OnBind()
     {
-        // UI表示の初期化
-        _uiHandler.UpdateSkillInfo(" ", " ", " "); // 説明エリアの初期化
-        _uiHandler.InitializeSliders(); // SliderのMaxValueを変更
-        _uiHandler.UpdatePrams(); // 下のバーの初期化
-        _uiHandler.SetUnlockButtonState(false); // UnlockButtonをインタラクティブできないように
-
         // スキルツリーパネルの操作
         ShowSkillTree(0);
         
@@ -117,4 +111,7 @@ public class SkillTreeUIController : UIControllerBase
     private void HandleClose() => OnClose?.Invoke();
     private void HandleShowEzechielTree() => OnShowEzechielTree?.Invoke();
     private void HandleUnlock() => OnUnlock?.Invoke();
+    private void ShowContagionTree() => ShowSkillTree(0);
+    private void ShowSymptomsTree() => ShowSkillTree(1);
+    private void ShowAbilityTree() => ShowSkillTree(2);
 }
