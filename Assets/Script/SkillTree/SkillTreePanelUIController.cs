@@ -13,7 +13,7 @@ public class SkillTreePanelUIController : UIControllerBase
     private SkillButton _selectedSkillButton; // 押されているスキルボタンの情報を保持しておく
     private SkillTreeUIController _uiController; // UIControllerの参照
     private SkillLogic _logic; // 処理
-    private ISkillTreeUIUpdater _skillTreeUIUpdater;
+    private ISkillTreeUIHandler _skillTreeUIHandler;
 
     public override UniTask OnAwake()
     {
@@ -61,8 +61,8 @@ public class SkillTreePanelUIController : UIControllerBase
     /// </summary>
     private void UpdateSkillUI(SkillButton button)
     {
-        _skillTreeUIUpdater.SkillTextsUpdate(button.SkillData.Name, button.SkillData.Description,button.SkillData.Cost.ToString());
-        _skillTreeUIUpdater.ToggleUnlockButton(_logic.CanUnlockSkill(button, _uiController.Resource));
+        _skillTreeUIHandler.UpdateSkillInfo(button.SkillData.Name, button.SkillData.Description,button.SkillData.Cost.ToString());
+        _skillTreeUIHandler.SetUnlockButtonState(_logic.CanUnlockSkill(button, _uiController.Resource));
     }
     
     /// <summary>
@@ -74,8 +74,8 @@ public class SkillTreePanelUIController : UIControllerBase
         if (_selectedSkillButton == null || _selectedSkillButton.IsUnlocked) return;
         
         _logic.UnlockSkill(_selectedSkillButton, _uiController);
-        _skillTreeUIUpdater.ToggleUnlockButton(false); // Activateボタンをインタラクティブ出来ないようにする
-        _skillTreeUIUpdater.UpdateUnderGauges();
+        _skillTreeUIHandler.SetUnlockButtonState(false); // Activateボタンをインタラクティブ出来ないようにする
+        _skillTreeUIHandler.UpdatePrams();
         
         Debug.Log($"スキル解放　現在の 拡散性{InfectionParameters.BaseRate}/ 致死率{InfectionParameters.LethalityRate}");
     }
@@ -86,7 +86,7 @@ public class SkillTreePanelUIController : UIControllerBase
     public void SetUIController(SkillTreeUIController skillTreeUIController)
     {
         _uiController = skillTreeUIController;
-        _skillTreeUIUpdater = skillTreeUIController.UIUpdater;
+        _skillTreeUIHandler = skillTreeUIController.UIHandler;
     }
 
     public override void Show() => CanvasVisibilityController.Show(_canvasGroup);

@@ -3,7 +3,7 @@ using UnityEngine.UI;
 /// <summary>
 /// スキルツリー画面のUI更新を補助するクラス
 /// </summary>
-public class SkillTreeUIUpdater : ISkillTreeUIUpdater
+public class SkillTreeUIHandler : ISkillTreeUIHandler
 {
     // スキル説明エリア部分
     private readonly Text _skillName;
@@ -17,7 +17,7 @@ public class SkillTreeUIUpdater : ISkillTreeUIUpdater
     private readonly Slider _detectionSlider; // 発覚率スライダー
     private readonly Slider _lethalitySlider; // 致死率スライダー
 
-    public SkillTreeUIUpdater(
+    public SkillTreeUIHandler(
         Text skillName, Text skillDescription, Text point, Button unlockButton,
         Text pointText, Slider spreadSlider, Slider detectionSlider, Slider lethalitySlider)
     {
@@ -34,7 +34,7 @@ public class SkillTreeUIUpdater : ISkillTreeUIUpdater
     /// <summary>
     /// スキル表示のUIを更新する
     /// </summary>
-    public void SkillTextsUpdate(string name, string description, string point)
+    public void UpdateSkillInfo(string name, string description, string point)
     {
         _skillName.text = name;
         _skillDescription.text = description;
@@ -44,7 +44,7 @@ public class SkillTreeUIUpdater : ISkillTreeUIUpdater
     /// <summary>
     /// スライダーの最大値の初期化
     /// </summary>
-    public void InitializeSlider()
+    public void InitializeSliders()
     {
         int maxValue = 110;
         _spreadSlider.maxValue = maxValue;
@@ -55,7 +55,7 @@ public class SkillTreeUIUpdater : ISkillTreeUIUpdater
     /// <summary>
     /// 解放コスト/拡散性/発覚率/致死率のスライダーのUIを更新する
     /// </summary>
-    public void UpdateUnderGauges()
+    public void UpdatePrams()
     {
         //_pointText.text = Resource.ToString();
         _spreadSlider.value = InfectionParameters.BaseRate;
@@ -66,8 +66,8 @@ public class SkillTreeUIUpdater : ISkillTreeUIUpdater
     /// <summary>
     /// スキルの解放ボタンにインタラクティブできるかどうかを切り替える
     /// </summary>
-    public void ToggleUnlockButton(bool isUnlock)
+    public void SetUnlockButtonState(bool isInteractable)
     {
-        _unlockButton.interactable = isUnlock;
+        _unlockButton.interactable = isInteractable;
     }
 }

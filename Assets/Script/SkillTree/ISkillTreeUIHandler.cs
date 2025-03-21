@@ -1,25 +1,25 @@
 /// <summary>
 /// SkillTreeUIUpdaterのインターフェース
 /// </summary>
-public interface ISkillTreeUIUpdater
+public interface ISkillTreeUIHandler
 {
     /// <summary>
     /// スキル表示のUIを更新する
     /// </summary>
-    public void SkillTextsUpdate(string name, string description, string point){}
-    
+    public void UpdateSkillInfo(string name, string description, string point);
+
     /// <summary>
     /// スライダーの最大値の初期化
     /// </summary>
-    public void InitializeSlider(){}
-    
+    public void InitializeSliders();
+
     /// <summary>
     /// 解放コスト/拡散性/発覚率/致死率のスライダーのUIを更新する
     /// </summary>
-    public void UpdateUnderGauges(){}
-    
+    public void UpdatePrams();
+
     /// <summary>
     /// スキルの解放ボタンにインタラクティブできるかどうかを切り替える
     /// </summary>
-    public void ToggleUnlockButton(bool isUnlock){}
+    public void SetUnlockButtonState(bool isInteractable);
 }
