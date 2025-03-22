@@ -1,5 +1,6 @@
 using System;
 using System.Diagnostics;
+using Cysharp.Threading.Tasks;
 using Debug = UnityEngine.Debug;
 
 /// <summary>
@@ -11,6 +12,15 @@ public static class StopwatchHelper
     {
         Stopwatch stopwatch = Stopwatch.StartNew();
         action.Invoke();
+        stopwatch.Stop();
+        Debug.Log($"{label}: {stopwatch.ElapsedMilliseconds}ミリ秒");
+    }
+    
+    public static async UniTask MeasureAsync(Func<UniTask> action, string label = "処理時間")
+    {
+        var stopwatch = new Stopwatch();
+        stopwatch.Start();
+        await action();
         stopwatch.Stop();
         Debug.Log($"{label}: {stopwatch.ElapsedMilliseconds}ミリ秒");
     }

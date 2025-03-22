@@ -68,7 +68,7 @@ public class MiniQuadtree
     /// <summary>
     /// シミュレーションの初期化処理
     /// </summary>
-    public async UniTaskVoid InitializeAgents(int citizen)
+    public async UniTask InitializeAgents(int citizen)
     {
         Debug.Log($"受け取った数：一般市民{citizen}");
 
@@ -84,6 +84,8 @@ public class MiniQuadtree
         _agents.TryGetValue((0,0), out var test);
         test.Infect();
         _agents[(0, 0)] = test;
+
+        await UniTask.CompletedTask;
     }
 
     private async UniTask GenerateAgents(int citizen)
