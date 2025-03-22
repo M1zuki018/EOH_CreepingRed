@@ -10,8 +10,8 @@ public class MiniCell
 {
     private readonly int _id; // セル自体のID
     
-    private MiniQuadtree _quadtree;
-    private AgentStateCount _cellStateCount;
+    private readonly MiniQuadtree _quadtree;
+    private readonly AgentStateCount _cellStateCount;
     public AgentStateCount CellStateCount => _cellStateCount;
     
     private JobHandle _quadtreeJobHandle;
