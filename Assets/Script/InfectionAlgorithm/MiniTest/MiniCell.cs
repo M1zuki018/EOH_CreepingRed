@@ -4,6 +4,7 @@ using UnityEngine;
 
 /// <summary>
 /// 縮小テスト用エージェント約10万人が詰められたセル。感染シミュレーションを行う部分
+/// ※3/22 魔法士は感染シミュレーションには入れずに、イベント側で扱う
 /// </summary>
 public class MiniCell
 {
@@ -13,21 +14,21 @@ public class MiniCell
     private JobHandle _quadtreeJobHandle;
     public AgentStateCount StateCount { get; private set; }
     
-    public MiniCell(int id, int citizen, int magicSoldier, float regionMod)
+    public MiniCell(int id, int citizen, float regionMod)
     {
         _id = id;
         _quadtree = new MiniQuadtree(new Rect(0, 0, 1000, 1000), regionMod);
         StateCount = new AgentStateCount();
         
-        InitializeAgents(citizen, magicSoldier);
+        InitializeAgents(citizen);
     }
 
     /// <summary>
     /// エージェントの生成
     /// </summary>
-    private void InitializeAgents(int citizen, int magicSoldier)
+    private void InitializeAgents(int citizen)
     {
-        _quadtree.InitializeAgents(citizen, magicSoldier).Forget();
+        _quadtree.InitializeAgents(citizen).Forget();
     }
 
     /// <summary>

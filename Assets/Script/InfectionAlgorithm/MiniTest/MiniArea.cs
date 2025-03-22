@@ -11,17 +11,15 @@ public class MiniArea
     #region パラメータ
 
     // 基本情報
-    private readonly int _population;// 総人口（万人）
     private readonly int _citizenPopulation; // 一般市民人口
-    private readonly int _magicSoldierPopulation; // 魔法士人口
     private readonly int _infectionRate; // 感染成功率（%）
 
     // 特殊フラグ（条件）
-    public List<string> SpecialFlags { get; } 
+    private List<string> _specialFlags;
 
     #endregion
     
-    private readonly List<MiniCell> _cells = new List<MiniCell>();
+    private List<MiniCell> _cells = new List<MiniCell>();
     private readonly AgentStateCount _areaStateCount;
     public AgentStateCount AreaStateCount => _areaStateCount;
     
@@ -32,17 +30,13 @@ public class MiniArea
     /// </summary>
     public MiniArea(AreaSettingsSO settings)
     {
-        _population = settings.Population * 1000;
         _citizenPopulation = settings.CitizenPopulation * 1000;
-        _magicSoldierPopulation = settings.MagicSoldierPopulation * 1000;
         _infectionRate = settings.InfectionRate;
-        SpecialFlags = settings.SpecialFlags ?? new List<string>();
+        _specialFlags = settings.SpecialFlags ?? new List<string>();
         
         _areaStateCount = new AgentStateCount();
-        
         InitializeCells(settings);
     }
-
 
     /// <summary>
     /// 初期化処理：セルを生成する
@@ -52,28 +46,25 @@ public class MiniArea
         StopwatchHelper.Measure(() =>
             {
                 int cellPopulation = 100000; // 1セルあたりの人口
-                int cellCount = _population / cellPopulation; // セルの個数計算
-
-                // セルごとの市民と魔法士の人数を計算
-                int cellCitizenPopulation = (int)(cellPopulation * (_citizenPopulation / (float)_population));
-                int cellMagicSoldierPopulation = cellPopulation - cellCitizenPopulation;
-
+                int cellCount = _citizenPopulation / cellPopulation; // セルの個数計算
+                
+                _cells = new List<MiniCell>(cellCount + 1);
+                
                 // セルを生成
                 for (int i = 0; i < cellCount; i++)
                 {
-                    _cells.Add(new MiniCell(i, cellCitizenPopulation, cellMagicSoldierPopulation, _infectionRate * 0.01f));
+                    _cells.Add(new MiniCell(i, cellPopulation, _infectionRate * 0.01f));
                 }
 
                 // あまりがあった場合
-                int remainderPopulation = _population - (cellCount * cellPopulation);
+                int remainderPopulation = _citizenPopulation - (cellCount * cellPopulation);
                 if (remainderPopulation > 0)
                 {
-                    int remainderCitizenPopulation = (int)(remainderPopulation * (_citizenPopulation / (float)_population));
-                    int remainderMagicSoldierPopulation = remainderPopulation - remainderCitizenPopulation;
-
-                    _cells.Add(new MiniCell(cellCount, remainderCitizenPopulation, remainderMagicSoldierPopulation, _infectionRate * 0.01f));
+                    _cells.Add(new MiniCell(cellCount, remainderPopulation, _infectionRate * 0.01f));
                 }
-            }, $"{settings.Name.ToString()}エリアのセルの数：{_cells.Count}");
+                
+                DebugLogHelper.LogImportant($"{settings.Name.ToString()}エリアのセルの数：{_cells.Count}");
+            }, "\ud83c\udfde\ufe0fエリア　セル生成時間");
         
         _tasks = new List<UniTask>(_cells.Count); // セルの数だけUniTaskのリストを事前に確保しておく
     }

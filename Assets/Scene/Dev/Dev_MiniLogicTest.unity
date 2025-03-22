@@ -241,7 +241,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _debugMode: 1
-  _isLoggingEnabled: 1
+  _isLoggingEnabled: 0
   _prefabsToInstantiate:
   - {fileID: 7459061100521286778, guid: 427f343d6e65f1546a247a99b992ab15, type: 3}
   - {fileID: 8039709439483262626, guid: 1c99968eeca271648aa4ef5b26548c5e, type: 3}

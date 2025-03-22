@@ -68,14 +68,14 @@ public class MiniQuadtree
     /// <summary>
     /// シミュレーションの初期化処理
     /// </summary>
-    public async UniTaskVoid InitializeAgents(int citizen, int magicSoldier)
+    public async UniTaskVoid InitializeAgents(int citizen)
     {
-        Debug.Log($"受け取った数：一般市民{citizen} 魔法士{magicSoldier}");
+        Debug.Log($"受け取った数：一般市民{citizen}");
 
         Stopwatch stopwatch = new Stopwatch();
         stopwatch.Start();
         
-        await GenerateAgents(citizen, magicSoldier);
+        await GenerateAgents(citizen);
         
         stopwatch.Stop();
         
@@ -86,7 +86,7 @@ public class MiniQuadtree
         _agents[(0, 0)] = test;
     }
 
-    private async UniTask GenerateAgents(int citizen, int magicSoldier)
+    private async UniTask GenerateAgents(int citizen)
     {
         int i = 0;
         // エージェントを並列処理で生成
@@ -97,19 +97,6 @@ public class MiniQuadtree
             int y = i / _maxX;  // 例：Y座標の計算
 
             _agents[(x, y)] = new Agent(i, AgentType.Citizen, x, y);
-        
-            // クワッドツリーに追加（非同期で追加）
-            Insert(_agents[(x, y)]);
-        }
-        
-        // エージェントを並列処理で生成
-        for (; i < citizen + magicSoldier; i++)
-        {
-            // 座標の計算（必要に応じてロジックを変更）
-            int x = i % _maxX;  // 例：X座標の計算
-            int y = i / _maxX;  // 例：Y座標の計算
-
-            _agents[(x, y)] = new Agent(i, AgentType.MagicSoldier, x, y);
         
             // クワッドツリーに追加（非同期で追加）
             Insert(_agents[(x, y)]);
