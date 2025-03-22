@@ -34,11 +34,11 @@ public class Cell
     private void UpdateStateCount(int magicSoldier)
     {
         /*
-        StateCount.ResetStateCount();
+        CellStateCount.ResetStateCount();
         foreach (var agent in _agents)
         {
-            StateCount.AddState(agent.State); // 各ステート
-            StateCount.AddState(magicSoldier); // 魔法士の数
+            CellStateCount.AddState(agent.State); // 各ステート
+            CellStateCount.AddState(magicSoldier); // 魔法士の数
         }
         */
     }

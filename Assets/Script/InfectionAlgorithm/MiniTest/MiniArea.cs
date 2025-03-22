@@ -101,11 +101,11 @@ public class MiniArea
             // 並列処理でエリアの状態を集計
             Parallel.ForEach(_cells, (cell) =>
             {
-                Interlocked.Add(ref totalHealthy, cell.StateCount.Healthy);
-                Interlocked.Add(ref totalInfected, cell.StateCount.Infected);
-                Interlocked.Add(ref totalNearDeath, cell.StateCount.NearDeath);
-                Interlocked.Add(ref totalGhost, cell.StateCount.Ghost);
-                Interlocked.Add(ref totalPerished, cell.StateCount.Perished);
+                Interlocked.Add(ref totalHealthy, cell.CellStateCount.Healthy);
+                Interlocked.Add(ref totalInfected, cell.CellStateCount.Infected);
+                Interlocked.Add(ref totalNearDeath, cell.CellStateCount.NearDeath);
+                Interlocked.Add(ref totalGhost, cell.CellStateCount.Ghost);
+                Interlocked.Add(ref totalPerished, cell.CellStateCount.Perished);
             });
             
             _areaStateCount.UpdateStateCount(

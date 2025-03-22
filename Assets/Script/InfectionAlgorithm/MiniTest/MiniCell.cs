@@ -1,3 +1,5 @@
+using System.Threading;
+using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
 using Unity.Jobs;
 using UnityEngine;
@@ -8,17 +10,20 @@ using UnityEngine;
 /// </summary>
 public class MiniCell
 {
-    private int _id; // セル自体のID
+    private readonly int _id; // セル自体のID
     
     private MiniQuadtree _quadtree;
     private JobHandle _quadtreeJobHandle;
-    public AgentStateCount StateCount { get; private set; }
+    private AgentStateCount _cellStateCount;
+    public AgentStateCount CellStateCount => _cellStateCount;
     
     public MiniCell(int id, int citizen, float regionMod)
     {
         _id = id;
+        
+        // 感染確率を渡してQuadtreeを作成。深さは初期値のゼロ
         _quadtree = new MiniQuadtree(new Rect(0, 0, 1000, 1000), regionMod);
-        StateCount = new AgentStateCount();
+        _cellStateCount = new AgentStateCount();
         
         InitializeAgents(citizen);
     }
@@ -38,27 +43,28 @@ public class MiniCell
     {
         StopwatchHelper.Measure(() =>
         {
-            // Quadtree のシミュレーション開始
-            _quadtreeJobHandle = _quadtree.SimulateInfection();
-
-            // すべての `Quadtree` のジョブが完了するまで待機
-            _quadtreeJobHandle.Complete();
-        },$"\ud83d\udfe6セル(ID:{_id}) 更新速度");
-        // ここでエージェントの状態をカウント
-        UpdateStateCount();
-
-        await UniTask.CompletedTask;
+            _quadtreeJobHandle = _quadtree.SimulateInfection(); // Quadtreeの更新処理
+            _quadtreeJobHandle.Complete(); // すべての `Quadtree` のジョブが完了するまで待機
+        },$"\ud83d\udfe6セル(ID:{_id}) 感染シミュレーションの更新速度");
+        
+        await UpdateStateCount();
     }
     
     /// <summary>
-    /// 各状態のエージェントの数を集計する
+    /// Quadtree内のエージェントのステートを集計する
     /// </summary>
-    private void UpdateStateCount()
+    private async UniTask UpdateStateCount()
     {
-        StateCount.ResetStateCount();
-        foreach (var agent in _quadtree.GetAllAgents())
+        _cellStateCount.ResetStateCount();
+        
+        StopwatchHelper.Measure(() =>
         {
-            StateCount.AddState(agent.State); // 各ステート
-        }
+            foreach (var agent in _quadtree.GetAllAgents())
+            {
+                _cellStateCount.AddState(agent.State); // 各ステート
+            }
+        }, $"\ud83d\udfe6セル(ID:{_id}) Quadtreeのステート集計速度");
+        
+        await UniTask.CompletedTask;
     }
 }
