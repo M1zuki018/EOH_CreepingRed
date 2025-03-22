@@ -47,14 +47,6 @@ public class MiniQuadtree
         _agents = new Dictionary<(int x, int y), Agent>();
         _infectedAgentsCoords = new List<(int, int)>();
         _checkAgentCoords = new HashSet<(int, int)>();
-        SetDifficultyMod();
-    }
-
-    /// <summary>
-    /// 現在の難易度に応じて難易度補正の値を決める
-    /// </summary>
-    private void SetDifficultyMod()
-    {
         _difficultyMod = GameSettingsManager.Difficulty switch
         {
             DifficultyEnum.Breeze => 0,
@@ -62,6 +54,7 @@ public class MiniQuadtree
             DifficultyEnum.Catastrophe => 0.1f, //難しい
             DifficultyEnum.Unknown => 0.2f, // 激ムズ
             DifficultyEnum.Custom => 0f, // カスタム難易度
+            _ => 0,
         };
     }
 
