@@ -15,6 +15,7 @@ public class MiniQuadtree
     // 定数
     private const int MAX_AGENTS = 5000; // 1ツリーの最大エージェント数
     private const int MAX_DEPTH = 10; // 最大分割回数
+    private const int MERGE_THRESHOLD = 4000; // 統合の閾値
     
     // 初期化処理
     private List<UniTask> _generateTasks; // エージェント生成タスクのリスト
@@ -78,9 +79,18 @@ public class MiniQuadtree
     /// </summary>
     private void TestInfection()
     {
-        _agents.TryGetValue((0,0), out var test);
-        test.Infect();
-        _agents[(0, 0)] = test;
+        MiniQuadtree targetTree = FindTargetTree(new Agent (99999, AgentType.Citizen, 0, 0)); // (0,0)座標のツリーを検索
+
+        if (targetTree._agents.TryGetValue((0, 0), out var test))
+        {
+            test.Infect();
+            targetTree._agents[(0, 0)] = test; // 更新
+            Debug.Log($"Agent at (0,0) infected in tree with bounds: {targetTree._bounds}");
+        }
+        else
+        {
+            Debug.LogWarning("No agent found at (0,0) in the target Quadtree.");
+        }
     }
 
     /// <summary>
@@ -168,17 +178,27 @@ public class MiniQuadtree
     private MiniQuadtree FindTargetTree(Agent agent)
     {
         MiniQuadtree currentTree = this;
+        Vector2 agentPos = new Vector2(agent.X, agent.Y);
     
         while (currentTree._subTrees.Count > 0)
         {
+            MiniQuadtree bestTree = null;
             foreach (var subTree in currentTree._subTrees.Keys)
             {
-                if (subTree._bounds.Contains(new Vector2(agent.X, agent.Y)))
+                if (subTree._bounds.Contains(agentPos))
                 {
-                    currentTree = subTree;
-                    break;
+                    bestTree = subTree;
+                    break; // 最初に見つかったものを採用
                 }
             }
+
+            if (bestTree == null)
+            {
+                Debug.LogWarning($"Agent ({agent.X}, {agent.Y}) が適切なサブツリーに属していません。現在のツリー: {currentTree._bounds}");
+                break;
+            }
+
+            currentTree = bestTree;
         }
 
         return currentTree;
@@ -201,8 +221,7 @@ public class MiniQuadtree
 
     #endregion
     
-    
-    #region ツリーに追加する処理
+    #region ツリーを操作する処理
     
     /// <summary>
     /// エージェントをツリーに追加する処理
@@ -266,13 +285,59 @@ public class MiniQuadtree
         float halfHeight = _bounds.height / 2f;
         float x = _bounds.xMin;
         float y = _bounds.yMin;
-        
+    
         // 4つのサブツリーを作成
-        _subTrees.Add(new MiniQuadtree(new Rect(x, y, halfWidth, halfHeight), _regionMod,_depth + 1), false);  // 左下
-        _subTrees.Add(new MiniQuadtree(new Rect(x + halfWidth, y, halfWidth, halfHeight), _regionMod,_depth + 1), false);  // 右下
-        _subTrees.Add(new MiniQuadtree(new Rect(x, y + halfHeight, halfWidth, halfHeight), _regionMod,_depth + 1), false);  // 左上
-        _subTrees.Add(new MiniQuadtree(new Rect(x + halfWidth, y + halfHeight, halfWidth, halfHeight), _regionMod,_depth + 1), false);  // 右上
+        var leftBottom  = new MiniQuadtree(new Rect(x, y, halfWidth, halfHeight), _regionMod, _depth + 1);
+        var rightBottom = new MiniQuadtree(new Rect(x + halfWidth, y, halfWidth, halfHeight), _regionMod, _depth + 1);
+        var leftTop     = new MiniQuadtree(new Rect(x, y + halfHeight, halfWidth, halfHeight), _regionMod, _depth + 1);
+        var rightTop    = new MiniQuadtree(new Rect(x + halfWidth, y + halfHeight, halfWidth, halfHeight), _regionMod, _depth + 1);
+
+        _subTrees.Add(leftBottom, false);
+        _subTrees.Add(rightBottom, false);
+        _subTrees.Add(leftTop, false);
+        _subTrees.Add(rightTop, false);
+
+        // デバッグ用ログ
+        Debug.Log($"サブツリー生成　深さ{_depth}: \n" +
+                  $"Left Bottom: {leftBottom._bounds} \n" +
+                  $"Right Bottom: {rightBottom._bounds} \n" +
+                  $"Left Top: {leftTop._bounds} \n" +
+                  $"Right Top: {rightTop._bounds}");
     }
+
+    /// <summary>
+    /// サブツリーを統合する処理（一定以下のエージェント数なら統合する）
+    /// </summary>
+    private void Marge()
+    {
+        if (_subTrees.Count == 0)
+            return; // すでにリーフノードなら何もしない
+
+        // 子ノード内のエージェント数を合計
+        int totalAgents = 0;
+        foreach (var subTree in _subTrees.Keys)
+        {
+            totalAgents += subTree._agents.Count;
+        }
+
+        // 子ノードの合計エージェント数が閾値以下なら統合
+        if (totalAgents <= MERGE_THRESHOLD)
+        {
+            // すべてのエージェントを現在のノードに統合
+            foreach (var subTree in _subTrees.Keys)
+            {
+                foreach (var agent in subTree._agents.Values)
+                {
+                    _agents[(agent.X, agent.Y)] = agent;
+                }
+            }
+
+            // サブツリーを削除
+            _subTrees.Clear();
+            Debug.Log("サブツリーを削除");
+        }
+    }
+    
     #endregion
 
     #region 感染シミュレーション
@@ -293,9 +358,9 @@ public class MiniQuadtree
             {
                 if (!agent.Value.Skip)
                 {
-                    _infectedAgentsCoords.Add(agent.Key); // スキップしなかったエージェントを座標をリストに追加
+                    _infectedAgentsCoords.Add(agent.Key); // 周囲を感染させる可能性があるエージェントをリストに追加
                 }
-                _nearDeathAgentsCoords.Add(agent.Key);
+                _nearDeathAgentsCoords.Add(agent.Key); // 死亡判定を行うリストに追加
             }
         }
 
@@ -303,9 +368,8 @@ public class MiniQuadtree
         {
             foreach (var subTree in _subTrees.Keys)
             {
-                _infectionJobHandle = JobHandle.CombineDependencies(
-                    _infectionJobHandle, subTree.SimulateInfection()
-                );
+                // サブツリーの感染処理も待つようにする
+                _infectionJobHandle = JobHandle.CombineDependencies(_infectionJobHandle, subTree.SimulateInfection());
             }
         }
 
