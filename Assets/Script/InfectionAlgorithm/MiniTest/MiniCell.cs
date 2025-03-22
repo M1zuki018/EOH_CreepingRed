@@ -59,7 +59,6 @@ public class MiniCell
         foreach (var agent in _quadtree.GetAllAgents())
         {
             StateCount.AddState(agent.State); // 各ステート
-            if(agent.Type == AgentType.MagicSoldier) StateCount.AddState(1); // 魔法士の数
         }
     }
 }

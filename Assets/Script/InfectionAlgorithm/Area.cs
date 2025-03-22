@@ -136,7 +136,7 @@ public class Area
         {
             AreaStateCount.UpdateStateCount(
                 cell.StateCount.Healthy, cell.StateCount.Infected, cell.StateCount.NearDeath,
-                cell.StateCount.Ghost, cell.StateCount.Perished, cell.StateCount.MagicSoldiers);
+                cell.StateCount.Ghost, cell.StateCount.Perished);
         }
     }
 }

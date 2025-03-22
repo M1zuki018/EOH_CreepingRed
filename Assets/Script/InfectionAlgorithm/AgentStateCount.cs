@@ -8,7 +8,6 @@ public class AgentStateCount
     public int NearDeath {get; private set;}
     public int Ghost{get; private set;}
     public int Perished {get; private set;}
-    public int MagicSoldiers{get; private set;}
 
     /// <summary>
     /// 各状態のエージェントを追加
@@ -36,24 +35,15 @@ public class AgentStateCount
     }
 
     /// <summary>
-    /// 魔法士エージェントを追加
-    /// </summary>
-    public void AddState(int magicSoldiers)
-    {
-        MagicSoldiers += magicSoldiers;
-    }
-
-    /// <summary>
     /// 値を更新する
     /// </summary>
-    public void UpdateStateCount(int health, int infected, int nearDeath, int ghost, int perished, int magicSoldiers)
+    public void UpdateStateCount(int health, int infected, int nearDeath, int ghost, int perished)
     {
         Healthy += health;
         Infected += infected;
         NearDeath += nearDeath;
         Ghost += ghost;
         Perished += perished;
-        MagicSoldiers += magicSoldiers;
     }
 
     public void ResetStateCount()
@@ -63,6 +53,5 @@ public class AgentStateCount
         NearDeath = 0;
         Ghost = 0;
         Perished = 0;
-        MagicSoldiers = 0;
     }
 }

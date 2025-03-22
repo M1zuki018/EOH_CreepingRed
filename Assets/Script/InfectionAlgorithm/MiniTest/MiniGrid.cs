@@ -92,18 +92,15 @@ public class MiniGrid
                     totalNearDeath += area.AreaStateCount.NearDeath;
                     totalGhost += area.AreaStateCount.Ghost;
                     totalPerished += area.AreaStateCount.Perished;
-                    totalMagicSoldiers += area.AreaStateCount.MagicSoldiers;
                 }
             }
 
             _totalStateCount.UpdateStateCount(
-                totalHealthy, totalInfected, totalNearDeath, 
-                totalGhost, totalPerished, totalMagicSoldiers
-            );
+                totalHealthy, totalInfected, totalNearDeath, totalGhost, totalPerished);
         }, "\ud83d\uddfa\ufe0fグリッド 全エージェントのステートの集計速度");
         
         // Gridの集計データをUIに反映
         Debug.Log($"[Grid 集計結果] 健常者: {_totalStateCount.Healthy} 感染者: {_totalStateCount.Infected} 仮死状態: {_totalStateCount.NearDeath} " +
-                  $"亡霊: {_totalStateCount.Ghost} 完全死亡状態: {_totalStateCount.Perished} 魔法士: {_totalStateCount.MagicSoldiers}");
+                  $"亡霊: {_totalStateCount.Ghost} 完全死亡状態: {_totalStateCount.Perished}");
     }
 }

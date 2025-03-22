@@ -65,8 +65,7 @@ public class Grid
         foreach (var area in Areas)
         {
             TotalStateCount.UpdateStateCount(area.AreaStateCount.Healthy, area.AreaStateCount.Infected,
-                area.AreaStateCount.NearDeath, area.AreaStateCount.Ghost, area.AreaStateCount.Perished,
-                area.AreaStateCount.MagicSoldiers);
+                area.AreaStateCount.NearDeath, area.AreaStateCount.Ghost, area.AreaStateCount.Perished);
         }
         
         // Gridの集計データをUIに反映
@@ -75,7 +74,6 @@ public class Grid
         Debug.Log($"仮死状態: {TotalStateCount.NearDeath}");
         Debug.Log($"亡霊: {TotalStateCount.Ghost}");
         Debug.Log($"完全死亡状態: {TotalStateCount.Perished}");
-        Debug.Log($"魔法士: {TotalStateCount.MagicSoldiers}");
     }
     
     /// <summary>

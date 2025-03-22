@@ -96,7 +96,7 @@ public class MiniArea
         StopwatchHelper.Measure(() =>
         {
             int totalHealthy = 0, totalInfected = 0, totalNearDeath = 0;
-            int totalGhost = 0, totalPerished = 0, totalMagicSoldiers = 0;
+            int totalGhost = 0, totalPerished = 0;
             
             // 並列処理でエリアの状態を集計
             Parallel.ForEach(_cells, (cell) =>
@@ -106,12 +106,11 @@ public class MiniArea
                 Interlocked.Add(ref totalNearDeath, cell.StateCount.NearDeath);
                 Interlocked.Add(ref totalGhost, cell.StateCount.Ghost);
                 Interlocked.Add(ref totalPerished, cell.StateCount.Perished);
-                Interlocked.Add(ref totalMagicSoldiers, cell.StateCount.MagicSoldiers);
             });
             
             _areaStateCount.UpdateStateCount(
                 totalHealthy, totalInfected, totalNearDeath,
-                totalGhost, totalPerished, totalMagicSoldiers
+                totalGhost, totalPerished
             );
         }, "\ud83c\udfde\ufe0fエリア 各セルのステートの集計速度");
 
