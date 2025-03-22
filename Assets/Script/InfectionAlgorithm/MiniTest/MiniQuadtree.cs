@@ -61,6 +61,7 @@ public class MiniQuadtree
     #region 初期化
     /// <summary>
     /// シミュレーションの初期化処理
+    /// ※大元のQuadtreeでのみ呼ばれる
     /// </summary>
     public async UniTask InitializeAgents(int citizen)
     {
@@ -73,6 +74,7 @@ public class MiniQuadtree
 
     /// <summary>
     /// 一人だけ感染させる処理
+    /// ※大元のQuadtreeでのみ呼ばれる
     /// </summary>
     private void TestInfection()
     {
@@ -83,6 +85,7 @@ public class MiniQuadtree
 
     /// <summary>
     /// エージェントを並列処理で生成する
+    /// ※大元のQuadtreeでのみ呼ばれる
     /// </summary>
     private async UniTask GenerateAgents(int citizen)
     {
@@ -97,26 +100,89 @@ public class MiniQuadtree
         JobHandle handle = job.Schedule(citizen, 64);
         handle.Complete();
         
-        // Dictionaryの操作をするのでメインスレッドに切り替える
-        await UniTask.SwitchToMainThread();
+        // サブツリーを作成
+        int requiredDepth = CalculateRequiredDepth(citizen);
+        EnsureSubTrees(requiredDepth);
         
-        // すぐに Dispose() する（保持時間を短くする）
-        List<Agent> agentList = new List<Agent>(citizen);
+        // 直接適切な辞書にエージェントを追加
         for (int i = 0; i < citizen; i++)
         {
-            agentList.Add(agentArray[i]);
+            InsertDirectly(agentArray[i]);
         }
+        
         agentArray.Dispose();
-        
-        // Dictionaryに追加する
-        for (int i = 0; i < citizen; i++)
-        {
-            Insert(agentList[i]);
-        }
         
         await UniTask.CompletedTask; // 全てのエージェントの生成を待つ
     }
     
+    /// <summary>
+    /// 必要なQuadtreeの分割深度を計算
+    /// ※大元のQuadtreeでのみ呼ばれる
+    /// </summary>
+    private int CalculateRequiredDepth(int citizen)
+    {
+        int depth = 0;
+        int capacity = MAX_AGENTS;
+
+        while (citizen > capacity)
+        {
+            capacity *= 4; // クワッドツリーは1分割ごとに4倍
+            depth++;
+        }
+
+        return depth;
+    }
+    
+    /// <summary>
+    /// 必要なサブツリーを確保する処理
+    /// </summary>
+    private void EnsureSubTrees(int requiredDepth)
+    {
+        if (_depth >= requiredDepth) return; // すでに十分な深さなら何もしない
+
+        if (_depth < requiredDepth) // 現在のツリーが十分な深さに達していない場合分割を行う
+        {
+            Subdivide(); // 分割を実行
+        }
+
+        foreach (var subtree in _subTrees)
+        {
+            subtree.Key.EnsureSubTrees(requiredDepth); // サブツリーが生成されていたら再帰的に処理を行う
+        }
+    }
+    
+    /// <summary>
+    /// エージェントを最適なツリーの辞書に直接追加
+    /// ※大元のQuadtreeでのみ呼ばれる
+    /// </summary>
+    private void InsertDirectly(Agent agent)
+    {
+        MiniQuadtree targetTree = FindTargetTree(agent);
+        targetTree._agents[(agent.X, agent.Y)] = agent;
+    }
+    
+    /// <summary>
+    /// エージェントを適切なサブツリーに割り当てる
+    /// ※大元のQuadtreeでのみ呼ばれる
+    /// </summary>
+    private MiniQuadtree FindTargetTree(Agent agent)
+    {
+        MiniQuadtree currentTree = this;
+    
+        while (currentTree._subTrees.Count > 0)
+        {
+            foreach (var subTree in currentTree._subTrees.Keys)
+            {
+                if (subTree._bounds.Contains(new Vector2(agent.X, agent.Y)))
+                {
+                    currentTree = subTree;
+                    break;
+                }
+            }
+        }
+
+        return currentTree;
+    }
     
     [BurstCompile]
     struct AgentInitializationJob : IJobParallelFor
@@ -133,6 +199,11 @@ public class MiniQuadtree
         }
     }
 
+    #endregion
+    
+    
+    #region ツリーに追加する処理
+    
     /// <summary>
     /// エージェントをツリーに追加する処理
     /// </summary>

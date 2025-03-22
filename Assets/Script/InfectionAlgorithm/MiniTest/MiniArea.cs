@@ -43,7 +43,7 @@ public class MiniArea
     /// </summary>
     private void InitializeCells(AreaSettingsSO settings)
     {
-        StopwatchHelper.Measure(() =>
+        StopwatchHelper.AlwaysUse(() =>
             {
                 int cellPopulation = 100000; // 1セルあたりの人口
                 int cellCount = _citizenPopulation / cellPopulation; // セルの個数計算
