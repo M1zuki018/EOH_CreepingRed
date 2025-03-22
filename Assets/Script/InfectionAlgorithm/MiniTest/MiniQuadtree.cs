@@ -1,5 +1,6 @@
 using System.Collections.Generic;
-using System.Diagnostics;
+using System.Linq;
+using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
 using Unity.Burst;
 using Unity.Collections;
@@ -16,6 +17,9 @@ public class MiniQuadtree
     // 定数
     private const int MAX_AGENTS = 5000; // 1ツリーの最大エージェント数
     private const int MAX_DEPTH = 10; // 最大分割回数
+    
+    // 初期化処理
+    private List<UniTask> _generateTasks; // エージェント生成タスクのリスト
     
     // QuadTree関連
     private Dictionary<MiniQuadtree, bool> _subTrees; // サブツリーとSkipフラグ
@@ -93,51 +97,80 @@ public class MiniQuadtree
     /// </summary>
     private async UniTask GenerateAgents(int citizen)
     {
+        _generateTasks = new List<UniTask>(citizen); // 生成するエージェントの数に合わせてリストを事前に確保
+        
         int i = 0;
         for (; i < citizen; i++)
         {
-            // 座標の計算（必要に応じてロジックを変更）
-            int x = i % _maxX;  // 例：X座標の計算
-            int y = i / _maxX;  // 例：Y座標の計算
-
-            _agents[(x, y)] = new Agent(i, AgentType.Citizen, x, y);
-        
-            // クワッドツリーに追加（非同期で追加）
-            Insert(_agents[(x, y)]);
+            _generateTasks.Add(GenerateAgentAsync(i));
         }
         
-        await UniTask.CompletedTask;
+        await UniTask.WhenAll(_generateTasks); // 全てのエージェントの生成を待つ
     }
-    
+
+    private async UniTask GenerateAgentAsync(int i)
+    {
+        // 座標の計算
+        int x = i % _maxX;
+        int y = i / _maxX;
+
+        _agents[(x, y)] = new Agent(i, AgentType.Citizen, x, y);
+        
+        // クワッドツリーに追加（非同期で追加）
+        await InsertAsync(_agents[(x, y)]);
+    }
+
     /// <summary>
     /// エージェントをツリーに追加する処理
     /// </summary>
-    private void Insert(Agent agent)
+    private async UniTask InsertAsync(Agent agent)
     {
+        // 範囲外なら無視
         if (agent.X < _bounds.xMin || agent.X >= _bounds.xMax || agent.Y < _bounds.yMin || agent.Y >= _bounds.yMax)
-        {
-            return; // 範囲外なら無視
-        }
-
+            return; 
+        
+        // 容量に空きがあったらそのままエージェントを追加
         if (_agents.Count < MAX_AGENTS)
         {
-            _agents[(agent.X, agent.Y)] = agent; // 容量に空きがあったらそのままエージェントを追加
+            _agents[(agent.X, agent.Y)] = agent; 
             return;
         }
 
-        if (_depth >= MAX_DEPTH) // 分割数に余裕がない場合
+        // 分割数に余裕がない場合そのままエージェントを追加
+        if (_depth >= MAX_DEPTH) 
         {
-            _agents[(agent.X, agent.Y)] = agent; // そのままエージェントを追加
+            _agents[(agent.X, agent.Y)] = agent;
             return;
         }
         
-        lock (_subdivideLock)  // 排他制御を行って分割処理をシリアルに実行
+        // 容量に空きがなく、分割数に余裕があるのでサブツリーに分割
+        await AddAgentToSubTree(agent);
+    }
+
+    /// <summary>
+    ///  エージェントをサブツリーに追加する
+    /// </summary>
+    private async UniTask AddAgentToSubTree(Agent agent)
+    {
+        if (_subTrees.Count == 0)
         {
-            if (_subTrees.Count == 0)  // 既にサブツリーが作成されていない場合のみ分割
+            Subdivide();
+        }
+        
+        // エージェントの位置に基づいてサブツリーに振り分け
+        foreach (var subTree in _subTrees.Keys.ToList())
+        {
+            // エージェントがサブツリーの範囲内に収まっているかをチェック
+            if (subTree._bounds.Contains(new Vector2(agent.X, agent.Y)))
             {
-                Subdivide(); // 分割処理
+                // サブツリーにエージェントを追加
+                await subTree.InsertAsync(agent);
+                return;
             }
         }
+
+        // もし適切なサブツリーが見つからなければ、通常のエージェント追加処理
+        _agents[(agent.X, agent.Y)] = agent;
     }
 
     /// <summary>
@@ -421,7 +454,11 @@ public class MiniQuadtree
         {
             foreach (var agent in subTree.GetAllAgents())
             {
-                yield return agent;
+                // サブツリー内のエージェントが _agents に含まれていないかチェック
+                if (!_agents.ContainsKey((agent.X, agent.Y)))  // 重複を防ぐ
+                {
+                    yield return agent;
+                }
             }
         }
     }

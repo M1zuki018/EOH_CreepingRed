@@ -23,8 +23,11 @@ public class MiniCell
         // 感染確率を渡してQuadtreeを作成。深さは初期値のゼロ
         _quadtree = new MiniQuadtree(new Rect(0, 0, 1000, 1000), regionMod);
         _cellStateCount = new AgentStateCount();
-        
-        InitializeAgents(citizen).Forget();
+
+        StopwatchHelper.Measure(() =>
+        {
+            InitializeAgents(citizen).Forget();
+        },"Quadtree生成完了");
     }
 
     /// <summary>
