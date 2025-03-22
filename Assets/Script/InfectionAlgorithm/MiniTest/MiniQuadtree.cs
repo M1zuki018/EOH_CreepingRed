@@ -1,13 +1,11 @@
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Jobs;
 using Unity.VisualScripting;
 using UnityEngine;
-using Debug = UnityEngine.Debug;
 
 /// <summary>
 /// 縮小テスト用Quadtreeを用いたエージェント管理システム
@@ -25,8 +23,8 @@ public class MiniQuadtree
     private Dictionary<MiniQuadtree, bool> _subTrees; // サブツリーとSkipフラグ
     private Dictionary<(int x, int y), Agent> _agents; // エージェントの情報
     private Rect _bounds;
-    private int _depth = 0; // 現在の分割数
-    private int _maxX = 1000; // セル内の座標の横幅の上限
+    private readonly int _depth = 0; // 現在の分割数
+    private readonly int _maxX = 1000; // セル内の座標の横幅の上限
     
     // シミュレーション関連
     private List<(int, int)> _infectedAgentsCoords; // 処理を行う感染済みのエージェント
@@ -36,7 +34,6 @@ public class MiniQuadtree
     private NativeArray<Agent> _agentArray; // 感染判定を行うエージェントのNativeArray
     private NativeArray<Agent> _nearDeathAgentsArray; // 死亡判定を行うエージェントのNativeArray
     private readonly object _lockObject = new object();
-    private readonly object _subdivideLock = new object();  // ロックオブジェクト
     private readonly float _regionMod; // 感染確率計算の環境補正
     private float _difficultyMod; // 感染確率計算の難易度補正
     private int _infectionRange; // 感染範囲
@@ -77,8 +74,7 @@ public class MiniQuadtree
         await GenerateAgents(citizen);
         
         TestInfection();
-        Debug.Log($"生成完了(エージェントの数{_agents.Count}/サブツリーの数{_subTrees.Count})");
-
+        
         await UniTask.CompletedTask;
     }
 
@@ -108,6 +104,9 @@ public class MiniQuadtree
         await UniTask.WhenAll(_generateTasks); // 全てのエージェントの生成を待つ
     }
 
+    /// <summary>
+    /// エージェントを生成する
+    /// </summary>
     private async UniTask GenerateAgentAsync(int i)
     {
         // 座標の計算
@@ -443,6 +442,9 @@ public class MiniQuadtree
 
     #endregion
     
+    /// <summary>
+    /// サブツリー含め全てのエージェントを取得する
+    /// </summary>
     public IEnumerable<Agent> GetAllAgents()
     {
         foreach (var agent in _agents.Values)

@@ -39,7 +39,6 @@ public class MiniGrid
                 Debug.LogWarning($" MiniGrid：{areaSetting.Name}　({x}, {y}) は無効な座標です");
             }
         }
-        Debug.Log($"グリッドの初期化完了");
     }
     
     /// <summary>
