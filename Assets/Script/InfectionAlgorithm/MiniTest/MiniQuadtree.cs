@@ -86,30 +86,54 @@ public class MiniQuadtree
     /// </summary>
     private async UniTask GenerateAgents(int citizen)
     {
-        _generateTasks = new List<UniTask>(citizen); // 生成するエージェントの数に合わせてリストを事前に確保
+        NativeArray<Agent> agentArray = new NativeArray<Agent>(citizen, Allocator.TempJob);
         
-        int i = 0;
-        for (; i < citizen; i++)
+        var job = new AgentInitializationJob
         {
-            _generateTasks.Add(GenerateAgentAsync(i));
+            Agents = agentArray,
+            MaxX = _maxX
+        };
+        
+        JobHandle handle = job.Schedule(citizen, 64);
+        handle.Complete();
+        
+        // Dictionaryの操作をするのでメインスレッドに切り替える
+        await UniTask.SwitchToMainThread();
+        
+        // すぐに Dispose() する（保持時間を短くする）
+        List<Agent> agentList = new List<Agent>(citizen);
+        for (int i = 0; i < citizen; i++)
+        {
+            agentList.Add(agentArray[i]);
+        }
+        agentArray.Dispose();
+        
+        _generateTasks?.Clear();
+        _generateTasks = new List<UniTask>(agentList.Count);
+        
+        // Dictionaryに追加する
+        for (int i = 0; i < citizen; i++)
+        {
+            _generateTasks.Add(InsertAsync(agentList[i]));
         }
         
         await UniTask.WhenAll(_generateTasks); // 全てのエージェントの生成を待つ
     }
-
-    /// <summary>
-    /// エージェントを生成する
-    /// </summary>
-    private async UniTask GenerateAgentAsync(int i)
+    
+    
+    [BurstCompile]
+    struct AgentInitializationJob : IJobParallelFor
     {
-        // 座標の計算
-        int x = i % _maxX;
-        int y = i / _maxX;
+        [WriteOnly] public NativeArray<Agent> Agents;
+        public int MaxX;
 
-        _agents[(x, y)] = new Agent(i, AgentType.Citizen, x, y);
-        
-        // クワッドツリーに追加（非同期で追加）
-        await InsertAsync(_agents[(x, y)]);
+        public void Execute(int i)
+        {
+            int x = i % MaxX;
+            int y = i / MaxX;
+
+            Agents[i] = new Agent(i, AgentType.Citizen, x, y);
+        }
     }
 
     /// <summary>
