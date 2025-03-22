@@ -108,16 +108,13 @@ public class MiniQuadtree
         }
         agentArray.Dispose();
         
-        _generateTasks?.Clear();
-        _generateTasks = new List<UniTask>(agentList.Count);
-        
         // Dictionaryに追加する
         for (int i = 0; i < citizen; i++)
         {
-            _generateTasks.Add(InsertAsync(agentList[i]));
+            Insert(agentList[i]);
         }
         
-        await UniTask.WhenAll(_generateTasks); // 全てのエージェントの生成を待つ
+        await UniTask.CompletedTask; // 全てのエージェントの生成を待つ
     }
     
     
@@ -139,7 +136,7 @@ public class MiniQuadtree
     /// <summary>
     /// エージェントをツリーに追加する処理
     /// </summary>
-    private async UniTask InsertAsync(Agent agent)
+    private void Insert(Agent agent)
     {
         // 範囲外なら無視
         if (agent.X < _bounds.xMin || agent.X >= _bounds.xMax || agent.Y < _bounds.yMin || agent.Y >= _bounds.yMax)
@@ -160,13 +157,13 @@ public class MiniQuadtree
         }
         
         // 容量に空きがなく、分割数に余裕があるのでサブツリーに分割
-        await AddAgentToSubTree(agent);
+        AddAgentToSubTree(agent);
     }
 
     /// <summary>
     ///  エージェントをサブツリーに追加する
     /// </summary>
-    private async UniTask AddAgentToSubTree(Agent agent)
+    private void AddAgentToSubTree(Agent agent)
     {
         if (_subTrees.Count == 0)
         {
@@ -180,7 +177,7 @@ public class MiniQuadtree
             if (subTree._bounds.Contains(new Vector2(agent.X, agent.Y)))
             {
                 // サブツリーにエージェントを追加
-                await subTree.InsertAsync(agent);
+                subTree.Insert(agent);
                 return;
             }
         }
