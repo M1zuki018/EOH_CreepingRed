@@ -23,7 +23,7 @@ public class MiniSimulation : IDisposable
     private async void UpdateSimulation(int time)
     {
         await _grid.SimulateInfectionAsync();
-        Debug.Log($"ゲーム内時間: {time} 時間経過");
+        Debug.Log($"\u23f1\ufe0fTimer： {time} 時間経過");
     }
 
     public void Dispose()

@@ -100,7 +100,7 @@ public class MiniGrid
                 totalHealthy, totalInfected, totalNearDeath, 
                 totalGhost, totalPerished, totalMagicSoldiers
             );
-        }, "StateCount集計速度");
+        }, "\ud83d\uddfa\ufe0fグリッド 全エージェントのステートの集計速度");
         
         // Gridの集計データをUIに反映
         Debug.Log($"[Grid 集計結果] 健常者: {_totalStateCount.Healthy} 感染者: {_totalStateCount.Infected} 仮死状態: {_totalStateCount.NearDeath} " +

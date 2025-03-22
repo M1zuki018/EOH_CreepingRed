@@ -122,7 +122,7 @@ public class MiniArea
                 totalHealthy, totalInfected, totalNearDeath,
                 totalGhost, totalPerished, totalMagicSoldiers
             );
-        }, "エリアのカウント集計速度");
+        }, "\ud83c\udfde\ufe0fエリア 各セルのステートの集計速度");
 
         await UniTask.CompletedTask; // 非同期完了を通知
     }

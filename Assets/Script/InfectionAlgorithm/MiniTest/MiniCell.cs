@@ -1,8 +1,6 @@
-using System.Diagnostics;
 using Cysharp.Threading.Tasks;
 using Unity.Jobs;
 using UnityEngine;
-using Debug = UnityEngine.Debug;
 
 /// <summary>
 /// 縮小テスト用エージェント約10万人が詰められたセル。感染シミュレーションを行う部分
@@ -37,18 +35,14 @@ public class MiniCell
     /// </summary>
     public async UniTask SimulateInfection()
     {
-        Stopwatch stopwatch = new Stopwatch();
-        stopwatch.Start();
-        
-        // Quadtree のシミュレーション開始
-        _quadtreeJobHandle = _quadtree.SimulateInfection();
-        
-        // すべての `Quadtree` のジョブが完了するまで待機
-        _quadtreeJobHandle.Complete();
-        
-        stopwatch.Stop();
-        
-        Debug.Log($"シミュレーション更新:{_id} {stopwatch.ElapsedMilliseconds} ミリ秒");
+        StopwatchHelper.Measure(() =>
+        {
+            // Quadtree のシミュレーション開始
+            _quadtreeJobHandle = _quadtree.SimulateInfection();
+
+            // すべての `Quadtree` のジョブが完了するまで待機
+            _quadtreeJobHandle.Complete();
+        },$"\ud83d\udfe6セル(ID:{_id}) 更新速度");
         // ここでエージェントの状態をカウント
         UpdateStateCount();
 
