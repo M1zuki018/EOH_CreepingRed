@@ -14,7 +14,7 @@ using Debug = UnityEngine.Debug;
 public class MiniQuadtree
 {
     // 定数
-    private const int MAX_AGENTS = 10000; // 1ツリーの最大エージェント数
+    private const int MAX_AGENTS = 5000; // 1ツリーの最大エージェント数
     private const int MAX_DEPTH = 10; // 最大分割回数
     
     // QuadTree関連
@@ -25,8 +25,8 @@ public class MiniQuadtree
     private int _maxX = 1000; // セル内の座標の横幅の上限
     
     // シミュレーション関連
-    private List<(int, int)> _infectedAgentsCoords = new List<(int, int)>(); // 処理を行う感染済みのエージェント
-    private HashSet<(int, int)> _checkAgentCoords = new HashSet<(int, int)>(); // 感染判定を行う対象のエージェント
+    private List<(int, int)> _infectedAgentsCoords; // 処理を行う感染済みのエージェント
+    private HashSet<(int, int)> _checkAgentCoords; // 感染判定を行う対象のエージェント
     private List<(int, int)> _nearDeathAgentsCoords = new List<(int, int)>(); // 仮死判定を行う対象のエージェント
     private JobHandle _infectionJobHandle;
     private NativeArray<Agent> _agentArray; // 感染判定を行うエージェントのNativeArray
@@ -70,28 +70,30 @@ public class MiniQuadtree
     /// </summary>
     public async UniTask InitializeAgents(int citizen)
     {
-        Debug.Log($"受け取った数：一般市民{citizen}");
-
-        Stopwatch stopwatch = new Stopwatch();
-        stopwatch.Start();
-        
         await GenerateAgents(citizen);
         
-        stopwatch.Stop();
-        
-        Debug.Log($"生成完了（実行時間:{stopwatch.ElapsedMilliseconds}ミリ秒） エージェントの数{_agents.Count}/サブツリーの数{_subTrees.Count}");
-        
-        _agents.TryGetValue((0,0), out var test);
-        test.Infect();
-        _agents[(0, 0)] = test;
+        TestInfection();
+        Debug.Log($"生成完了(エージェントの数{_agents.Count}/サブツリーの数{_subTrees.Count})");
 
         await UniTask.CompletedTask;
     }
 
+    /// <summary>
+    /// 一人だけ感染させる処理
+    /// </summary>
+    private void TestInfection()
+    {
+        _agents.TryGetValue((0,0), out var test);
+        test.Infect();
+        _agents[(0, 0)] = test;
+    }
+
+    /// <summary>
+    /// エージェントを並列処理で生成する
+    /// </summary>
     private async UniTask GenerateAgents(int citizen)
     {
         int i = 0;
-        // エージェントを並列処理で生成
         for (; i < citizen; i++)
         {
             // 座標の計算（必要に応じてロジックを変更）
@@ -104,7 +106,7 @@ public class MiniQuadtree
             Insert(_agents[(x, y)]);
         }
         
-        await UniTask.Yield();
+        await UniTask.CompletedTask;
     }
     
     /// <summary>
@@ -143,8 +145,6 @@ public class MiniQuadtree
     /// </summary>
     private void Subdivide() 
     {
-        Debug.Log("サブツリー生成");
-        
         float halfWidth = _bounds.width / 2f;
         float halfHeight = _bounds.height / 2f;
         float x = _bounds.xMin;
