@@ -13,6 +13,7 @@ public class LifecycleController : MonoBehaviour
 {
     [Header("Debug")]
     [SerializeField] private bool _debugMode = true;
+    [SerializeField] private bool _isLogFormatEnabled = true;
     [SerializeField] private bool _isLoggingEnabled = true;
     
     [Header("設定")]
@@ -28,6 +29,7 @@ public class LifecycleController : MonoBehaviour
             return;
         }
         
+        DebugLogHelper.IsLogFormatEnabled = _isLogFormatEnabled;
         DebugLogHelper.IsLoggingEnabled = _isLoggingEnabled;
         
         await AutoInstantiate(); // インスタンス化

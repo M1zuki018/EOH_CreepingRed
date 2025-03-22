@@ -32,7 +32,7 @@ public class MiniGrid
             {
                 // SOで設定した座標に基づいてエリアを配置
                 _areas[x, y] = new MiniArea(areaSetting);
-                Debug.Log($"エリア作成 ({x}, {y}) : {areaSetting.Name.ToString()}");
+                DebugLogHelper.TestOnly($"エリア作成 ({x}, {y}) : {areaSetting.Name.ToString()}");
             }
             else
             {

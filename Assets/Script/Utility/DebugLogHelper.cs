@@ -5,9 +5,7 @@ using UnityEngine;
 /// </summary>
 public static class DebugLogHelper
 {
-    /// <summary>
-    /// ログの出力を有効にするかどうか
-    /// </summary>
+    public static bool IsLogFormatEnabled { get; set; } = true;
     public static bool IsLoggingEnabled { get; set; } = true;
     
     /// <summary>
@@ -24,9 +22,20 @@ public static class DebugLogHelper
     /// </summary>
     public static void LogFormat(string format, params object[] args)
     {
-        if (IsLoggingEnabled)
+        if (IsLogFormatEnabled)
         {
             Debug.LogFormat(format, args);
+        }
+    }
+
+    /// <summary>
+    /// テスト中のみ表示したいログ
+    /// </summary>
+    public static void TestOnly(string message)
+    {
+        if (IsLoggingEnabled)
+        {
+            Debug.Log(message);
         }
     }
 }
