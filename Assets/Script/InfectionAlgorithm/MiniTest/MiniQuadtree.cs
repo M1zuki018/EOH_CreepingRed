@@ -297,8 +297,7 @@ public class MiniQuadtree
         _subTrees.Add(leftTop, false);
         _subTrees.Add(rightTop, false);
 
-        // デバッグ用ログ
-        Debug.Log($"サブツリー生成　深さ{_depth}: \n" +
+        DebugLogHelper.TestOnly($"サブツリー生成　深さ{_depth}: \n" +
                   $"Left Bottom: {leftBottom._bounds} \n" +
                   $"Right Bottom: {rightBottom._bounds} \n" +
                   $"Left Top: {leftTop._bounds} \n" +
