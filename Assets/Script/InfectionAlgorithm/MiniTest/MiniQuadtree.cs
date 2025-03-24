@@ -354,7 +354,7 @@ public class MiniQuadtree
         _infectionRange = InfectionParameters.InfectionRange; // 感染範囲を更新
         
         IdentifyInfectedAgents();
-        NearDeathDetermination(); // 死亡判定
+        if(InfectionParameters.LethalityRate > 0) NearDeathDetermination(); // 致死率が0以上のときは死亡判定を行う
         
         if (_subTrees.Count > 0)
         {
