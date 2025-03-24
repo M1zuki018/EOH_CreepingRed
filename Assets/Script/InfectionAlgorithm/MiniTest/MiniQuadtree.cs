@@ -6,6 +6,7 @@ using Unity.Collections;
 using Unity.Jobs;
 using Unity.VisualScripting;
 using UnityEngine;
+using Random = Unity.Mathematics.Random;
 
 /// <summary>
 /// 縮小テスト用Quadtreeを用いたエージェント管理システム
@@ -38,7 +39,7 @@ public class MiniQuadtree
     private readonly float _regionMod; // 感染確率計算の環境補正
     private float _difficultyMod; // 感染確率計算の難易度補正
     private int _infectionRange; // 感染範囲
-    private HashSet<(int x, int y)> _coordsToMarkSkip = new HashSet<(int x, int y)>();
+    private HashSet<(int x, int y)> _coordsToMarkSkip = new HashSet<(int x, int y)>(); // Skipフラグを立てるエージェントのリスト
 
     public MiniQuadtree(Rect bounds, float regionMod, int depth = 0)
     {
@@ -486,6 +487,7 @@ public class MiniQuadtree
         {
             agents = _agentArray,
             infectionRate = infectionRate,
+            random = new Random((uint)UnityEngine.Random.Range(1, int.MaxValue))
         };
         
         JobHandle jobHandle = job.Schedule(_agentArray.Length, 64);
@@ -507,6 +509,7 @@ public class MiniQuadtree
     {
         public NativeArray<Agent> agents;
         public float infectionRate;
+        public Random random;
         
         public void Execute(int index)
         {
@@ -518,7 +521,7 @@ public class MiniQuadtree
             float infectionProbability = infectionRate * (1 - targetResistMod);
             
             // 感染判定。乱数が感染確率
-            if (infectionProbability > agent.RandomNumber())
+            if (infectionProbability > random.NextInt(100))
             {
                 agent.Infect(); // 感染
             }
@@ -543,8 +546,7 @@ public class MiniQuadtree
         {
             if (_agents.TryGetValue(coord, out var agent))
             {
-                _nearDeathAgentsArray[index] = agent;
-                index++;
+                _nearDeathAgentsArray[index++] = agent;
             }
         }
 
@@ -552,22 +554,17 @@ public class MiniQuadtree
         {
             agents = _nearDeathAgentsArray,
             lethalityRate = InfectionParameters.LethalityRate,
+            random =  new Random((uint)UnityEngine.Random.Range(1, int.MaxValue))
         };
         
         JobHandle jobHandle = job.Schedule(_nearDeathAgentsArray.Length, 64);
-        
         jobHandle.Complete();
         
         // 結果を _agents に反映
         for (int i = 0; i < _nearDeathAgentsArray.Length; i++)
         {
             var updatedAgent = _nearDeathAgentsArray[i];
-            var coord = (updatedAgent.X, updatedAgent.Y);
-
-            if (_agents.ContainsKey(coord))
-            {
-                _agents[coord] = updatedAgent; // 更新を反映
-            }
+            _agents[(updatedAgent.X, updatedAgent.Y)] = updatedAgent; // 更新を反映
         }
         
         // メモリ解放
@@ -579,12 +576,13 @@ public class MiniQuadtree
     {
         public NativeArray<Agent> agents;
         public float lethalityRate; // 致死率
+        public Random random;
         
         public void Execute(int index)
         {
             Agent agent = agents[index];
 
-            if (lethalityRate > agent.RandomNumber())
+            if (lethalityRate > random.NextInt(100))
             {
                 agent.NearDeath();
             }

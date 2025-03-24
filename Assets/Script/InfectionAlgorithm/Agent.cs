@@ -1,7 +1,3 @@
-using System;
-using UnityEngine;
-using Random = System.Random;
-
 /// <summary>
 /// 1エージェントの構造体
 /// </summary>
@@ -14,9 +10,6 @@ public struct Agent
     public AgentState State { get; private set; }
     public bool Skip{ get; set;}
 
-    // Randomは構造体に直接埋め込むのは難しいので、必要なときに生成する
-    private  Unity.Mathematics.Random _random;
-
     public Agent(int id, AgentType type, int x, int y)
     {
         Id = id;
@@ -24,11 +17,10 @@ public struct Agent
         X = x;
         Y = y;
         State = AgentState.Healthy;
-        
-        _random = new Unity.Mathematics.Random(100);
         Skip = false;
     }
 
+    /*
     public void Move(Grid grid)
     {
         // 生活・逃走などのルールに応じた移動処理
@@ -37,6 +29,7 @@ public struct Agent
         X = Math.Max(0, Math.Min(grid.Areas.GetLength(0) - 1, X + dx));
         Y = Math.Max(0, Math.Min(grid.Areas.GetLength(1) - 1, Y + dy));
     }
+    */
     
     /// <summary>
     /// 感染
@@ -52,13 +45,5 @@ public struct Agent
     public void NearDeath()
     { 
         State = AgentState.NearDeath;
-    }
-
-    /// <summary>
-    /// 0-99の乱数を返す
-    /// </summary>
-    public int RandomNumber()
-    {
-        return _random.NextInt(100);
     }
 }
