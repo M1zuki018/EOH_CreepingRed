@@ -122,6 +122,8 @@ public class MiniQuadtree
             InsertDirectly(agentArray[i]);
         }
         
+        DebugLog();
+        
         agentArray.Dispose();
         
         await UniTask.CompletedTask; // 全てのエージェントの生成を待つ
@@ -171,7 +173,8 @@ public class MiniQuadtree
     private void InsertDirectly(Agent agent)
     {
         MiniQuadtree targetTree = FindTargetTree(agent);
-        targetTree._agents[(agent.X, agent.Y)] = agent;
+        //Debug.Log($"ターゲットのツリー{targetTree._bounds}");
+        targetTree._agents.Add((agent.X, agent.Y), agent);
     }
     
     /// <summary>
@@ -355,8 +358,6 @@ public class MiniQuadtree
                 }
             }
         }
-
-        DebugLog();
         
         return ProcessInfectionAreas();
     }

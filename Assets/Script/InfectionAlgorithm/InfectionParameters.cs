@@ -4,7 +4,7 @@
 public static class InfectionParameters
 {
     /// <summary>基礎感染率（拡散性を足していく）</summary>
-    public static float BaseRate = 90f;
+    public static float BaseRate = 100f;
 
     /// <summary>環境補正</summary>
     public static float EnvMod = 0f;
