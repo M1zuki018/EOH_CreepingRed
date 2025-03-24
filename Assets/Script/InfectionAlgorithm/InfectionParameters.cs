@@ -13,5 +13,5 @@ public static class InfectionParameters
     public static float LethalityRate = 0f;
 
     /// <summary>感染範囲</summary>
-    public static int InfectionRange = 10;
+    public static int InfectionRange = 15;
 }

@@ -1,5 +1,7 @@
+using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using Unity.Jobs;
+using Unity.VisualScripting;
 using UnityEngine;
 
 /// <summary>
@@ -11,11 +13,13 @@ public class MiniCell
     private readonly int _id; // セル自体のID
     
     private readonly MiniQuadtree _quadtree;
-    private readonly MiniAgentManager _agentManager;
+    private readonly Dictionary<MiniAgentManager, bool> _agentManager = new Dictionary<MiniAgentManager, bool>();
     private readonly AgentStateCount _cellStateCount;
     public AgentStateCount CellStateCount => _cellStateCount;
+
+    private int _managerCapacity = 10000;
     
-    private JobHandle _quadtreeJobHandle;
+    private List<JobHandle> _quadtreeJobHandle = new List<JobHandle>();
     
     public MiniCell(int id, int citizen, float regionMod)
     {
@@ -23,7 +27,10 @@ public class MiniCell
         
         // 感染確率を渡してQuadtreeを作成。深さは初期値のゼロ
         //_quadtree = new MiniQuadtree(new Rect(0, 0, 1000, 1000), regionMod);
-        _agentManager = new MiniAgentManager(regionMod);
+        for(int i = 0; i < Mathf.Ceil(citizen / _managerCapacity); i++)
+        {
+            _agentManager.Add(new MiniAgentManager(regionMod), false);
+        }
         _cellStateCount = new AgentStateCount();
 
         StopwatchHelper.Measure(() =>
@@ -37,7 +44,14 @@ public class MiniCell
     /// </summary>
     private async UniTask InitializeAgents(int citizen)
     {
-        await _agentManager.InitializeAgents(citizen);
+        List<UniTask> tasks = new List<UniTask>(_agentManager.Count);
+        
+        foreach (var agentManager in _agentManager.Keys)
+        {
+            tasks.Add(agentManager.InitializeAgents(citizen));
+        }
+        
+        await UniTask.WhenAll(tasks);
     }
 
     /// <summary>
@@ -45,10 +59,19 @@ public class MiniCell
     /// </summary>
     public async UniTask SimulateInfection()
     {
+        _quadtreeJobHandle.Clear();
+        
         StopwatchHelper.Measure(() =>
         {
-            _quadtreeJobHandle = _agentManager.SimulateInfection(); // Quadtreeの更新処理
-            _quadtreeJobHandle.Complete(); // すべてのQuadtreeのジョブが完了するまで待機
+            foreach (var agentManager in _agentManager.Keys)
+            {
+                if (_agentManager[agentManager])
+                {
+                    _quadtreeJobHandle.Add(agentManager.SimulateInfection()); // Quadtreeの更新処理
+                }
+            }
+            
+            //_quadtreeJobHandle.Complete(); // すべてのQuadtreeのジョブが完了するまで待機
         },$"\ud83d\udfe6セル(ID:{_id}) 感染シミュレーションの更新速度");
         
         await UpdateStateCount();
@@ -63,12 +86,29 @@ public class MiniCell
         
         await StopwatchHelper.MeasureAsync(async () =>
         {
-            var allAgents = _agentManager.GetAllAgents();
-            
-            foreach (var agent in allAgents)
+            foreach (var agentManager in _agentManager.Keys)
             {
-                _cellStateCount.AddState(agent.State); // 各ステートをカウント
+                var allAgents = agentManager.GetAllAgents();
+            
+                bool isAllHealthy = true;
+                int infectedCount = 0;
+                
+                foreach (var agent in allAgents)
+                {
+                    _cellStateCount.AddState(agent.State); // 各ステートをカウント
+                    if (agent.State == AgentState.Infected)
+                    {
+                        isAllHealthy = false;
+                        infectedCount++;
+                    }
+                }
+
+                if (!isAllHealthy)
+                {
+                    _agentManager[agentManager] = false;
+                }
             }
+            
         }, $"\ud83d\udfe6セル(ID:{_id}) Quadtreeのステート集計速度");
     }
 }
