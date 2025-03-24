@@ -1,5 +1,7 @@
 using System.Collections.Generic;
+using System.Linq;
 using Cysharp.Threading.Tasks;
+using Unity.Collections;
 using Unity.Jobs;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -19,7 +21,7 @@ public class MiniCell
 
     private int _managerCapacity = 10000;
     
-    private List<JobHandle> _quadtreeJobHandle = new List<JobHandle>();
+    private List<JobHandle> _jobHandle = new List<JobHandle>();
     
     public MiniCell(int id, int citizen, float regionMod)
     {
@@ -59,19 +61,28 @@ public class MiniCell
     /// </summary>
     public async UniTask SimulateInfection()
     {
-        _quadtreeJobHandle.Clear();
+        _jobHandle.Clear();
         
         StopwatchHelper.Measure(() =>
         {
+            if (_agentManager.Count == 0)
+            {
+                return;
+            }
             foreach (var agentManager in _agentManager.Keys)
             {
-                if (_agentManager[agentManager])
-                {
-                    _quadtreeJobHandle.Add(agentManager.SimulateInfection()); // Quadtreeの更新処理
-                }
+                _jobHandle.Add(agentManager.SimulateInfection()); // Quadtreeの更新処理
+                // if (_agentManager[agentManager])
+                // {
+                //     _jobHandle.Add(agentManager.SimulateInfection()); // Quadtreeの更新処理
+                // }
             }
+
+            var jobHandles = _jobHandle.ToNativeArray(Allocator.TempJob);
+            JobHandle.CompleteAll(jobHandles); // すべてのQuadtreeのジョブが完了するまで待機
             
-            //_quadtreeJobHandle.Complete(); // すべてのQuadtreeのジョブが完了するまで待機
+            jobHandles.Dispose();
+                
         },$"\ud83d\udfe6セル(ID:{_id}) 感染シミュレーションの更新速度");
         
         await UpdateStateCount();
@@ -86,6 +97,13 @@ public class MiniCell
         
         await StopwatchHelper.MeasureAsync(async () =>
         {
+            if (_agentManager.Count == 0)
+            {
+                return;
+            }
+            
+            var skipAgentManager = new List<MiniAgentManager>();
+            
             foreach (var agentManager in _agentManager.Keys)
             {
                 var allAgents = agentManager.GetAllAgents();
@@ -105,8 +123,13 @@ public class MiniCell
 
                 if (!isAllHealthy)
                 {
-                    _agentManager[agentManager] = false;
+                    skipAgentManager.Add(agentManager);
                 }
+            }
+
+            foreach (var skip in skipAgentManager)
+            {
+                _agentManager[skip] = false;
             }
             
         }, $"\ud83d\udfe6セル(ID:{_id}) Quadtreeのステート集計速度");
