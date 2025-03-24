@@ -54,10 +54,10 @@ public class MiniAgentManager
     /// <summary>
     /// Cellクラスが呼び出す初期化処理
     /// </summary>
-    public async UniTask InitializeAgents(int citizen)
+    public async UniTask InitializeAgents(int citizen, bool infection = false)
     {
         await GenerateAgents(citizen);
-        TestInfection();
+        if(infection) TestInfection();
     }
 
     /// <summary>

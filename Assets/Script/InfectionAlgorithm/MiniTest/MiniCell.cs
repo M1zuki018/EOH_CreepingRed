@@ -41,9 +41,12 @@ public class MiniCell
     {
         List<UniTask> tasks = new List<UniTask>(_agentManager.Count);
         
+        bool hasInitialized = false;
+        
         foreach (var kvp in _agentManager)
         {
-            tasks.Add(kvp.Key.InitializeAgents(citizen));
+            tasks.Add(kvp.Key.InitializeAgents(citizen, !hasInitialized));
+            hasInitialized = true;
         }
         
         await UniTask.WhenAll(tasks); // 全ての生成が終わるまで待つ
