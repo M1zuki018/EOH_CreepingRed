@@ -38,6 +38,7 @@ public class MiniQuadtree
     private readonly float _regionMod; // 感染確率計算の環境補正
     private float _difficultyMod; // 感染確率計算の難易度補正
     private int _infectionRange; // 感染範囲
+    private HashSet<(int x, int y)> _coordsToMarkSkip = new HashSet<(int x, int y)>();
 
     public MiniQuadtree(Rect bounds, float regionMod, int depth = 0)
     {
@@ -351,6 +352,26 @@ public class MiniQuadtree
         _checkAgentCoords.Clear();
         _infectionRange = InfectionParameters.InfectionRange; // 感染範囲を更新
         
+        IdentifyInfectedAgents();
+        NearDeathDetermination(); // 死亡判定
+        
+        if (_subTrees.Count > 0)
+        {
+            foreach (var subTree in _subTrees.Keys)
+            {
+                // サブツリーの感染処理も待つようにする
+                _infectionJobHandle = JobHandle.CombineDependencies(_infectionJobHandle, subTree.SimulateInfection());
+            }
+        }
+        
+        return ProcessInfectionAreas();
+    }
+
+    /// <summary>
+    /// 感染中のエージェントを特定し、リストに詰める
+    /// </summary>
+    private void IdentifyInfectedAgents()
+    {
         foreach (var agent in _agents)
         {
             if (agent.Value.State == AgentState.Infected)
@@ -362,94 +383,88 @@ public class MiniQuadtree
                 _nearDeathAgentsCoords.Add(agent.Key); // 死亡判定を行うリストに追加
             }
         }
-
-        if (_subTrees.Count > 0)
-        {
-            foreach (var subTree in _subTrees.Keys)
-            {
-                // サブツリーの感染処理も待つようにする
-                _infectionJobHandle = JobHandle.CombineDependencies(_infectionJobHandle, subTree.SimulateInfection());
-            }
-        }
-
-        NearDeathDetermination(); // 死亡判定
-        return GetInfectedAreas();
     }
 
     /// <summary>
     /// 感染範囲内のエージェントを収集し、ジョブをスケジュール
     /// </summary>
-    private JobHandle GetInfectedAreas()
+    private JobHandle ProcessInfectionAreas()
     {
-        HashSet<(int, int)> coordsToCheck = new HashSet<(int, int)>();
-        HashSet<(int, int)> coordsToMarkSkip = new HashSet<(int, int)>();
-
+        var infectionCandidates = CollectInfectionCandidates(); // 感染判定を行うエージェントを収集
+        UpdateSkipFlags(); // エージェントのスキップフラグを確認する
+    
         lock (_lockObject)
         {
-            foreach (var coord in _infectedAgentsCoords)
-            {
-                // 対応するエージェントが取得出来なかったら以降の処理を行わないで次
-                if (!_agents.TryGetValue(coord, out var infectedAgent))
-                    continue;
-
-                // 周囲の座標を調べ、感染範囲内にいるエージェントを取得
-                bool allNeighborsInfected = true; // 初期状態は全て感染していると仮定
-                for (int dx = -_infectionRange; dx <= _infectionRange; dx++)
-                {
-                    for (int dy = -_infectionRange; dy <= _infectionRange; dy++)
-                    {
-                        (int, int) neighborCoord = (infectedAgent.X + dx, infectedAgent.Y + dy);
-
-                        // 辞書にその座標のエージェントが存在するか確認
-                        if (_agents.ContainsKey(neighborCoord))
-                        {
-                            if (_agents[neighborCoord].State != AgentState.Infected)
-                            {
-                                allNeighborsInfected = false;
-                                coordsToCheck.Add(neighborCoord); // 感染判定のリストに入れる
-                            }
-                        }
-                    }
-                }
-
-                // 全ての隣接エージェントが感染していれば、Skipフラグを設定
-                if (allNeighborsInfected)
-                {
-                    coordsToMarkSkip.Add(coord);
-                }
-            }
-
-            // ループ後に Skipフラグを設定
-            foreach (var coord in coordsToMarkSkip)
-            {
-                _agents.TryGetValue(coord, out var skipAgent);
-                skipAgent.Skip = true;
-                _agents[coord] = skipAgent;
-            }
+            _checkAgentCoords.AddRange(infectionCandidates);
         }
 
-        lock (_lockObject)
-        {
-            _checkAgentCoords.AddRange(coordsToCheck); // lockして同期をとる
-        }
-        
         if (_subTrees.Count > 0)
         {
             foreach (var subTree in _subTrees.Keys)
             {
                 _infectionJobHandle = JobHandle.CombineDependencies(
-                    _infectionJobHandle, subTree.GetInfectedAreas()
+                    _infectionJobHandle, subTree.ProcessInfectionAreas()
                 );
             }
         }
 
-        return InfectionDetermination();
+        return PerformInfectionJob();
+    }
+
+    /// <summary>
+    /// 感染判定を行うエージェントを収集する
+    /// </summary>
+    private HashSet<(int, int)> CollectInfectionCandidates()
+    {
+        HashSet<(int, int)> candidates = new();
+        _coordsToMarkSkip.Clear();
+
+        foreach (var coord in _infectedAgentsCoords)
+        {
+            if (!_agents.TryGetValue(coord, out var infectedAgent))
+                continue;
+
+            bool allNeighborsInfected = true;
+            for (int dx = -_infectionRange; dx <= _infectionRange; dx++)
+            {
+                for (int dy = -_infectionRange; dy <= _infectionRange; dy++)
+                {
+                    (int, int) neighborCoord = (infectedAgent.X + dx, infectedAgent.Y + dy);
+                    if (_agents.TryGetValue(neighborCoord, out var neighbor) && neighbor.State != AgentState.Infected)
+                    {
+                        allNeighborsInfected = false;
+                        candidates.Add(neighborCoord);
+                    }
+                }
+            }
+
+            if (allNeighborsInfected)
+            {
+                _coordsToMarkSkip.Add(coord);
+            }
+        }
+        return candidates;
+    }
+
+    /// <summary>
+    /// Skipフラグを更新
+    /// </summary>
+    private void UpdateSkipFlags()
+    {
+        foreach (var coord in _coordsToMarkSkip)
+        {
+            if (_agents.TryGetValue(coord, out var agent))
+            {
+                agent.Skip = true;
+                _agents[coord] = agent;
+            }
+        }
     }
 
     /// <summary>
     /// 感染判定を並列処理で一斉に行う
     /// </summary>
-    private JobHandle InfectionDetermination()
+    private JobHandle PerformInfectionJob()
     {
         _agentArray = new NativeArray<Agent>(_checkAgentCoords.Count, Allocator.TempJob);
         
@@ -459,8 +474,7 @@ public class MiniQuadtree
         {
             if (_agents.TryGetValue(coord, out var agent))
             {
-                _agentArray[index] = agent;
-                index++;
+                _agentArray[index++] = agent;
             }
         }
         
@@ -474,26 +488,17 @@ public class MiniQuadtree
             infectionRate = infectionRate,
         };
         
-        JobHandle jobHandle = job.Schedule(_agentArray.Length, 64); // 64スレッド単位で並列処理
-        
-        // ジョブが完了した後に Dispose を呼び出す
+        JobHandle jobHandle = job.Schedule(_agentArray.Length, 64);
         jobHandle.Complete();
         
         // 結果を _agents に反映
         for (int i = 0; i < _agentArray.Length; i++)
         {
             var updatedAgent = _agentArray[i];
-            var coord = (updatedAgent.X, updatedAgent.Y);
-
-            if (_agents.ContainsKey(coord))
-            {
-                _agents[coord] = updatedAgent; // 更新を反映
-            }
+            _agents[(updatedAgent.X, updatedAgent.Y)] = updatedAgent; // 更新を反映
         }
         
-        // メモリ解放
         _agentArray.Dispose();
-        
         return jobHandle;
     }
 
