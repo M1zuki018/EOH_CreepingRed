@@ -41,9 +41,9 @@ public class MiniCell
     {
         List<UniTask> tasks = new List<UniTask>(_agentManager.Count);
         
-        foreach (var agentManager in _agentManager.Keys)
+        foreach (var kvp in _agentManager)
         {
-            tasks.Add(agentManager.InitializeAgents(citizen));
+            tasks.Add(kvp.Key.InitializeAgents(citizen));
         }
         
         await UniTask.WhenAll(tasks); // 全ての生成が終わるまで待つ
@@ -68,9 +68,8 @@ public class MiniCell
 
             if (_jobHandle.Count > 0)
             {
-                var jobHandles = new NativeArray<JobHandle>(_jobHandle.ToArray(), Allocator.TempJob);
+                using var jobHandles = new NativeArray<JobHandle>(_jobHandle.ToArray(), Allocator.TempJob);
                 JobHandle.CompleteAll(jobHandles); // すべてのQuadtreeのジョブが完了するまで待機
-                jobHandles.Dispose(); // メモリ解放
             }
 
             
