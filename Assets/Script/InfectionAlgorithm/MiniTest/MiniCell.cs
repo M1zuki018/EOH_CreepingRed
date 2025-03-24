@@ -12,7 +12,7 @@ using UnityEngine;
 public class MiniCell
 {
     private readonly int _id; // セル自体のID
-    private readonly Dictionary<MiniAgentManager, bool> _agentManager = new Dictionary<MiniAgentManager, bool>(); // AgentManagerにリスト
+    private readonly Dictionary<MiniAgentManager, (bool skip, bool infection)> _agentManager = new Dictionary<MiniAgentManager, (bool, bool)>(); // AgentManagerにリスト
     private readonly AgentStateCount _cellStateCount;
     public AgentStateCount CellStateCount => _cellStateCount; // エージェントのカウント用のクラス
 
@@ -28,7 +28,7 @@ public class MiniCell
         
         for(int i = 0; i < managerCount; i++)
         {
-            _agentManager[new MiniAgentManager(regionMod)] = false; // 必要な個数分MiniAgentManagerを作成
+            _agentManager[new MiniAgentManager(regionMod)] = (false, false); // 必要な個数分MiniAgentManagerを作成
         }
         
         StopwatchHelper.Measure(() => InitializeAgents(citizen).Forget(),"Quadtree生成完了");
@@ -63,7 +63,7 @@ public class MiniCell
         {
             foreach (var kvp in _agentManager)
             {
-                if (kvp.Value) // スキップでなければ
+                if (kvp.Value.skip) // スキップでなければ
                 {
                     _jobHandle.Add(kvp.Key.SimulateInfection()); 
                 }
@@ -95,6 +95,8 @@ public class MiniCell
             
             HashSet<MiniAgentManager> skipManagers = new HashSet<MiniAgentManager>();
             HashSet<MiniAgentManager> restartManagers = new HashSet<MiniAgentManager>();
+            HashSet<MiniAgentManager> infectionManagers = new HashSet<MiniAgentManager>();
+            
             
             foreach (var kvp in _agentManager)
             {
@@ -113,25 +115,49 @@ public class MiniCell
                         infectedCount++;
                     }
                 }
+                
+                float infectionRatio = (float)infectedCount / totalAgents;
+                
+                // 感染者が６割以上なら感染処理を行う
+                if (infectionRatio >= 0.6f && !kvp.Value.infection)
+                {
+                    infectionManagers.Add(kvp.Key);
+                }
+                
 
                 if (!isAllHealthy || infectedCount != totalAgents)
                 {
-                    restartManagers.Add(kvp.Key);
+                    if(!kvp.Value.skip) restartManagers.Add(kvp.Key);
                     continue;
                 }
                 
                 // 全員が健康状態 もしくは 全員が感染状態の場合、スキップするようにする
                 skipManagers.Add(kvp.Key);
             }
-
+            
+            // 再起動処理
             foreach (var restart in restartManagers)
             {
-                _agentManager[restart] = true;
+                _agentManager[restart] = (true, _agentManager[restart].infection);
             }
             
+            // スキップ処理
             foreach (var skip in skipManagers)
             {
-                _agentManager[skip] = false;
+                _agentManager[skip] = (false, _agentManager[skip].infection);
+            }
+
+            if (infectionManagers.Count > 0)
+            {
+                for (int i = 0; i < infectionManagers.Count; i++)
+                {
+                    
+                }
+            }
+            // 感染拡大処理
+            foreach (var infection in infectionManagers)
+            {
+                
             }
             
         }, $"\ud83d\udfe6セル(ID:{_id}) Quadtreeのステート集計速度");

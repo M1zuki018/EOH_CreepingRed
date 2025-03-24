@@ -57,18 +57,21 @@ public class MiniAgentManager
     public async UniTask InitializeAgents(int citizen, bool infection = false)
     {
         await GenerateAgents(citizen);
-        if(infection) TestInfection();
+        if(infection) Infection(1);
     }
 
     /// <summary>
-    /// 一人感染者を発生させる　
+    /// エージェントを感染させる処理
     /// </summary>
-    private void TestInfection()
+    public void Infection(int count)
     {
-        var coord = (0, 0);
-        _agents.TryGetValue(coord, out Agent targetAgent);
-        targetAgent.Infect();
-        _agents[coord] = targetAgent;
+        for (int i = 0; i < count; i++)
+        {
+            var coord = (count % _maxX, count % _maxX); // 座標を作成
+            _agents.TryGetValue(coord, out Agent targetAgent);
+            targetAgent.Infect();
+            _agents[coord] = targetAgent; // 感染させたエージェントを辞書に戻す
+        }
     }
     
     /// <summary>
@@ -199,7 +202,7 @@ public class MiniAgentManager
                     }
                 }
             }
-
+            
             if (allNeighborsInfected)
             {
                 _coordsToMarkSkip.Add(coord);
