@@ -114,7 +114,7 @@ public class MiniQuadtree
         
         // サブツリーを作成
         int requiredDepth = CalculateRequiredDepth(citizen);
-        EnsureSubTrees(requiredDepth);
+        await EnsureSubTrees(requiredDepth);
         
         // 直接適切な辞書にエージェントを追加
         for (int i = 0; i < citizen; i++)
@@ -148,9 +148,10 @@ public class MiniQuadtree
     /// <summary>
     /// 必要なサブツリーを確保する処理
     /// </summary>
-    private void EnsureSubTrees(int requiredDepth)
+    private async UniTask EnsureSubTrees(int requiredDepth)
     {
-        if (_depth >= requiredDepth) return; // すでに十分な深さなら何もしない
+        if (_depth >= requiredDepth) 
+            return; // すでに十分な深さなら何もしない
 
         if (_depth < requiredDepth) // 現在のツリーが十分な深さに達していない場合分割を行う
         {
@@ -159,7 +160,7 @@ public class MiniQuadtree
 
         foreach (var subtree in _subTrees)
         {
-            subtree.Key.EnsureSubTrees(requiredDepth); // サブツリーが生成されていたら再帰的に処理を行う
+            await subtree.Key.EnsureSubTrees(requiredDepth); // サブツリーが生成されていたら再帰的に処理を行う
         }
     }
     
@@ -175,32 +176,19 @@ public class MiniQuadtree
     
     /// <summary>
     /// エージェントを適切なサブツリーに割り当てる
-    /// ※大元のQuadtreeでのみ呼ばれる
     /// </summary>
     private MiniQuadtree FindTargetTree(Agent agent)
     {
         MiniQuadtree currentTree = this;
         Vector2 agentPos = new Vector2(agent.X, agent.Y);
-    
-        while (currentTree._subTrees.Count > 0)
-        {
-            MiniQuadtree bestTree = null;
-            foreach (var subTree in currentTree._subTrees.Keys)
-            {
-                if (subTree._bounds.Contains(agentPos))
-                {
-                    bestTree = subTree;
-                    break; // 最初に見つかったものを採用
-                }
-            }
 
-            if (bestTree == null)
+        foreach (var subTree in _subTrees.Keys)
+        {
+            if (subTree._bounds.Contains(agentPos))
             {
-                Debug.LogWarning($"Agent ({agent.X}, {agent.Y}) が適切なサブツリーに属していません。現在のツリー: {currentTree._bounds}");
+                currentTree = subTree.FindTargetTree(agent); // 再帰的に呼び出して適切なツリーを特定する
                 break;
             }
-
-            currentTree = bestTree;
         }
 
         return currentTree;
@@ -368,12 +356,18 @@ public class MiniQuadtree
             }
         }
 
-        foreach (var subTree in _subTrees.Keys)
-        {
-            //Debug.Log(subTree._agents.Count);
-        }
+        DebugLog();
         
         return ProcessInfectionAreas();
+    }
+
+    private void DebugLog()
+    {
+        foreach (var subTree in _subTrees.Keys)
+        {
+            Debug.Log($"深さ{_depth}   agent数{subTree._agents.Count}");
+            subTree.DebugLog();
+        }
     }
 
     /// <summary>
