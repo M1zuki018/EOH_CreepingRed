@@ -10,7 +10,7 @@ public static class InfectionParameters
     public static float EnvMod = 0f;
 
     /// <summary>致死率</summary>
-    public static float LethalityRate = 50f;
+    public static float LethalityRate = 0f;
 
     /// <summary>感染範囲</summary>
     public static int InfectionRange = 2;

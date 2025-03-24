@@ -436,6 +436,11 @@ public class MiniQuadtree
                         allNeighborsInfected = false;
                         candidates.Add(neighborCoord);
                     }
+                    else
+                    {
+                        // 近隣のサブツリーも探索
+                        GetNeighborsFromSubtrees(neighborCoord, ref candidates, ref allNeighborsInfected);
+                    }
                 }
             }
 
@@ -444,7 +449,23 @@ public class MiniQuadtree
                 _coordsToMarkSkip.Add(coord);
             }
         }
+        
         return candidates;
+    }
+    
+    /// <summary>
+    /// サブツリーを跨いで感染範囲内のエージェントを取得
+    /// </summary>
+    private void GetNeighborsFromSubtrees((int, int) coord, ref HashSet<(int, int)> candidates, ref bool allNeighborsInfected)
+    {
+        foreach (var (subTree, bounds) in _subTrees)
+        {
+            if (subTree._agents.TryGetValue(coord, out var neighbor) && neighbor.State != AgentState.Infected)
+            {
+                allNeighborsInfected = false;
+                candidates.Add(coord);
+            }
+        }
     }
 
     /// <summary>
