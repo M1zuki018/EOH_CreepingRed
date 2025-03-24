@@ -39,7 +39,6 @@ public class MiniQuadtree
     private float _difficultyMod; // 感染確率計算の難易度補正
     private int _infectionRange; // 感染範囲
     private HashSet<(int x, int y)> _coordsToMarkSkip = new HashSet<(int x, int y)>();
-    private System.Random _rand = new System.Random();
 
     public MiniQuadtree(Rect bounds, float regionMod, int depth = 0)
     {
@@ -487,7 +486,6 @@ public class MiniQuadtree
         {
             agents = _agentArray,
             infectionRate = infectionRate,
-            randomNumber = _rand.Next(0,100)
         };
         
         JobHandle jobHandle = job.Schedule(_agentArray.Length, 64);
@@ -509,7 +507,6 @@ public class MiniQuadtree
     {
         public NativeArray<Agent> agents;
         public float infectionRate;
-        public int randomNumber;
         
         public void Execute(int index)
         {
@@ -521,7 +518,7 @@ public class MiniQuadtree
             float infectionProbability = infectionRate * (1 - targetResistMod);
             
             // 感染判定。乱数が感染確率
-            if (infectionProbability > randomNumber)
+            if (infectionProbability > agent.RandomNumber())
             {
                 agent.Infect(); // 感染
             }
@@ -555,7 +552,6 @@ public class MiniQuadtree
         {
             agents = _nearDeathAgentsArray,
             lethalityRate = InfectionParameters.LethalityRate,
-            randomNumber = _rand.Next(0, 100)
         };
         
         JobHandle jobHandle = job.Schedule(_nearDeathAgentsArray.Length, 64);
@@ -583,13 +579,12 @@ public class MiniQuadtree
     {
         public NativeArray<Agent> agents;
         public float lethalityRate; // 致死率
-        public int randomNumber;
         
         public void Execute(int index)
         {
             Agent agent = agents[index];
 
-            if (lethalityRate > randomNumber)
+            if (lethalityRate > agent.RandomNumber())
             {
                 agent.NearDeath();
             }
