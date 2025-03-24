@@ -8,37 +8,30 @@ using UnityEngine;
 
 /// <summary>
 /// 縮小テスト用エージェント約10万人が詰められたセル。感染シミュレーションを行う部分
-/// ※3/22 魔法士は感染シミュレーションには入れずに、イベント側で扱う
 /// </summary>
 public class MiniCell
 {
     private readonly int _id; // セル自体のID
-    
-    private readonly MiniQuadtree _quadtree;
-    private readonly Dictionary<MiniAgentManager, bool> _agentManager = new Dictionary<MiniAgentManager, bool>();
+    private readonly Dictionary<MiniAgentManager, bool> _agentManager = new Dictionary<MiniAgentManager, bool>(); // AgentManagerにリスト
     private readonly AgentStateCount _cellStateCount;
-    public AgentStateCount CellStateCount => _cellStateCount;
+    public AgentStateCount CellStateCount => _cellStateCount; // エージェントのカウント用のクラス
 
-    private int _managerCapacity = 10000;
-    
-    private List<JobHandle> _jobHandle = new List<JobHandle>();
+    private const int ManagerCapacity = 10000; // 一つのAgentManagerクラスに持たせるAgentの総数の上限
+    private readonly List<JobHandle> _jobHandle = new List<JobHandle>(); // エージェント生成JobのHandle
     
     public MiniCell(int id, int citizen, float regionMod)
     {
         _id = id;
-        
-        // 感染確率を渡してQuadtreeを作成。深さは初期値のゼロ
-        //_quadtree = new MiniQuadtree(new Rect(0, 0, 1000, 1000), regionMod);
-        for(int i = 0; i < Mathf.Ceil(citizen / _managerCapacity); i++)
-        {
-            _agentManager.Add(new MiniAgentManager(regionMod), false);
-        }
         _cellStateCount = new AgentStateCount();
-
-        StopwatchHelper.Measure(() =>
+        
+        int managerCount = Mathf.CeilToInt((float)citizen / ManagerCapacity); // 人口÷エージェント総数の上限
+        
+        for(int i = 0; i < managerCount; i++)
         {
-            InitializeAgents(citizen).Forget();
-        },"Quadtree生成完了");
+            _agentManager[new MiniAgentManager(regionMod)] = false; // 必要な個数分MiniAgentManagerを作成
+        }
+        
+        StopwatchHelper.Measure(() => InitializeAgents(citizen).Forget(),"Quadtree生成完了");
     }
 
     /// <summary>
@@ -53,7 +46,7 @@ public class MiniCell
             tasks.Add(agentManager.InitializeAgents(citizen));
         }
         
-        await UniTask.WhenAll(tasks);
+        await UniTask.WhenAll(tasks); // 全ての生成が終わるまで待つ
     }
 
     /// <summary>
@@ -65,23 +58,22 @@ public class MiniCell
         
         StopwatchHelper.Measure(() =>
         {
-            if (_agentManager.Count == 0)
+            foreach (var kvp in _agentManager)
             {
-                return;
-            }
-            foreach (var agentManager in _agentManager.Keys)
-            {
-                _jobHandle.Add(agentManager.SimulateInfection()); // Quadtreeの更新処理
-                // if (_agentManager[agentManager])
-                // {
-                //     _jobHandle.Add(agentManager.SimulateInfection()); // Quadtreeの更新処理
-                // }
+                if (kvp.Value) // スキップでなければ
+                {
+                    _jobHandle.Add(kvp.Key.SimulateInfection()); 
+                }
             }
 
-            var jobHandles = _jobHandle.ToNativeArray(Allocator.TempJob);
-            JobHandle.CompleteAll(jobHandles); // すべてのQuadtreeのジョブが完了するまで待機
+            if (_jobHandle.Count > 0)
+            {
+                var jobHandles = new NativeArray<JobHandle>(_jobHandle.ToArray(), Allocator.TempJob);
+                JobHandle.CompleteAll(jobHandles); // すべてのQuadtreeのジョブが完了するまで待機
+                jobHandles.Dispose(); // メモリ解放
+            }
+
             
-            jobHandles.Dispose();
                 
         },$"\ud83d\udfe6セル(ID:{_id}) 感染シミュレーションの更新速度");
         
@@ -97,19 +89,18 @@ public class MiniCell
         
         await StopwatchHelper.MeasureAsync(async () =>
         {
-            if (_agentManager.Count == 0)
+            if (_agentManager.Count == 0) return;
+            
+            HashSet<MiniAgentManager> skipManagers = new HashSet<MiniAgentManager>();
+            HashSet<MiniAgentManager> restartManagers = new HashSet<MiniAgentManager>();
+            
+            foreach (var kvp in _agentManager)
             {
-                return;
-            }
+                var allAgents = kvp.Key.GetAllAgents(); // AgentManagerから全てのエージェントを取得する
             
-            var skipAgentManager = new List<MiniAgentManager>();
-            
-            foreach (var agentManager in _agentManager.Keys)
-            {
-                var allAgents = agentManager.GetAllAgents();
-            
-                bool isAllHealthy = true;
-                int infectedCount = 0;
+                bool isAllHealthy = true; // 全てのエージェントが感染しているか
+                int infectedCount = 0; // 感染者の人数
+                int totalAgents = allAgents.Count();
                 
                 foreach (var agent in allAgents)
                 {
@@ -121,13 +112,22 @@ public class MiniCell
                     }
                 }
 
-                if (!isAllHealthy)
+                if (!isAllHealthy || infectedCount != totalAgents)
                 {
-                    skipAgentManager.Add(agentManager);
+                    restartManagers.Add(kvp.Key);
+                    continue;
                 }
+                
+                // 全員が健康状態 もしくは 全員が感染状態の場合、スキップするようにする
+                skipManagers.Add(kvp.Key);
             }
 
-            foreach (var skip in skipAgentManager)
+            foreach (var restart in restartManagers)
+            {
+                _agentManager[restart] = true;
+            }
+            
+            foreach (var skip in skipManagers)
             {
                 _agentManager[skip] = false;
             }
