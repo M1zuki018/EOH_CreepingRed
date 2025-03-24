@@ -59,10 +59,10 @@ public class MiniCell
     {
         _cellStateCount.ResetStateCount();
         
-        var allAgents = _quadtree.GetAllAgents();
-        
         await StopwatchHelper.MeasureAsync(async () =>
         {
+            var allAgents = _quadtree.GetAllAgents();
+            
             foreach (var agent in allAgents)
             {
                 _cellStateCount.AddState(agent.State); // 各ステートをカウント

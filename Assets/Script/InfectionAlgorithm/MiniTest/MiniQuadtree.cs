@@ -360,8 +360,11 @@ public class MiniQuadtree
         {
             foreach (var subTree in _subTrees.Keys)
             {
-                // サブツリーの感染処理も待つようにする
-                _infectionJobHandle = JobHandle.CombineDependencies(_infectionJobHandle, subTree.SimulateInfection());
+                if (_subTrees[subTree])
+                {
+                    // サブツリーの感染処理も待つようにする
+                    _infectionJobHandle = JobHandle.CombineDependencies(_infectionJobHandle, subTree.SimulateInfection());
+                }
             }
         }
         
@@ -624,6 +627,11 @@ public class MiniQuadtree
             yield return agent;
         }
 
+        bool healthy = true;
+        int infectionCount = 0;
+        var skipTree = new List<MiniQuadtree>();
+        var awakeTree = new List<MiniQuadtree>();
+        
         foreach (var subTree in _subTrees.Keys)
         {
             foreach (var agent in subTree.GetAllAgents())
@@ -631,9 +639,37 @@ public class MiniQuadtree
                 // サブツリー内のエージェントが _agents に含まれていないかチェック
                 if (!_agents.ContainsKey((agent.X, agent.Y)))  // 重複を防ぐ
                 {
+                    if (agent.State == AgentState.Infected)
+                    {
+                        infectionCount++;
+                        healthy = false;
+                    }
                     yield return agent;
                 }
             }
+            
+            if (healthy || infectionCount == subTree._agents.Count)
+            {
+                skipTree.Add(subTree);
+            }
+            else
+            {
+                awakeTree.Add(subTree);
+            }
+        }
+        
+        // サブツリー内の全てのエージェントが健康状態　もしくは
+        // サブツリー内の全てのエージェントが感染状態なら処理をスキップできるようにする
+        foreach (var subTree in skipTree)
+        {
+            Debug.Log("停止");
+            _subTrees[subTree] = false;
+        }
+
+        foreach (var subTree in awakeTree)
+        {
+            Debug.Log("再起動");
+            _subTrees[subTree] = true;
         }
     }
 }
