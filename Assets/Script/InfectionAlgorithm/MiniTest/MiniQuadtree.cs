@@ -622,33 +622,36 @@ public class MiniQuadtree
     /// </summary>
     public IEnumerable<Agent> GetAllAgents()
     {
+        // 自分のエージェントを最初に返す
         foreach (var agent in _agents.Values)
         {
             yield return agent;
         }
-
-        bool healthy = true;
-        int infectionCount = 0;
+        
         var skipTree = new List<MiniQuadtree>();
         var awakeTree = new List<MiniQuadtree>();
         
+        // サブツリー内のエージェントを処理
         foreach (var subTree in _subTrees.Keys)
         {
+            bool isAllHealthy = true;
+            int infectedCount = 0;
+            
             foreach (var agent in subTree.GetAllAgents())
             {
-                // サブツリー内のエージェントが _agents に含まれていないかチェック
                 if (!_agents.ContainsKey((agent.X, agent.Y)))  // 重複を防ぐ
                 {
                     if (agent.State == AgentState.Infected)
                     {
-                        infectionCount++;
-                        healthy = false;
+                        infectedCount++;
+                        isAllHealthy = false;
                     }
                     yield return agent;
                 }
             }
             
-            if (healthy || infectionCount == subTree._agents.Count)
+            // サブツリー内のエージェントが全て健康、もしくは全て感染状態の場合
+            if (isAllHealthy || infectedCount == subTree._agents.Count)
             {
                 skipTree.Add(subTree);
             }
@@ -662,14 +665,20 @@ public class MiniQuadtree
         // サブツリー内の全てのエージェントが感染状態なら処理をスキップできるようにする
         foreach (var subTree in skipTree)
         {
-            Debug.Log("停止");
-            _subTrees[subTree] = false;
+            if (_subTrees[subTree])
+            {
+                Debug.Log("停止");
+                _subTrees[subTree] = false;
+            }
         }
 
         foreach (var subTree in awakeTree)
         {
-            Debug.Log("再起動");
-            _subTrees[subTree] = true;
+            if (!_subTrees[subTree])
+            {
+                Debug.Log("再起動");
+                _subTrees[subTree] = true;
+            }
         }
     }
 }
