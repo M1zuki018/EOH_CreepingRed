@@ -11,6 +11,7 @@ public class MiniCell
     private readonly int _id; // セル自体のID
     
     private readonly MiniQuadtree _quadtree;
+    private readonly MiniAgentManager _agentManager;
     private readonly AgentStateCount _cellStateCount;
     public AgentStateCount CellStateCount => _cellStateCount;
     
@@ -21,7 +22,8 @@ public class MiniCell
         _id = id;
         
         // 感染確率を渡してQuadtreeを作成。深さは初期値のゼロ
-        _quadtree = new MiniQuadtree(new Rect(0, 0, 1000, 1000), regionMod);
+        //_quadtree = new MiniQuadtree(new Rect(0, 0, 1000, 1000), regionMod);
+        _agentManager = new MiniAgentManager(regionMod);
         _cellStateCount = new AgentStateCount();
 
         StopwatchHelper.Measure(() =>
@@ -35,7 +37,7 @@ public class MiniCell
     /// </summary>
     private async UniTask InitializeAgents(int citizen)
     {
-        await _quadtree.InitializeAgents(citizen);
+        await _agentManager.InitializeAgents(citizen);
     }
 
     /// <summary>
@@ -45,7 +47,7 @@ public class MiniCell
     {
         StopwatchHelper.Measure(() =>
         {
-            _quadtreeJobHandle = _quadtree.SimulateInfection(); // Quadtreeの更新処理
+            _quadtreeJobHandle = _agentManager.SimulateInfection(); // Quadtreeの更新処理
             _quadtreeJobHandle.Complete(); // すべてのQuadtreeのジョブが完了するまで待機
         },$"\ud83d\udfe6セル(ID:{_id}) 感染シミュレーションの更新速度");
         
@@ -61,7 +63,7 @@ public class MiniCell
         
         await StopwatchHelper.MeasureAsync(async () =>
         {
-            var allAgents = _quadtree.GetAllAgents();
+            var allAgents = _agentManager.GetAllAgents();
             
             foreach (var agent in allAgents)
             {
