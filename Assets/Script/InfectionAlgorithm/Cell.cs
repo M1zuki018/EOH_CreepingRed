@@ -16,21 +16,21 @@ public class Cell
 
     private JobHandle _jobHandle; // エージェント生成JobのHandle
     
-    public Cell(int id, int citizen, float regionMod)
+    public Cell(int id, int citizen, float regionMod, bool infection)
     {
         _id = id;
         _cellStateCount = new AgentStateCount();
         _agentManager = new AgentManager(regionMod);
-        StopwatchHelper.Measure(() => InitializeAgents(citizen).Forget(),"Agent生成完了");
-
+        StopwatchHelper.Measure(() => InitializeAgents(citizen, infection).Forget(),"Agent生成完了");
     }
 
     /// <summary>
     /// エージェントの生成
     /// </summary>
-    private async UniTask InitializeAgents(int citizen)
+    private async UniTask InitializeAgents(int citizen, bool infection)
     {
         await _agentManager.InitializeAgents(citizen);
+        if(infection) Infection(1);
     }
 
     /// <summary>

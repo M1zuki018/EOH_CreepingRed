@@ -23,20 +23,20 @@ public class Area
     /// <summary>
     /// エリアのコンストラクタ
     /// </summary>
-    public Area(AreaSettingsSO settings)
+    public Area(AreaSettingsSO settings, bool infection)
     {
         _citizenPopulation = settings.CitizenPopulation * 1000;
         _infectionRate = settings.InfectionRate;
         _specialFlags = settings.SpecialFlags ?? new List<string>();
         _areaStateCount = new AgentStateCount();
         
-        InitializeCells(settings);
+        InitializeCells(settings, infection);
     }
 
     /// <summary>
     /// 初期化処理：セルを生成する
     /// </summary>
-    private void InitializeCells(AreaSettingsSO settings)
+    private void InitializeCells(AreaSettingsSO settings, bool infection)
     {
         StopwatchHelper.Measure(() =>
         {
@@ -48,7 +48,14 @@ public class Area
             for (int i = 0; i < cellCount; i++)
             {
                 // 最初のセルだけ感染させる
-                _cells.Add(new Cell(i, cellPopulation, _infectionRate * 0.01f));
+                if (infection)
+                {
+                    _cells.Add(new Cell(i, cellPopulation, _infectionRate * 0.01f, i == 0));
+                }
+                else
+                {
+                    _cells.Add(new Cell(i, cellPopulation, _infectionRate * 0.01f, false));
+                }
             }
 
             // あまりがあった場合
@@ -56,19 +63,12 @@ public class Area
             if (remainderPopulation > 0)
             {
                 // 他にセルが登録されていなければあまりのセルを感染させる
-                _cells.Add(new Cell(cellCount, remainderPopulation, _infectionRate * 0.01f));
+                if(infection)_cells.Add(new Cell(cellCount, remainderPopulation, _infectionRate * 0.01f, cellCount == 0));
+                else _cells.Add(new Cell(cellCount, remainderPopulation, _infectionRate * 0.01f, false));
             }
                 
             DebugLogHelper.LogTestOnly($"{settings.Name.ToString()}エリアのセルの数：{_cells.Count}");
         }, "\ud83c\udfde\ufe0fエリア　セル生成時間");
-    }
-
-    /// <summary>
-    /// 最初のセルを感染させる
-    /// </summary>
-    public void Infection()
-    {
-        _cells[_infectionIndex].Infection(1);
     }
 
     /// <summary>

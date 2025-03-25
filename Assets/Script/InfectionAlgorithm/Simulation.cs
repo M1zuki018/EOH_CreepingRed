@@ -23,7 +23,7 @@ public class Simulation : IDisposable
     private async void UpdateSimulation(int time)
     {
         await _grid.SimulateInfectionAsync();
-        Debug.Log($"\u23f1\ufe0fTimer： {time} 時間経過");
+        DebugLogHelper.LogTestOnly($"\u23f1\ufe0fTimer： {time} 時間経過");
     }
 
     public void Dispose()

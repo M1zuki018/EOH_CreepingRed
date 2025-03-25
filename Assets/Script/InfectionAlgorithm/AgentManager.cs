@@ -123,7 +123,7 @@ public class AgentManager
 
     #region 感染シミュレーション
 
-    // <summary>
+    /// <summary>
     /// 感染状態のエージェントで、Skipフラグがfalseのエージェントを探す
     /// </summary>
     public JobHandle SimulateInfection()

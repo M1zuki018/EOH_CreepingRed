@@ -24,6 +24,10 @@ public class Grid
     {
         StopwatchHelper.AlwaysUse(() =>
         {
+            int index = GameSettingsManager.StartPointIndex;
+            int startX = index % 5;
+            int startY = index / 5;
+            
             foreach (var areaSetting in areaSettings)
             {
                 int x = areaSetting.X;
@@ -32,8 +36,9 @@ public class Grid
                 // Areasの範囲を超えないかチェック
                 if (x >= 0 && x < _areas.GetLength(0) && y >= 0 && y < _areas.GetLength(1))
                 {
+                    var check = startX == x && startY == y;
                     // SOで設定した座標に基づいてエリアを配置
-                    _areas[x, y] = new Area(areaSetting);
+                    _areas[x, y] = new Area(areaSetting, check);
                     DebugLogHelper.LogTestOnly($"エリア作成 ({x}, {y}) : {areaSetting.Name.ToString()}");
                 }
                 else
@@ -41,22 +46,7 @@ public class Grid
                     Debug.LogWarning($" MiniGrid：{areaSetting.Name}　({x}, {y}) は無効な座標です");
                 }
             }
-            
-            StartInfection();
         },"\ud83d\uddfa\ufe0fグリッド 初期化");
-    }
-    
-    /// <summary>
-    /// 感染を始める
-    /// </summary>
-    public void StartInfection()
-    {
-        // Title画面で設定した感染開始地点から、感染させる座標を割り出す
-        int index = GameSettingsManager.StartPointIndex;
-        int x = index % 5;
-        int y = index / 5;
-        
-        _areas[x,y].Infection();
     }
     
     /// <summary>

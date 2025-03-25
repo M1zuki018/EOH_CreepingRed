@@ -8,7 +8,7 @@ public static class GameSettingsManager
     private static GameSettings _instance;
     
     private static DifficultyEnum _difficulty = DifficultyEnum.Breeze;
-    private static int _startPointIndex = 2;
+    private static int _startPointIndex = 7;
     
     private static GameSettings Instance
     {
