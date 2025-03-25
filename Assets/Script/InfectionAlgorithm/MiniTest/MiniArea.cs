@@ -2,28 +2,26 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
+using UnityEngine;
 
 /// <summary>
 /// 縮小テスト用各区域を管理するクラス
 /// </summary>
 public class MiniArea
 {
-    #region パラメータ
-
     // 基本情報
     private readonly int _citizenPopulation; // 一般市民人口
     private readonly int _infectionRate; // 感染成功率（%）
 
     // 特殊フラグ（条件）
     private List<string> _specialFlags;
-
-    #endregion
     
-    private List<MiniCell> _cells = new List<MiniCell>();
+    private List<MiniCell> _cells = new List<MiniCell>(); // セルのリスト
+    private int _infectionIndex; // 感染が行われているセルのインデックス
     private readonly AgentStateCount _areaStateCount;
-    public AgentStateCount AreaStateCount => _areaStateCount;
+    public AgentStateCount AreaStateCount => _areaStateCount; // Areaクラスのエージェントの状態の集計結果
     
-    private List<UniTask> _tasks = new List<UniTask>();
+    private List<UniTask> _tasks = new List<UniTask>(); // シミュレーション更新タスクのリスト
 
     /// <summary>
     /// エリアのコンストラクタ
@@ -54,14 +52,14 @@ public class MiniArea
                 for (int i = 0; i < cellCount; i++)
                 {
                     // 第四引数　Infection　bool型の入れ方を考える
-                    _cells.Add(new MiniCell(i, cellPopulation, _infectionRate * 0.01f, true));
+                    _cells.Add(new MiniCell(i, cellPopulation, _infectionRate * 0.01f, i == 0));
                 }
 
                 // あまりがあった場合
                 int remainderPopulation = _citizenPopulation - (cellCount * cellPopulation);
                 if (remainderPopulation > 0)
                 {
-                    _cells.Add(new MiniCell(cellCount, remainderPopulation, _infectionRate * 0.01f, true));
+                    _cells.Add(new MiniCell(cellCount, remainderPopulation, _infectionRate * 0.01f, _cells.Count == 0));
                 }
                 
                 DebugLogHelper.LogImportant($"{settings.Name.ToString()}エリアのセルの数：{_cells.Count}");
@@ -115,6 +113,15 @@ public class MiniArea
             );
         }, "\ud83c\udfde\ufe0fエリア 各セルのステートの集計速度");
 
+        // 感染フラグが立っていたら、次のセルに感染を広める
+        if (_cells[_infectionIndex].Spreading)
+        {
+            if (_infectionIndex != _cells.Count)
+            {
+                _cells[++_infectionIndex].Infection(1);
+            }
+        }
+        
         await UniTask.CompletedTask; // 非同期完了を通知
     }
 }

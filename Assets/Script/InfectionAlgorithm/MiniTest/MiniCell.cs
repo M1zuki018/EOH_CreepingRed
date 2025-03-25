@@ -13,6 +13,7 @@ public class MiniCell
     private readonly AgentStateCount _cellStateCount;
     public AgentStateCount CellStateCount => _cellStateCount; // エージェントのカウント用のクラス
     public bool IsActive { get; private set; } // シミュレーションが起動中かどうか
+    public bool Spreading { get; private set; } // 他のセルに感染を広げるかどうか
 
     private JobHandle _jobHandle; // エージェント生成JobのHandle
     
@@ -31,6 +32,14 @@ public class MiniCell
     {
         await _agentManager.InitializeAgents(citizen);
         if(infection) _agentManager.Infection(1); // 感染させるセルに対してのみフラグを立てる
+    }
+
+    /// <summary>
+    /// 感染開始処理
+    /// </summary>
+    public void Infection(int count)
+    {
+        _agentManager.Infection(count);
     }
 
     /// <summary>
@@ -59,19 +68,21 @@ public class MiniCell
 
         await StopwatchHelper.MeasureAsync(async () =>
             {
-                int infection = 0;
                 var allAgents = _agentManager.GetAllAgents(); // AgentManagerから全てのエージェントを取得する
                 
                 foreach (var agent in allAgents)
                 {
                     _cellStateCount.AddState(agent.State); // 各ステートをカウント
-                    if (agent.State == AgentState.Infected)
-                    {
-                        infection++;
-                    }
+                }
+
+                // セル内の感染率が8割を越えたらフラグを立てる
+                if ((float)_cellStateCount.Infected / allAgents.Count() > 0.8f)
+                {
+                    Spreading = true;
                 }
                 
-                if (infection == allAgents.Count() || infection == 0)
+                // 全員死亡 もしくは 全員健康状態のときは処理をスキップするようにする
+                if (_cellStateCount.NearDeath == allAgents.Count() || _cellStateCount.Healthy == 0)
                 {
                     IsActive = false;
                     return;
@@ -80,7 +91,6 @@ public class MiniCell
                 if (!IsActive)
                 {
                     IsActive = true;
-                    Debug.Log("起動");
                 }
 
             }, $"\ud83d\udfe6セル(ID:{_id}) Quadtreeのステート集計速度");
