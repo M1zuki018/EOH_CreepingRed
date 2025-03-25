@@ -1,6 +1,4 @@
-#nullable enable
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 
@@ -9,12 +7,13 @@ using UnityEngine;
 /// </summary>
 public class Grid
 {
-    public Area[,] Areas { get; } = new Area[1 ,1]; // エリアを動的に変更する予定がないので二次元配列でやってみる
-    public AgentStateCount TotalStateCount { get; private set; }
+    private readonly Area[,] _areas = new Area[5 ,4]; // エリアクラスの二次元配列
+    private readonly AgentStateCount _totalStateCount; // ゲーム内に存在するエージェントの累計
+    private readonly List<UniTask> _tasks = new List<UniTask>();
 
     public Grid(List<AreaSettingsSO> areaSettings)
     {
-        TotalStateCount = new AgentStateCount();
+        _totalStateCount = new AgentStateCount();
         InitializeAreas(areaSettings);
     }
 
@@ -23,24 +22,41 @@ public class Grid
     /// </summary>
     private void InitializeAreas(List<AreaSettingsSO> areaSettings)
     {
-        foreach (var areaSetting in areaSettings)
+        StopwatchHelper.AlwaysUse(() =>
         {
-            int x = areaSetting.X;
-            int y = areaSetting.Y;
+            foreach (var areaSetting in areaSettings)
+            {
+                int x = areaSetting.X;
+                int y = areaSetting.Y;
+
+                // Areasの範囲を超えないかチェック
+                if (x >= 0 && x < _areas.GetLength(0) && y >= 0 && y < _areas.GetLength(1))
+                {
+                    // SOで設定した座標に基づいてエリアを配置
+                    _areas[x, y] = new Area(areaSetting);
+                    DebugLogHelper.LogTestOnly($"エリア作成 ({x}, {y}) : {areaSetting.Name.ToString()}");
+                }
+                else
+                {
+                    Debug.LogWarning($" MiniGrid：{areaSetting.Name}　({x}, {y}) は無効な座標です");
+                }
+            }
             
-            // Areasの範囲を超えないかチェック
-            if (x >= 0 && x < Areas.GetLength(0) && y >= 0 && y < Areas.GetLength(1))
-            {
-                // SOで設定した座標に基づいてエリアを配置
-                Areas[x, y] = new Area(areaSetting);
-                Debug.Log($"Area placed at ({x}, {y}) : {areaSetting.Name.ToString()}");
-            }
-            else
-            {
-                Debug.LogWarning($"Invalid area coordinates ({x}, {y}) for area: {areaSetting.Name}");
-            }
-        }
-        Debug.Log($"Grid Initialize Finish");
+            StartInfection();
+        },"\ud83d\uddfa\ufe0fグリッド 初期化");
+    }
+    
+    /// <summary>
+    /// 感染を始める
+    /// </summary>
+    public void StartInfection()
+    {
+        // Title画面で設定した感染開始地点から、感染させる座標を割り出す
+        int index = GameSettingsManager.StartPointIndex;
+        int x = index % 5;
+        int y = index / 5;
+        
+        _areas[x,y].Infection();
     }
     
     /// <summary>
@@ -48,43 +64,60 @@ public class Grid
     /// </summary>
     public async UniTask SimulateInfectionAsync()
     {
-        List<Task> tasks = new List<Task>();
-        foreach (var area in Areas)
-        {
-            tasks.Add(Task.Run(() => area.SimulateInfectionAsync()));
-        }
+        _tasks.Clear(); // 最初にTaskのリストをクリアして再利用
         
-        await Task.WhenAll(tasks);  // すべてのタスクが完了するまで待機
+        await StopwatchHelper.AlwaysUseAsync(async () =>
+        {
+            for (int x = 0; x < _areas.GetLength(0); x++)
+            {
+                for (int y = 0; y < _areas.GetLength(1); y++)
+                {
+                    var area = _areas[x, y];
+                    if (area != null)
+                    {
+                        _tasks.Add(area.SimulateInfectionAsync());
+                    }
+                }
+            }
+        
+            await UniTask.WhenAll(_tasks);  // すべてのタスクが完了するまで待機
+        }, "\ud83d\uddfa\ufe0fグリッド シミュレーション更新");
+        
+        
         UpdateStateCount();
     }
 
     private void UpdateStateCount()
     {
-        TotalStateCount.ResetStateCount(); // 一度リセットする
+        _totalStateCount.ResetStateCount(); // 一度リセットする
         
-        foreach (var area in Areas)
+        StopwatchHelper.Measure(() =>
         {
-            TotalStateCount.UpdateStateCount(area.AreaStateCount.Healthy, area.AreaStateCount.Infected,
-                area.AreaStateCount.NearDeath, area.AreaStateCount.Ghost, area.AreaStateCount.Perished);
-        }
+            // バッチ処理で追加
+            int totalHealthy = 0, totalInfected = 0, totalNearDeath = 0;
+            int totalGhost = 0, totalPerished = 0, totalMagicSoldiers = 0;
+
+            for (int x = 0; x < _areas.GetLength(0); x++)
+            {
+                for (int y = 0; y < _areas.GetLength(1); y++)
+                {
+                    var area = _areas[x, y];
+                    if (area == null) continue;
+
+                    totalHealthy += area.AreaStateCount.Healthy;
+                    totalInfected += area.AreaStateCount.Infected;
+                    totalNearDeath += area.AreaStateCount.NearDeath;
+                    totalGhost += area.AreaStateCount.Ghost;
+                    totalPerished += area.AreaStateCount.Perished;
+                }
+            }
+
+            _totalStateCount.UpdateStateCount(
+                totalHealthy, totalInfected, totalNearDeath, totalGhost, totalPerished);
+        }, "\ud83d\uddfa\ufe0fグリッド 全エージェントのステートの集計速度");
         
         // Gridの集計データをUIに反映
-        Debug.Log($"健常者: {TotalStateCount.Healthy}");
-        Debug.Log($"感染者: {TotalStateCount.Infected}");
-        Debug.Log($"仮死状態: {TotalStateCount.NearDeath}");
-        Debug.Log($"亡霊: {TotalStateCount.Ghost}");
-        Debug.Log($"完全死亡状態: {TotalStateCount.Perished}");
-    }
-    
-    /// <summary>
-    /// エリアデータを取得する（範囲外なら null）
-    /// </summary>
-    public Area? GetArea(int x, int y)
-    {
-        if (x < 0 || x >= Areas.GetLength(0) || y < 0 || y >= Areas.GetLength(1))
-        {
-            return null; // 範囲外なら null を返す
-        }
-        return Areas[x, y];
+        Debug.Log($"[Grid 集計結果] 健常者: {_totalStateCount.Healthy} 感染者: {_totalStateCount.Infected} 仮死状態: {_totalStateCount.NearDeath} " +
+                  $"亡霊: {_totalStateCount.Ghost} 完全死亡状態: {_totalStateCount.Perished}");
     }
 }

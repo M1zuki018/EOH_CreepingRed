@@ -1,114 +1,74 @@
-using System;
 using System.Collections.Generic;
-using System.Diagnostics;
+using System.Threading;
 using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
-using Debug = UnityEngine.Debug;
 
 /// <summary>
 /// 各区域を管理するクラス
 /// </summary>
 public class Area
 {
-    #region パラメータ
-
     // 基本情報
-    public int X { get; } // 座標
-    public int Y { get; }
-    public SectionEnum Name { get; } // 名称
-    public AreaCategoryEnum Category { get; } // 区域の区分
-    public int Population { get; private set; }  // 総人口（万人）
-    public int CitizenPopulation { get; private set; }  // 一般市民人口
-    public int MagicSoldierPopulation { get; private set; }     // 魔法士人口
-    public float AreaSize { get; } // 面積(㎢)
-    public int PopulationDensity { get; } // 人口密度(人/㎢)
+    private readonly int _citizenPopulation; // 一般市民人口
+    private readonly int _infectionRate; // 感染成功率（%）
+    private List<string> _specialFlags; // 特殊フラグ（条件）
     
-    // 状態パラメータ
-    public int Security { get; private set; }  // 治安（0-100）
-    public int MobilityRate { get; private set; } // 移動率（0-100）
-    public int InfectionRate { get; private set; } // 感染成功率（%）
-    public int Control { get; private set; } // 統制力（0-100）
-
-    // 特殊フラグ（条件）
-    public List<string> SpecialFlags { get; } 
-
-    // 動的データ
-    public int Healthy { get; private set; } // 健康な人
-    public int Infected { get; private set; } // 感染者
-    public int NearDeath { get; private set; } // 仮死者
-    public int Ghost { get; private set; } // 亡霊
-    public int Perished { get; private set; } // 完全死亡者
-
-    #endregion
+    private List<Cell> _cells = new List<Cell>(); // セルのリスト
+    private int _infectionIndex = 0; // 感染が行われているセルのインデックス
+    private readonly AgentStateCount _areaStateCount;
+    public AgentStateCount AreaStateCount => _areaStateCount; // Areaクラスのエージェントの状態の集計結果
     
-    private List<Cell> _cells = new List<Cell>();
-    public AgentStateCount AreaStateCount { get; private set; }
+    private List<UniTask> _tasks = new List<UniTask>(); // シミュレーション更新タスクのリスト
 
     /// <summary>
     /// エリアのコンストラクタ
     /// </summary>
     public Area(AreaSettingsSO settings)
     {
-        X = settings.X;
-        Y = settings.Y;
-        Name = settings.Name;
-        Category = settings.Category;
-        Population = settings.Population * 10000;
-        CitizenPopulation = settings.CitizenPopulation * 10000;
-        MagicSoldierPopulation = settings.MagicSoldierPopulation * 10000;
-        AreaSize = settings.AreaSize;
-        PopulationDensity = settings.PopulationDensity;
-        Security = settings.Security;
-        MobilityRate = settings.MobilityRate;
-        InfectionRate = settings.InfectionRate;
-        Control = settings.Control;
-        SpecialFlags = settings.SpecialFlags ?? new List<string>();
-
-        // 初期状態
-        Healthy = Population * 10000;  // 10万人単位から実際の人数に換算
-        Infected = 0;
-        NearDeath = 0;
-        Ghost = 0;
-        Perished = 0;
-        
-        AreaStateCount = new AgentStateCount();
+        _citizenPopulation = settings.CitizenPopulation * 1000;
+        _infectionRate = settings.InfectionRate;
+        _specialFlags = settings.SpecialFlags ?? new List<string>();
+        _areaStateCount = new AgentStateCount();
         
         InitializeCells(settings);
     }
-    
 
     /// <summary>
     /// 初期化処理：セルを生成する
     /// </summary>
     private void InitializeCells(AreaSettingsSO settings)
     {
-        Stopwatch stopwatch = new Stopwatch();
-        stopwatch.Start();
-        
-        int cellPopulation = 100000; // 1セルあたりの人口
-        int cellCount = Population / cellPopulation; // セルの個数計算
-        
-        // セルごとの市民と魔法士の人数を計算
-        int cellCitizenPopulation = (int)(cellPopulation * (CitizenPopulation / (float)Population));
-        int cellMagicSoldierPopulation = cellPopulation - cellCitizenPopulation;
-        
-        // セルを生成
-        for (int i = 0; i < cellCount; i++)
+        StopwatchHelper.Measure(() =>
         {
-            _cells.Add(new Cell(i, cellCitizenPopulation, cellMagicSoldierPopulation));
-        }
+            int cellPopulation = 100000; // 1セルあたりの人口
+            int cellCount = _citizenPopulation / cellPopulation; // セルの個数計算
+            _cells = new List<Cell>(cellCount + 1); // 事前にリストを確保
+                
+            // セルを生成
+            for (int i = 0; i < cellCount; i++)
+            {
+                // 最初のセルだけ感染させる
+                _cells.Add(new Cell(i, cellPopulation, _infectionRate * 0.01f));
+            }
 
-        // あまりがあった場合
-        int remainderPopulation = Population - (cellCount * cellPopulation);
-        if (remainderPopulation > 0)
-        {
-            int remainderCitizenPopulation = (int)(remainderPopulation * (CitizenPopulation / (float)Population));
-            int remainderMagicSoldierPopulation = remainderPopulation - remainderCitizenPopulation;
-            
-            _cells.Add(new Cell(cellCount, remainderCitizenPopulation, remainderMagicSoldierPopulation));
-        }
-        
-        Debug.Log($"{settings.Name.ToString()}エリアのセルの数：{_cells.Count} 実行時間: {stopwatch.ElapsedMilliseconds} ミリ秒");
+            // あまりがあった場合
+            int remainderPopulation = _citizenPopulation - (cellCount * cellPopulation);
+            if (remainderPopulation > 0)
+            {
+                // 他にセルが登録されていなければあまりのセルを感染させる
+                _cells.Add(new Cell(cellCount, remainderPopulation, _infectionRate * 0.01f));
+            }
+                
+            DebugLogHelper.LogTestOnly($"{settings.Name.ToString()}エリアのセルの数：{_cells.Count}");
+        }, "\ud83c\udfde\ufe0fエリア　セル生成時間");
+    }
+
+    /// <summary>
+    /// 最初のセルを感染させる
+    /// </summary>
+    public void Infection()
+    {
+        _cells[_infectionIndex].Infection(1);
     }
 
     /// <summary>
@@ -116,27 +76,55 @@ public class Area
     /// </summary>
     public async UniTask SimulateInfectionAsync()
     {
-        List<Task> tasks = new List<Task>();
-        foreach (var cell in _cells)
+        _tasks.Clear(); // リセット
+        _tasks = new List<UniTask>(_cells.Count); // セルの数だけUniTaskのリストを事前に確保しておく
+        
+        for (int i = 0; i < _cells.Count; i++)
         {
-            tasks.Add(Task.Run(() => cell.SimulateInfection(100f, InfectionRate)));
+            _tasks.Add(_cells[i].SimulateInfection()); // アクティブなセルに対してのみ更新を行う
         }
+
+        await UniTask.WhenAll(_tasks); // 全てのセルのシミュレーション更新を待機
         
-        await Task.WhenAll(tasks);
-        
-        tasks.Add(Task.Run(UpdateStateCount));
-        
-        await Task.WhenAll(tasks);
+        await UpdateStateCount();
     }
-    
-    private void UpdateStateCount()
+
+    /// <summary>
+    /// AgentStateCountを更新する
+    /// </summary>
+    private async UniTask UpdateStateCount()
     {
-        AreaStateCount.ResetStateCount();
-        foreach (var cell in _cells)
+        _areaStateCount.ResetStateCount(); // 一旦リセット
+
+        await StopwatchHelper.MeasureAsync(async () =>
         {
-            AreaStateCount.UpdateStateCount(
-                cell.StateCount.Healthy, cell.StateCount.Infected, cell.StateCount.NearDeath,
-                cell.StateCount.Ghost, cell.StateCount.Perished);
+            int totalHealthy = 0, totalInfected = 0, totalNearDeath = 0;
+            int totalGhost = 0, totalPerished = 0;
+            
+            // 並列処理でエリアの状態を集計
+            Parallel.ForEach(_cells, (cell) =>
+            {
+                Interlocked.Add(ref totalHealthy, cell.CellStateCount.Healthy);
+                Interlocked.Add(ref totalInfected, cell.CellStateCount.Infected);
+                Interlocked.Add(ref totalNearDeath, cell.CellStateCount.NearDeath);
+                Interlocked.Add(ref totalGhost, cell.CellStateCount.Ghost);
+                Interlocked.Add(ref totalPerished, cell.CellStateCount.Perished);
+            });
+            
+            // 集計結果を反映する
+            _areaStateCount.UpdateStateCount(
+                totalHealthy, totalInfected, totalNearDeath,
+                totalGhost, totalPerished
+            );
+        }, "\ud83c\udfde\ufe0fエリア 各セルのステートの集計速度");
+
+        // 感染フラグが立っていたら、次のセルに感染を広める
+        if (_infectionIndex < _cells.Count && _cells[_infectionIndex].Spreading)
+        {
+            if (_infectionIndex < _cells.Count - 1) // 範囲を越えないようにする
+            {
+                _cells[++_infectionIndex].Infection(1);
+            }
         }
     }
 }

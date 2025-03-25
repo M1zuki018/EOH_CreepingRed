@@ -2,9 +2,9 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// シミュレーションテスト用のクラス
+/// ViewBaseを継承したSimulationロジックの根幹となるクラス
 /// </summary>
-public class TestSimulator : ViewBase, ISimulator
+public class Simulator : ViewBase, ISimulator
 {
     [SerializeField] private List<AreaSettingsSO> _areaSettings = new List<AreaSettingsSO>();
     private Simulation _simulation;

@@ -172,7 +172,7 @@ public class AreaCsvReader : EditorWindow
         {
             uiTestSimulator.RegisterAreas(createdAreas);
         }
-        else if (simulator is TestSimulator testSimulator)
+        else if (simulator is Simulator testSimulator)
         {
             testSimulator.RegisterAreas(createdAreas);
         }

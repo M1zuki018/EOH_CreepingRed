@@ -91,7 +91,7 @@ public class MiniQuadtree
         }
         else
         {
-            Debug.LogWarning("No agent found at (0,0) in the target Quadtree.");
+            Debug.LogWarning("No agent found at (0,0) in the target AgentManager.");
         }
     }
 

@@ -30,7 +30,7 @@ public class GameManager : ViewBase
     /// </summary>
     private ISimulator FindActiveSimulator()
     {
-        return (ISimulator)FindAnyObjectByType<TestSimulator>() ??
+        return (ISimulator)FindAnyObjectByType<Simulator>() ??
                (ISimulator)FindAnyObjectByType<MiniTestSimulator>() ??
                (ISimulator)FindAnyObjectByType<UITestSimulator>();
     }

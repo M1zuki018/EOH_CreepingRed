@@ -42,7 +42,7 @@ public class TitleSceneUIManager : UIManagerBase
     /// </summary>
     private void TransitionScene()
     {
-        TransitionScene("Dev_MiniLogicTest");
+        TransitionScene("Dev_InGame");
     }
     
     protected override void UnregisterEvents()

@@ -7,7 +7,7 @@ using Debug = UnityEngine.Debug;
 /// </summary>
 public class MiniGrid
 {
-    private readonly MiniArea[,] _areas = new MiniArea[5 ,4]; // エリアデータの二次元配列
+    private readonly MiniArea[,] _areas = new MiniArea[5 ,4]; // エリアクラスの二次元配列
     private readonly AgentStateCount _totalStateCount; // ゲーム内に存在するエージェントの累計
     private readonly List<UniTask> _tasks = new List<UniTask>();
     

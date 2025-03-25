@@ -1,53 +1,112 @@
+using System.Linq;
 using Cysharp.Threading.Tasks;
-using UnityEngine;
+using Unity.Jobs;
 
 /// <summary>
 /// エージェント約10万人が詰められたセル。感染シミュレーションを行う部分
 /// </summary>
 public class Cell
 {
-    private int _id; // セル自体のID
+    private readonly int _id; // セル自体のID
+    private readonly AgentManager _agentManager; // シミュレーションを行うクラス
+    private readonly AgentStateCount _cellStateCount;
+    public AgentStateCount CellStateCount => _cellStateCount; // エージェントのカウント用のクラス
+    private bool _isActive; // シミュレーションが起動中かどうか
+    public bool Spreading { get; private set; } // 他のセルに感染を広げるかどうか
+
+    private JobHandle _jobHandle; // エージェント生成JobのHandle
     
-    private Quadtree _quadtree;
-    public AgentStateCount StateCount { get; private set; }
-    
-    public Cell(int id, int citizen, int magicSoldier)
+    public Cell(int id, int citizen, float regionMod)
     {
         _id = id;
-        _quadtree = new Quadtree(new Rect(0, 0, 1000, 1000));
-        StateCount = new AgentStateCount();
-        
-        InitializeAgents(citizen, magicSoldier);
+        _cellStateCount = new AgentStateCount();
+        _agentManager = new AgentManager(regionMod);
+        StopwatchHelper.Measure(() => InitializeAgents(citizen).Forget(),"Agent生成完了");
+
     }
 
     /// <summary>
     /// エージェントの生成
     /// </summary>
-    private void InitializeAgents(int citizen, int magicSoldier)
+    private async UniTask InitializeAgents(int citizen)
     {
-        _quadtree.InitializeAgents(citizen, magicSoldier).Forget();
+        await _agentManager.InitializeAgents(citizen);
     }
 
     /// <summary>
-    /// 各状態のエージェントの数を集計する
+    /// 感染開始処理
     /// </summary>
-    private void UpdateStateCount(int magicSoldier)
+    public void Infection(int count)
     {
-        /*
-        CellStateCount.ResetStateCount();
-        foreach (var agent in _agents)
-        {
-            CellStateCount.AddState(agent.State); // 各ステート
-            CellStateCount.AddState(magicSoldier); // 魔法士の数
-        }
-        */
+        _agentManager.Infection(count);
     }
 
     /// <summary>
     /// 感染シミュレーション
     /// </summary>
-    public void SimulateInfection(float baseInfectionRate, float infectionMultiplier)
+    public async UniTask SimulateInfection()
     {
-        _quadtree.SimulateInfection();
+        StopwatchHelper.Measure(() =>
+            {
+                if (!_isActive) return;
+
+                _jobHandle = _agentManager.SimulateInfection(); // Jobを設定
+                _jobHandle.Complete();
+
+            },$"\ud83d\udfe6セル(ID:{_id}) 感染シミュレーションの更新速度");
+        await UpdateStateCount();
+    }
+
+    /// <summary>
+    /// Quadtree内のエージェントのステートを集計する
+    /// </summary>
+    private async UniTask UpdateStateCount()
+    {
+        _cellStateCount.ResetStateCount();
+
+        await StopwatchHelper.MeasureAsync(async () =>
+            {
+                var allAgents = _agentManager.GetAllAgents(); // AgentManagerから全てのエージェントを取得する
+                int agentsCount = allAgents.Count();
+                
+                foreach (var agent in allAgents)
+                {
+                    _cellStateCount.AddState(agent.State); // 各ステートをカウント
+                }
+                
+                HandleInfectionSpread(agentsCount);
+                HandleCellActivation(agentsCount);
+                
+            }, $"\ud83d\udfe6セル(ID:{_id}) Cellのステート集計速度");
+    }
+
+    /// <summary>
+    /// セル内の感染率が8割を越えたらフラグを立てる
+    /// </summary>
+    private void HandleInfectionSpread(int allAgents)
+    {
+        if ((float)_cellStateCount.Infected / allAgents > 0.8f)
+        {
+            Spreading = true;
+        }
+    }
+
+    /// <summary>
+    /// セルのアクティブ状態を更新する
+    /// </summary>
+    private void HandleCellActivation(int allAgents)
+    {
+        // 全員死亡 もしくは 全員健康状態のときは処理をスキップするようにする
+        if (_cellStateCount.NearDeath == allAgents || _cellStateCount.Healthy == 0)
+        {
+            _isActive = false;
+            return;
+        }
+
+        // 一つ目の条件を抜けた場合で、まだ起動していなかったら起動する
+        if (!_isActive)
+        {
+            _isActive = true;
+        }
     }
 }
