@@ -1,5 +1,5 @@
 using System;
-using Cysharp.Threading.Tasks;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -12,21 +12,38 @@ using UnityEngine.UI;
 /// </summary>
 public class BaseSelectionUIController : UIControllerBase
 {
-    [SerializeField, HighlightIfNull] private Button _gameStartButton;
+    [SerializeField, HighlightIfNull] private List<Button> _gameStartButton;
     
     public event Action OnGameStart;
 
     protected override void RegisterEvents()
     {
-        _gameStartButton.onClick.AddListener(() => OnGameStart?.Invoke());
+        for (int i = 0; i < _gameStartButton.Count; i++)
+        {
+            var index = i;
+            _gameStartButton[i].onClick.AddListener(() => HandleGameStart(index));
+        }
     }
 
     protected override void UnregisterEvents()
     {
-        _gameStartButton.onClick.RemoveListener(() => OnGameStart?.Invoke());
+        for (int i = 0; i < _gameStartButton.Count; i++)
+        {
+            var index = i;
+            _gameStartButton[i].onClick.RemoveListener(() => HandleGameStart(index));
+        }
     }
 
     public override void Show() => CanvasVisibilityUtility.Show(_canvasGroup);
     public override void Hide() => CanvasVisibilityUtility.Hide(_canvasGroup);
     public override void Block() => CanvasVisibilityUtility.Block(_canvasGroup);
+
+    /// <summary>
+    /// ゲームスタートのイベントを発火すると同時に感染開始地底をGameSettingsに登録する
+    /// </summary>
+    private void HandleGameStart(int index)
+    {
+        OnGameStart?.Invoke();
+        GameSettingsManager.StartPointIndex = index;
+    }
 }

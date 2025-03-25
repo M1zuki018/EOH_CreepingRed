@@ -8,7 +8,8 @@ public static class GameSettingsManager
     private static GameSettings _instance;
     
     private static DifficultyEnum _difficulty = DifficultyEnum.Breeze;
-
+    private static int _startPointIndex = 0;
+    
     private static GameSettings Instance
     {
         get
@@ -24,7 +25,7 @@ public static class GameSettingsManager
             return _instance;
         }
     }
-
+    
     /// <summary>
     /// 難易度
     /// </summary>
@@ -32,6 +33,15 @@ public static class GameSettingsManager
     {
         get => _difficulty;
         set => _difficulty = value;
+    }
+
+    /// <summary>
+    /// 感染開始地点のIndex
+    /// </summary>
+    public static int StartPointIndex
+    {
+        get => _startPointIndex;
+        set => _startPointIndex = value;
     }
     
     /// <summary>
