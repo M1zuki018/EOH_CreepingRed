@@ -41,6 +41,8 @@ public class MiniGrid
                     Debug.LogWarning($" MiniGrid：{areaSetting.Name}　({x}, {y}) は無効な座標です");
                 }
             }
+            
+            StartInfection();
         },"\ud83d\uddfa\ufe0fグリッド 初期化");
     }
 
@@ -49,7 +51,12 @@ public class MiniGrid
     /// </summary>
     public void StartInfection()
     {
-        _areas[0,2].Infection();
+        // Title画面で設定した感染開始地点から、感染させる座標を割り出す
+        int index = GameSettingsManager.StartPointIndex;
+        int x = index % 5;
+        int y = index / 5;
+        
+        _areas[x,y].Infection();
     }
     
     /// <summary>
