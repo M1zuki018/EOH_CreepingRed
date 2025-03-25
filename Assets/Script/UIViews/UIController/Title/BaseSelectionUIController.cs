@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 /// <summary>
@@ -12,25 +14,29 @@ using UnityEngine.UI;
 /// </summary>
 public class BaseSelectionUIController : UIControllerBase
 {
-    [SerializeField, HighlightIfNull] private List<Button> _gameStartButton;
-    
+    [SerializeField, HighlightIfNull] private Button _gameStartButton;
+    [SerializeField, HighlightIfNull] private List<Button> _baseSelectButton;
     public event Action OnGameStart;
-
+    
     protected override void RegisterEvents()
     {
-        for (int i = 0; i < _gameStartButton.Count; i++)
+        _gameStartButton.onClick.AddListener(HandleGameStart);
+        for (int i = 0; i < _baseSelectButton.Count; i++)
         {
             var index = i;
-            _gameStartButton[i].onClick.AddListener(() => HandleGameStart(index));
+            _baseSelectButton[i].onClick.AddListener(() => HandleSelectBase(index));
         }
+        
+        _gameStartButton.interactable = false; // 拠点が選択されるまではインタラクティブ出来ないようにする
     }
 
     protected override void UnregisterEvents()
     {
-        for (int i = 0; i < _gameStartButton.Count; i++)
+        _gameStartButton.onClick.RemoveListener(HandleGameStart);
+        for (int i = 0; i < _baseSelectButton.Count; i++)
         {
             var index = i;
-            _gameStartButton[i].onClick.RemoveListener(() => HandleGameStart(index));
+            _baseSelectButton[i].onClick.RemoveListener(() => HandleSelectBase(index));
         }
     }
 
@@ -41,9 +47,10 @@ public class BaseSelectionUIController : UIControllerBase
     /// <summary>
     /// ゲームスタートのイベントを発火すると同時に感染開始地底をGameSettingsに登録する
     /// </summary>
-    private void HandleGameStart(int index)
+    private void HandleSelectBase(int index)
     {
-        OnGameStart?.Invoke();
         GameSettingsManager.StartPointIndex = index;
+        _gameStartButton.interactable = true;
     }
+    private void HandleGameStart() => OnGameStart?.Invoke();
 }
