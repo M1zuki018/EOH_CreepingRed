@@ -32,7 +32,7 @@ public class MiniGrid
             {
                 // SOで設定した座標に基づいてエリアを配置
                 _areas[x, y] = new MiniArea(areaSetting);
-                DebugLogHelper.TestOnly($"エリア作成 ({x}, {y}) : {areaSetting.Name.ToString()}");
+                DebugLogHelper.LogTestOnly($"エリア作成 ({x}, {y}) : {areaSetting.Name.ToString()}");
             }
             else
             {
@@ -56,7 +56,7 @@ public class MiniGrid
     {
         _tasks.Clear(); // 最初にTaskのリストをクリアして再利用
         
-        await StopwatchHelper.MeasureAsync(async () =>
+        await StopwatchHelper.AlwaysUseAsync(async () =>
         {
             for (int x = 0; x < _areas.GetLength(0); x++)
             {

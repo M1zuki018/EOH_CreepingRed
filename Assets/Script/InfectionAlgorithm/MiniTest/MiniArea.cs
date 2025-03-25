@@ -38,7 +38,7 @@ public class MiniArea
     /// </summary>
     private void InitializeCells(AreaSettingsSO settings)
     {
-        StopwatchHelper.TestOnlyMeasure(() =>
+        StopwatchHelper.Measure(() =>
             {
                 int cellPopulation = 100000; // 1セルあたりの人口
                 int cellCount = _citizenPopulation / cellPopulation; // セルの個数計算
@@ -59,7 +59,7 @@ public class MiniArea
                     _cells.Add(new MiniCell(cellCount, remainderPopulation, _infectionRate * 0.01f));
                 }
                 
-                DebugLogHelper.LogicTest($"{settings.Name.ToString()}エリアのセルの数：{_cells.Count}");
+                DebugLogHelper.LogTestOnly($"{settings.Name.ToString()}エリアのセルの数：{_cells.Count}");
             }, "\ud83c\udfde\ufe0fエリア　セル生成時間");
     }
 
@@ -96,7 +96,7 @@ public class MiniArea
     {
         _areaStateCount.ResetStateCount(); // 一旦リセット
 
-        await StopwatchHelper.TestOnlyMeasureAsync(async () =>
+        await StopwatchHelper.MeasureAsync(async () =>
         {
             int totalHealthy = 0, totalInfected = 0, totalNearDeath = 0;
             int totalGhost = 0, totalPerished = 0;

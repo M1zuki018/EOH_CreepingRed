@@ -5,25 +5,24 @@ using UnityEngine;
 /// </summary>
 public static class DebugLogHelper
 {
-    public static bool IsLogFormatEnabled { get; set; } = true;
-    public static bool IsLoggingEnabled { get; set; } = true;
-    public static bool IsLogicTestEnabled { get; set; } = true;
+    public static bool IsObjectCreationLoggingEnabled { get; set; } = true;
+    public static bool IsTestLoggingEnabled { get; set; } = true;
     
     /// <summary>
     /// 目立つログを出力する
     /// </summary>
-    public static void LogImportant(string message)
+    public static void LogImportant(object message)
     {
         string border = new string('=', 20); // 長いラインを作る
         Debug.Log($"<color=red><b>{border}{message}{border}</b></color>");
     }
     
     /// <summary>
-    /// フォーマット付きのログ出力
+    /// シーン基盤Object生成時に使用しているフォーマット付きのログ出力
     /// </summary>
-    public static void LogFormat(string format, params object[] args)
+    public static void LogObjectCreation(string format, params object[] args)
     {
-        if (IsLogFormatEnabled)
+        if (IsObjectCreationLoggingEnabled)
         {
             Debug.LogFormat(format, args);
         }
@@ -32,20 +31,9 @@ public static class DebugLogHelper
     /// <summary>
     /// テスト中のみ表示したいログ
     /// </summary>
-    public static void TestOnly(string message)
+    public static void LogTestOnly(object message)
     {
-        if (IsLoggingEnabled)
-        {
-            Debug.Log(message);
-        }
-    }
-
-    /// <summary>
-    /// ロジックの規模が小さいテスト中のみ表示したいログ
-    /// </summary>
-    public static void LogicTest(string message)
-    {
-        if (IsLogicTestEnabled)
+        if (IsTestLoggingEnabled)
         {
             Debug.Log(message);
         }

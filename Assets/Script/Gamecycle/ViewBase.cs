@@ -11,7 +11,7 @@ public abstract class ViewBase : MonoBehaviour
     /// </summary>
     public virtual UniTask OnAwake()
     {
-        DebugLogHelper.LogFormat("[ViewBase] {0} の Awake 実行", gameObject.name);
+        DebugLogHelper.LogObjectCreation("[ViewBase] {0} の Awake 実行", gameObject.name);
         return UniTask.CompletedTask;
     }
 
@@ -20,7 +20,7 @@ public abstract class ViewBase : MonoBehaviour
     /// </summary>
     public virtual UniTask OnUIInitialize()
     {
-        DebugLogHelper.LogFormat("[ViewBase] {0} の UIInitialize 実行", gameObject.name);
+        DebugLogHelper.LogObjectCreation("[ViewBase] {0} の UIInitialize 実行", gameObject.name);
         return UniTask.CompletedTask;
     }
 
@@ -29,7 +29,7 @@ public abstract class ViewBase : MonoBehaviour
     /// </summary>
     public virtual UniTask OnBind()
     {
-        DebugLogHelper.LogFormat("[ViewBase] {0} の Bind 実行", gameObject.name);
+        DebugLogHelper.LogObjectCreation("[ViewBase] {0} の Bind 実行", gameObject.name);
         return UniTask.CompletedTask;
     }
 
@@ -38,7 +38,7 @@ public abstract class ViewBase : MonoBehaviour
     /// </summary>
     public virtual UniTask OnStart()
     {
-        DebugLogHelper.LogFormat("[ViewBase] {0} の Start 実行", gameObject.name);
+        DebugLogHelper.LogObjectCreation("[ViewBase] {0} の Start 実行", gameObject.name);
         return UniTask.CompletedTask;
     }
 }

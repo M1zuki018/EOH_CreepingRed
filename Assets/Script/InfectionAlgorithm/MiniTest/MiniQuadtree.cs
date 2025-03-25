@@ -290,7 +290,7 @@ public class MiniQuadtree
         _subTrees.Add(leftTop, false);
         _subTrees.Add(rightTop, false);
 
-        DebugLogHelper.TestOnly($"サブツリー生成　深さ{_depth}: \n" +
+        DebugLogHelper.LogTestOnly($"サブツリー生成　深さ{_depth}: \n" +
                   $"Left Bottom: {leftBottom._bounds} \n" +
                   $"Right Bottom: {rightBottom._bounds} \n" +
                   $"Left Top: {leftTop._bounds} \n" +
@@ -661,7 +661,7 @@ public class MiniQuadtree
         {
             if (_subTrees[subTree])
             {
-                DebugLogHelper.TestOnly("停止");
+                DebugLogHelper.LogTestOnly("停止");
                 _subTrees[subTree] = false;
             }
         }
@@ -670,7 +670,7 @@ public class MiniQuadtree
         {
             if (!_subTrees[subTree])
             {
-                DebugLogHelper.TestOnly("再起動");
+                DebugLogHelper.LogTestOnly("再起動");
                 _subTrees[subTree] = true;
             }
         }

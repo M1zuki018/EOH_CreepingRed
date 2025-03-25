@@ -21,7 +21,7 @@ public class MiniCell
         _id = id;
         _cellStateCount = new AgentStateCount();
         _agentManager = new MiniAgentManager(regionMod);
-        StopwatchHelper.TestOnlyMeasure(() => InitializeAgents(citizen).Forget(),"Agent生成完了");
+        StopwatchHelper.Measure(() => InitializeAgents(citizen).Forget(),"Agent生成完了");
     }
 
     /// <summary>
@@ -45,7 +45,7 @@ public class MiniCell
     /// </summary>
     public async UniTask SimulateInfection()
     {
-        StopwatchHelper.TestOnlyMeasure(() =>
+        StopwatchHelper.Measure(() =>
             {
                 if (!_isActive) return;
 
@@ -63,7 +63,7 @@ public class MiniCell
     {
         _cellStateCount.ResetStateCount();
 
-        await StopwatchHelper.TestOnlyMeasureAsync(async () =>
+        await StopwatchHelper.MeasureAsync(async () =>
             {
                 var allAgents = _agentManager.GetAllAgents(); // AgentManagerから全てのエージェントを取得する
                 int agentsCount = allAgents.Count();

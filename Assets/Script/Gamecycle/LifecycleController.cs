@@ -15,7 +15,6 @@ public class LifecycleController : MonoBehaviour
     [SerializeField, Comment("デバッグモード：本番環境にスキップしない")] private bool _debugMode = true;
     [SerializeField, Comment("Objectの生成ログを表示")] private bool _isLogFormatEnabled = true;
     [SerializeField, Comment("テストのログを表示")] private bool _isLoggingEnabled = true;
-    [SerializeField, Comment("感染シミュレーションの詳細なログを表示")] private bool _isLogicTestEnabled = true;
     
     [Header("設定")]
     [SerializeField] private List<GameObject> _prefabsToInstantiate = new List<GameObject>();
@@ -30,9 +29,8 @@ public class LifecycleController : MonoBehaviour
             return;
         }
         
-        DebugLogHelper.IsLogFormatEnabled = _isLogFormatEnabled;
-        DebugLogHelper.IsLoggingEnabled = _isLoggingEnabled;
-        DebugLogHelper.IsLogicTestEnabled = _isLogicTestEnabled;
+        DebugLogHelper.IsObjectCreationLoggingEnabled = _isLogFormatEnabled;
+        DebugLogHelper.IsTestLoggingEnabled = _isLoggingEnabled;
         
         await AutoInstantiate(); // インスタンス化
         
@@ -66,7 +64,7 @@ public class LifecycleController : MonoBehaviour
             var existingInstance = FindObjectOfType(viewType) as ViewBase;
             if (existingInstance != null)
             {
-                Debug.Log($"{prefab.name} の既存インスタンスが見つかったため、再生成しません");
+                DebugLogHelper.LogObjectCreation("{0} の既存インスタンスが見つかったため、再生成しません", prefab.name);
                 RegisterViewBase(existingInstance);
             }
             else // 既存インスタンスがなかったら作成する
