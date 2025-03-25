@@ -39,15 +39,14 @@ public class MiniCell
     public async UniTask SimulateInfection()
     {
         StopwatchHelper.Measure(() =>
-        {
-            if (IsActive)
             {
-                _jobHandle = _agentManager.SimulateInfection(); // Jobを設定
-                _jobHandle.Complete();
-            }
-            
-        },$"\ud83d\udfe6セル(ID:{_id}) 感染シミュレーションの更新速度");
-        
+                if (IsActive)
+                {
+                    _jobHandle = _agentManager.SimulateInfection(); // Jobを設定
+                    _jobHandle.Complete();
+                }
+
+            },$"\ud83d\udfe6セル(ID:{_id}) 感染シミュレーションの更新速度");
         await UpdateStateCount();
     }
 

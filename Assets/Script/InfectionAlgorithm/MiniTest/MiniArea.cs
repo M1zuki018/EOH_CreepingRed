@@ -53,14 +53,15 @@ public class MiniArea
                 // セルを生成
                 for (int i = 0; i < cellCount; i++)
                 {
-                    _cells.Add(new MiniCell(i, cellPopulation, _infectionRate * 0.01f));
+                    // 第四引数　Infection　bool型の入れ方を考える
+                    _cells.Add(new MiniCell(i, cellPopulation, _infectionRate * 0.01f, true));
                 }
 
                 // あまりがあった場合
                 int remainderPopulation = _citizenPopulation - (cellCount * cellPopulation);
                 if (remainderPopulation > 0)
                 {
-                    _cells.Add(new MiniCell(cellCount, remainderPopulation, _infectionRate * 0.01f));
+                    _cells.Add(new MiniCell(cellCount, remainderPopulation, _infectionRate * 0.01f, true));
                 }
                 
                 DebugLogHelper.LogImportant($"{settings.Name.ToString()}エリアのセルの数：{_cells.Count}");
@@ -78,7 +79,7 @@ public class MiniArea
 
         for (int i = 0; i < _cells.Count; i++)
         {
-            _tasks.Add(_cells[i].SimulateInfection());
+            _tasks.Add(_cells[i].SimulateInfection()); // アクティブなセルに対してのみ更新を行う
         }
 
         await UniTask.WhenAll(_tasks);
