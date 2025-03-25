@@ -7,7 +7,7 @@ using Debug = UnityEngine.Debug;
 /// </summary>
 public class MiniGrid
 {
-    private readonly MiniArea[,] _areas = new MiniArea[1 ,1]; // エリアデータの二次元配列
+    private readonly MiniArea[,] _areas = new MiniArea[3 ,1]; // エリアデータの二次元配列
     private readonly AgentStateCount _totalStateCount; // ゲーム内に存在するエージェントの累計
     private readonly List<UniTask> _tasks = new List<UniTask>();
     
@@ -39,6 +39,14 @@ public class MiniGrid
                 Debug.LogWarning($" MiniGrid：{areaSetting.Name}　({x}, {y}) は無効な座標です");
             }
         }
+    }
+
+    /// <summary>
+    /// 感染を始める
+    /// </summary>
+    public void StartInfection()
+    {
+        _areas[0,0].Infection();
     }
     
     /// <summary>

@@ -48,7 +48,7 @@ public class MiniArea
                 for (int i = 0; i < cellCount; i++)
                 {
                     // 最初のセルだけ感染させる
-                    _cells.Add(new MiniCell(i, cellPopulation, _infectionRate * 0.01f, i == 0));
+                    _cells.Add(new MiniCell(i, cellPopulation, _infectionRate * 0.01f));
                 }
 
                 // あまりがあった場合
@@ -56,11 +56,19 @@ public class MiniArea
                 if (remainderPopulation > 0)
                 {
                     // 他にセルが登録されていなければあまりのセルを感染させる
-                    _cells.Add(new MiniCell(cellCount, remainderPopulation, _infectionRate * 0.01f, _cells.Count == 0));
+                    _cells.Add(new MiniCell(cellCount, remainderPopulation, _infectionRate * 0.01f));
                 }
                 
                 DebugLogHelper.LogImportant($"{settings.Name.ToString()}エリアのセルの数：{_cells.Count}");
             }, "\ud83c\udfde\ufe0fエリア　セル生成時間");
+    }
+
+    /// <summary>
+    /// 最初のセルを感染させる
+    /// </summary>
+    public void Infection()
+    {
+        _cells[_infectionIndex].Infection(1);
     }
 
     /// <summary>

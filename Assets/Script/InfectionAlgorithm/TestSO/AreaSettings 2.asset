@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 65b5aee03a9e6c149b0d7f369996c783, type: 3}
+  m_Name: AreaSettings 2
+  m_EditorClassIdentifier: 
+  X: 2
+  Y: 0
+  Name: 2
+  Category: 0
+  Population: 150
+  CitizenPopulation: 35
+  MagicSoldierPopulation: 15
+  AreaSize: 15
+  PopulationDensity: 1
+  Security: 1
+  MobilityRate: 1
+  InfectionRate: 1
+  Control: 1
+  SpecialFlags: []

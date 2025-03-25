@@ -17,6 +17,11 @@ public class MiniSimulation : IDisposable
         _grid = new MiniGrid(areaSettings); // グリッドを生成する
         _subscription = timeManager.GameTimeProp.Subscribe(UpdateSimulation);
     }
+
+    public void Infection()
+    {
+        _grid.StartInfection();
+    }
     
     /// <summary>
     /// 1更新のメソッド(等倍時には3秒に一回呼び出される)

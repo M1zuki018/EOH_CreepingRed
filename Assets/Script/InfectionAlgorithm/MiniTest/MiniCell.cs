@@ -16,24 +16,20 @@ public class MiniCell
 
     private JobHandle _jobHandle; // エージェント生成JobのHandle
     
-    public MiniCell(int id, int citizen, float regionMod, bool infection)
+    public MiniCell(int id, int citizen, float regionMod)
     {
         _id = id;
         _cellStateCount = new AgentStateCount();
         _agentManager = new MiniAgentManager(regionMod);
-        StopwatchHelper.Measure(() => InitializeAgents(citizen, infection).Forget(),"Agent生成完了");
+        StopwatchHelper.Measure(() => InitializeAgents(citizen).Forget(),"Agent生成完了");
     }
 
     /// <summary>
     /// エージェントの生成（非同期でセットアップ）
     /// </summary>
-    private async UniTask InitializeAgents(int citizen, bool infection)
+    private async UniTask InitializeAgents(int citizen)
     {
         await _agentManager.InitializeAgents(citizen);
-        if(infection)
-        {
-            _agentManager.Infection(1); // 感染させるセルに対してのみフラグを立てる
-        }
     }
 
     /// <summary>
