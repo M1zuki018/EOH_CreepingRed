@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
-using UnityEngine;
 
 /// <summary>
 /// 縮小テスト用各区域を管理するクラス
@@ -12,9 +11,7 @@ public class MiniArea
     // 基本情報
     private readonly int _citizenPopulation; // 一般市民人口
     private readonly int _infectionRate; // 感染成功率（%）
-
-    // 特殊フラグ（条件）
-    private List<string> _specialFlags;
+    private List<string> _specialFlags; // 特殊フラグ（条件）
     
     private List<MiniCell> _cells = new List<MiniCell>(); // セルのリスト
     private int _infectionIndex; // 感染が行われているセルのインデックス
@@ -31,8 +28,8 @@ public class MiniArea
         _citizenPopulation = settings.CitizenPopulation * 1000;
         _infectionRate = settings.InfectionRate;
         _specialFlags = settings.SpecialFlags ?? new List<string>();
-        
         _areaStateCount = new AgentStateCount();
+        
         InitializeCells(settings);
     }
 
@@ -45,13 +42,12 @@ public class MiniArea
             {
                 int cellPopulation = 100000; // 1セルあたりの人口
                 int cellCount = _citizenPopulation / cellPopulation; // セルの個数計算
-                
-                _cells = new List<MiniCell>(cellCount + 1);
+                _cells = new List<MiniCell>(cellCount + 1); // 事前にリストを確保
                 
                 // セルを生成
                 for (int i = 0; i < cellCount; i++)
                 {
-                    // 第四引数　Infection　bool型の入れ方を考える
+                    // 最初のセルだけ感染させる
                     _cells.Add(new MiniCell(i, cellPopulation, _infectionRate * 0.01f, i == 0));
                 }
 
@@ -59,13 +55,12 @@ public class MiniArea
                 int remainderPopulation = _citizenPopulation - (cellCount * cellPopulation);
                 if (remainderPopulation > 0)
                 {
+                    // 他にセルが登録されていなければあまりのセルを感染させる
                     _cells.Add(new MiniCell(cellCount, remainderPopulation, _infectionRate * 0.01f, _cells.Count == 0));
                 }
                 
                 DebugLogHelper.LogImportant($"{settings.Name.ToString()}エリアのセルの数：{_cells.Count}");
             }, "\ud83c\udfde\ufe0fエリア　セル生成時間");
-        
-        _tasks = new List<UniTask>(_cells.Count); // セルの数だけUniTaskのリストを事前に確保しておく
     }
 
     /// <summary>
@@ -74,13 +69,14 @@ public class MiniArea
     public async UniTask SimulateInfectionAsync()
     {
         _tasks.Clear(); // リセット
-
+        _tasks = new List<UniTask>(_cells.Count); // セルの数だけUniTaskのリストを事前に確保しておく
+        
         for (int i = 0; i < _cells.Count; i++)
         {
             _tasks.Add(_cells[i].SimulateInfection()); // アクティブなセルに対してのみ更新を行う
         }
 
-        await UniTask.WhenAll(_tasks);
+        await UniTask.WhenAll(_tasks); // 全てのセルのシミュレーション更新を待機
         
         await UpdateStateCount();
     }
@@ -92,7 +88,7 @@ public class MiniArea
     {
         _areaStateCount.ResetStateCount(); // 一旦リセット
 
-        StopwatchHelper.Measure(() =>
+        await StopwatchHelper.MeasureAsync(async () =>
         {
             int totalHealthy = 0, totalInfected = 0, totalNearDeath = 0;
             int totalGhost = 0, totalPerished = 0;
@@ -107,6 +103,7 @@ public class MiniArea
                 Interlocked.Add(ref totalPerished, cell.CellStateCount.Perished);
             });
             
+            // 集計結果を反映する
             _areaStateCount.UpdateStateCount(
                 totalHealthy, totalInfected, totalNearDeath,
                 totalGhost, totalPerished
@@ -116,12 +113,10 @@ public class MiniArea
         // 感染フラグが立っていたら、次のセルに感染を広める
         if (_cells[_infectionIndex].Spreading)
         {
-            if (_infectionIndex != _cells.Count)
+            if (_infectionIndex < _cells.Count - 1) // 範囲を越えないようにする
             {
                 _cells[++_infectionIndex].Infection(1);
             }
         }
-        
-        await UniTask.CompletedTask; // 非同期完了を通知
     }
 }

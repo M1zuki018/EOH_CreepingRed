@@ -1,7 +1,6 @@
 using System.Linq;
 using Cysharp.Threading.Tasks;
 using Unity.Jobs;
-using UnityEngine;
 
 /// <summary>
 /// 縮小テスト用エージェント約10万人が詰められたセル。感染シミュレーションを行う部分
@@ -12,7 +11,7 @@ public class MiniCell
     private readonly MiniAgentManager _agentManager; // シミュレーションを行うクラス
     private readonly AgentStateCount _cellStateCount;
     public AgentStateCount CellStateCount => _cellStateCount; // エージェントのカウント用のクラス
-    public bool IsActive { get; private set; } // シミュレーションが起動中かどうか
+    private bool _isActive; // シミュレーションが起動中かどうか
     public bool Spreading { get; private set; } // 他のセルに感染を広げるかどうか
 
     private JobHandle _jobHandle; // エージェント生成JobのHandle
@@ -31,7 +30,10 @@ public class MiniCell
     private async UniTask InitializeAgents(int citizen, bool infection)
     {
         await _agentManager.InitializeAgents(citizen);
-        if(infection) _agentManager.Infection(1); // 感染させるセルに対してのみフラグを立てる
+        if(infection)
+        {
+            _agentManager.Infection(1); // 感染させるセルに対してのみフラグを立てる
+        }
     }
 
     /// <summary>
@@ -49,11 +51,10 @@ public class MiniCell
     {
         StopwatchHelper.Measure(() =>
             {
-                if (IsActive)
-                {
-                    _jobHandle = _agentManager.SimulateInfection(); // Jobを設定
-                    _jobHandle.Complete();
-                }
+                if (!_isActive) return;
+
+                _jobHandle = _agentManager.SimulateInfection(); // Jobを設定
+                _jobHandle.Complete();
 
             },$"\ud83d\udfe6セル(ID:{_id}) 感染シミュレーションの更新速度");
         await UpdateStateCount();
@@ -69,30 +70,46 @@ public class MiniCell
         await StopwatchHelper.MeasureAsync(async () =>
             {
                 var allAgents = _agentManager.GetAllAgents(); // AgentManagerから全てのエージェントを取得する
+                int agentsCount = allAgents.Count();
                 
                 foreach (var agent in allAgents)
                 {
                     _cellStateCount.AddState(agent.State); // 各ステートをカウント
                 }
-
-                // セル内の感染率が8割を越えたらフラグを立てる
-                if ((float)_cellStateCount.Infected / allAgents.Count() > 0.8f)
-                {
-                    Spreading = true;
-                }
                 
-                // 全員死亡 もしくは 全員健康状態のときは処理をスキップするようにする
-                if (_cellStateCount.NearDeath == allAgents.Count() || _cellStateCount.Healthy == 0)
-                {
-                    IsActive = false;
-                    return;
-                }
-
-                if (!IsActive)
-                {
-                    IsActive = true;
-                }
-
+                HandleInfectionSpread(agentsCount);
+                HandleCellActivation(agentsCount);
+                
             }, $"\ud83d\udfe6セル(ID:{_id}) Quadtreeのステート集計速度");
+    }
+
+    /// <summary>
+    /// セル内の感染率が8割を越えたらフラグを立てる
+    /// </summary>
+    private void HandleInfectionSpread(int allAgents)
+    {
+        if ((float)_cellStateCount.Infected / allAgents > 0.8f)
+        {
+            Spreading = true;
+        }
+    }
+
+    /// <summary>
+    /// セルのアクティブ状態を更新する
+    /// </summary>
+    private void HandleCellActivation(int allAgents)
+    {
+        // 全員死亡 もしくは 全員健康状態のときは処理をスキップするようにする
+        if (_cellStateCount.NearDeath == allAgents || _cellStateCount.Healthy == 0)
+        {
+            _isActive = false;
+            return;
+        }
+
+        // 一つ目の条件を抜けた場合で、まだ起動していなかったら起動する
+        if (!_isActive)
+        {
+            _isActive = true;
+        }
     }
 }
