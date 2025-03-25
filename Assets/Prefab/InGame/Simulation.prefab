@@ -44,3 +44,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a4f8485372bf3e24190fba486f442193, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _areaSettings:
+  - {fileID: 11400000, guid: 7dee6fc7d20940e49a0a67d9a137de26, type: 2}
+  - {fileID: 11400000, guid: ccc68856647d330438906afb41df9de8, type: 2}
+  - {fileID: 11400000, guid: f74283139082f02499bf24136f32d833, type: 2}
+  - {fileID: 11400000, guid: c94da1349a283074eb9858d4921c538c, type: 2}
+  - {fileID: 11400000, guid: 46b98c9e23e8cde498eb084cbcccb5cd, type: 2}
+  - {fileID: 11400000, guid: c99d253eba40deb408a4a63360e61961, type: 2}
+  - {fileID: 11400000, guid: 9856ecbcc2ce6a149858f1a036428373, type: 2}
+  - {fileID: 11400000, guid: a4f66169ad82466408e6ef8611b1d0c7, type: 2}
+  - {fileID: 11400000, guid: a8632c9625eb2fc47bbcc4f380a9db6f, type: 2}
+  - {fileID: 11400000, guid: 96e91237a74db7d4197133698b018a45, type: 2}
+  - {fileID: 11400000, guid: 07b73730648b73847a84d217a2ba6276, type: 2}
+  - {fileID: 11400000, guid: 736775952af54c74d873cd8c839e6848, type: 2}
+  - {fileID: 11400000, guid: 12f830704aeaf0a45a904c98e9402218, type: 2}
+  - {fileID: 11400000, guid: ea08b149d82816243af40e6ae6e59fad, type: 2}
+  - {fileID: 11400000, guid: 50635c8632bd77348828f180c6d91f55, type: 2}
+  - {fileID: 11400000, guid: a02ecf154b99c1944802cf0f1c006df4, type: 2}
+  - {fileID: 11400000, guid: a4d826897513c2e48b158dd1e2777aa9, type: 2}
+  - {fileID: 11400000, guid: a1b22d965bb0b774895f9896c400f92d, type: 2}
+  - {fileID: 11400000, guid: b57111152e45cb646b41a7b0d3cecedc, type: 2}

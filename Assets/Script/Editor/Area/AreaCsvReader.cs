@@ -18,7 +18,7 @@ public class AreaCsvReader : EditorWindow
     [MenuItem("Creeping Red/AreaCsvReader")]
     public static void ShowWindow()
     {
-        GetWindow<AreaCsvReader>("AreaScvReader");
+        GetWindow<AreaCsvReader>("AreaCsvReader");
     }
 
     private void OnGUI()
@@ -121,7 +121,7 @@ public class AreaCsvReader : EditorWindow
     {
         T scriptableObject = CreateInstance<T>();
         PopulateScriptableObject(scriptableObject, values);
-        string assetPath = $"{path}{scriptableObject.name}.asset";
+        string assetPath = $"{path}{ExtensionsUtility.ToSectionEnum(values[3])}.asset";
         AssetDatabase.CreateAsset(scriptableObject, assetPath);
         return scriptableObject;
     }

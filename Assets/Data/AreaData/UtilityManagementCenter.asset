@@ -10,19 +10,19 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 65b5aee03a9e6c149b0d7f369996c783, type: 3}
-  m_Name: MiddleClassNorthDistrict
+  m_Name: UtilityManagementCenter
   m_EditorClassIdentifier: 
-  X: 1
-  Y: 1
-  Name: 6
-  Category: 2
-  Population: 2300
-  CitizenPopulation: 2295
+  X: 0
+  Y: 2
+  Name: 10
+  Category: 4
+  Population: 150
+  CitizenPopulation: 145
   MagicSoldierPopulation: 5
-  AreaSize: 1013
-  PopulationDensity: 22705
-  Security: 45
-  MobilityRate: 70
+  AreaSize: 242.5
+  PopulationDensity: 6185
+  Security: 75
+  MobilityRate: 30
   InfectionRate: 0
-  Control: 50
+  Control: 70
   SpecialFlags: []

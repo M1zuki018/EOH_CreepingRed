@@ -8,7 +8,7 @@ public static class ExtensionsUtility
 {
     private static readonly Dictionary<SectionEnum, string> SectionDictionary = new Dictionary<SectionEnum, string>
     {
-        {SectionEnum.MagicTechnologyResearchArea, "魔法技術研究区"},
+            {SectionEnum.MagicTechnologyResearchArea, "魔法技術研究区"},
             {SectionEnum.MagicianTrainingCenter, "魔法士訓練所"},
             {SectionEnum.CentralTower, "セントラル・タワー"},
             {SectionEnum.UpperClassResidentialDistrict, "上級階級用邸宅街"},
