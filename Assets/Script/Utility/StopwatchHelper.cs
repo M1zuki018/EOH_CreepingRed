@@ -35,4 +35,21 @@ public static class StopwatchHelper
         stopwatch.Stop();
         Debug.Log($"{label}: {stopwatch.ElapsedMilliseconds}ミリ秒");
     }
+    
+    public static void TestOnlyMeasure(Action action, string label = "処理時間")
+    {
+        Stopwatch stopwatch = Stopwatch.StartNew();
+        action.Invoke();
+        stopwatch.Stop();
+        DebugLogHelper.LogicTest($"{label}: {stopwatch.ElapsedMilliseconds}ミリ秒");
+    }
+    
+    public static async UniTask TestOnlyMeasureAsync(Func<UniTask> action, string label = "処理時間")
+    {
+        var stopwatch = new Stopwatch();
+        stopwatch.Start();
+        await action();
+        stopwatch.Stop();
+        DebugLogHelper.LogicTest($"{label}: {stopwatch.ElapsedMilliseconds}ミリ秒");
+    }
 }

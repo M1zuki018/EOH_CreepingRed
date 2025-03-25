@@ -7,6 +7,7 @@ public static class DebugLogHelper
 {
     public static bool IsLogFormatEnabled { get; set; } = true;
     public static bool IsLoggingEnabled { get; set; } = true;
+    public static bool IsLogicTestEnabled { get; set; } = true;
     
     /// <summary>
     /// 目立つログを出力する
@@ -34,6 +35,17 @@ public static class DebugLogHelper
     public static void TestOnly(string message)
     {
         if (IsLoggingEnabled)
+        {
+            Debug.Log(message);
+        }
+    }
+
+    /// <summary>
+    /// ロジックの規模が小さいテスト中のみ表示したいログ
+    /// </summary>
+    public static void LogicTest(string message)
+    {
+        if (IsLogicTestEnabled)
         {
             Debug.Log(message);
         }

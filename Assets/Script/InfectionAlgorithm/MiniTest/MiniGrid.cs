@@ -7,7 +7,7 @@ using Debug = UnityEngine.Debug;
 /// </summary>
 public class MiniGrid
 {
-    private readonly MiniArea[,] _areas = new MiniArea[3 ,1]; // エリアデータの二次元配列
+    private readonly MiniArea[,] _areas = new MiniArea[5 ,4]; // エリアデータの二次元配列
     private readonly AgentStateCount _totalStateCount; // ゲーム内に存在するエージェントの累計
     private readonly List<UniTask> _tasks = new List<UniTask>();
     
@@ -46,7 +46,7 @@ public class MiniGrid
     /// </summary>
     public void StartInfection()
     {
-        _areas[0,0].Infection();
+        _areas[0,2].Infection();
     }
     
     /// <summary>
@@ -56,19 +56,23 @@ public class MiniGrid
     {
         _tasks.Clear(); // 最初にTaskのリストをクリアして再利用
         
-        for (int x = 0; x < _areas.GetLength(0); x++)
+        await StopwatchHelper.MeasureAsync(async () =>
         {
-            for (int y = 0; y < _areas.GetLength(1); y++)
+            for (int x = 0; x < _areas.GetLength(0); x++)
             {
-                var area = _areas[x, y];
-                if (area != null)
+                for (int y = 0; y < _areas.GetLength(1); y++)
                 {
-                    _tasks.Add(area.SimulateInfectionAsync());
+                    var area = _areas[x, y];
+                    if (area != null)
+                    {
+                        _tasks.Add(area.SimulateInfectionAsync());
+                    }
                 }
             }
-        }
         
-        await UniTask.WhenAll(_tasks);  // すべてのタスクが完了するまで待機
+            await UniTask.WhenAll(_tasks);  // すべてのタスクが完了するまで待機
+        }, "\ud83d\uddfa\ufe0fグリッド シミュレーション更新");
+        
         
         UpdateStateCount();
     }

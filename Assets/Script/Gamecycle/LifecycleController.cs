@@ -12,9 +12,10 @@ using UnityEngine.SceneManagement;
 public class LifecycleController : MonoBehaviour
 {
     [Header("Debug")]
-    [SerializeField] private bool _debugMode = true;
-    [SerializeField] private bool _isLogFormatEnabled = true;
-    [SerializeField] private bool _isLoggingEnabled = true;
+    [SerializeField, Comment("デバッグモード：本番環境にスキップしない")] private bool _debugMode = true;
+    [SerializeField, Comment("Objectの生成ログを表示")] private bool _isLogFormatEnabled = true;
+    [SerializeField, Comment("テストのログを表示")] private bool _isLoggingEnabled = true;
+    [SerializeField, Comment("感染シミュレーションの詳細なログを表示")] private bool _isLogicTestEnabled = true;
     
     [Header("設定")]
     [SerializeField] private List<GameObject> _prefabsToInstantiate = new List<GameObject>();
@@ -31,6 +32,7 @@ public class LifecycleController : MonoBehaviour
         
         DebugLogHelper.IsLogFormatEnabled = _isLogFormatEnabled;
         DebugLogHelper.IsLoggingEnabled = _isLoggingEnabled;
+        DebugLogHelper.IsLogicTestEnabled = _isLogicTestEnabled;
         
         await AutoInstantiate(); // インスタンス化
         

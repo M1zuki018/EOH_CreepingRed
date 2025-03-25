@@ -7,7 +7,7 @@ using UnityEngine;
 /// </summary>
 public class MiniTestSimulator : ViewBase, ISimulator
 {
-    [SerializeField, ExpandableSO] private List<AreaSettingsSO> _areaSettings = new List<AreaSettingsSO>();
+    [SerializeField] private List<AreaSettingsSO> _areaSettings = new List<AreaSettingsSO>();
     private MiniSimulation _simulation;
 
     /// <summary>

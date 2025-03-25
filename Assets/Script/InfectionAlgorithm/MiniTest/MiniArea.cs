@@ -14,7 +14,7 @@ public class MiniArea
     private List<string> _specialFlags; // 特殊フラグ（条件）
     
     private List<MiniCell> _cells = new List<MiniCell>(); // セルのリスト
-    private int _infectionIndex; // 感染が行われているセルのインデックス
+    private int _infectionIndex = 0; // 感染が行われているセルのインデックス
     private readonly AgentStateCount _areaStateCount;
     public AgentStateCount AreaStateCount => _areaStateCount; // Areaクラスのエージェントの状態の集計結果
     
@@ -38,7 +38,7 @@ public class MiniArea
     /// </summary>
     private void InitializeCells(AreaSettingsSO settings)
     {
-        StopwatchHelper.AlwaysUse(() =>
+        StopwatchHelper.TestOnlyMeasure(() =>
             {
                 int cellPopulation = 100000; // 1セルあたりの人口
                 int cellCount = _citizenPopulation / cellPopulation; // セルの個数計算
@@ -59,7 +59,7 @@ public class MiniArea
                     _cells.Add(new MiniCell(cellCount, remainderPopulation, _infectionRate * 0.01f));
                 }
                 
-                DebugLogHelper.LogImportant($"{settings.Name.ToString()}エリアのセルの数：{_cells.Count}");
+                DebugLogHelper.LogicTest($"{settings.Name.ToString()}エリアのセルの数：{_cells.Count}");
             }, "\ud83c\udfde\ufe0fエリア　セル生成時間");
     }
 
@@ -96,7 +96,7 @@ public class MiniArea
     {
         _areaStateCount.ResetStateCount(); // 一旦リセット
 
-        await StopwatchHelper.MeasureAsync(async () =>
+        await StopwatchHelper.TestOnlyMeasureAsync(async () =>
         {
             int totalHealthy = 0, totalInfected = 0, totalNearDeath = 0;
             int totalGhost = 0, totalPerished = 0;
@@ -119,7 +119,7 @@ public class MiniArea
         }, "\ud83c\udfde\ufe0fエリア 各セルのステートの集計速度");
 
         // 感染フラグが立っていたら、次のセルに感染を広める
-        if (_cells[_infectionIndex].Spreading)
+        if (_infectionIndex < _cells.Count && _cells[_infectionIndex].Spreading)
         {
             if (_infectionIndex < _cells.Count - 1) // 範囲を越えないようにする
             {
