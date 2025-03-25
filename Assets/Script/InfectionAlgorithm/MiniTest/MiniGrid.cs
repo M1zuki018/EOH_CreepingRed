@@ -22,23 +22,26 @@ public class MiniGrid
     /// </summary>
     private void InitializeAreas(List<AreaSettingsSO> areaSettings)
     {
-        foreach (var areaSetting in areaSettings)
+        StopwatchHelper.AlwaysUse(() =>
         {
-            int x = areaSetting.X;
-            int y = areaSetting.Y;
-            
-            // Areasの範囲を超えないかチェック
-            if (x >= 0 && x < _areas.GetLength(0) && y >= 0 && y < _areas.GetLength(1))
+            foreach (var areaSetting in areaSettings)
             {
-                // SOで設定した座標に基づいてエリアを配置
-                _areas[x, y] = new MiniArea(areaSetting);
-                DebugLogHelper.LogTestOnly($"エリア作成 ({x}, {y}) : {areaSetting.Name.ToString()}");
+                int x = areaSetting.X;
+                int y = areaSetting.Y;
+
+                // Areasの範囲を超えないかチェック
+                if (x >= 0 && x < _areas.GetLength(0) && y >= 0 && y < _areas.GetLength(1))
+                {
+                    // SOで設定した座標に基づいてエリアを配置
+                    _areas[x, y] = new MiniArea(areaSetting);
+                    DebugLogHelper.LogTestOnly($"エリア作成 ({x}, {y}) : {areaSetting.Name.ToString()}");
+                }
+                else
+                {
+                    Debug.LogWarning($" MiniGrid：{areaSetting.Name}　({x}, {y}) は無効な座標です");
+                }
             }
-            else
-            {
-                Debug.LogWarning($" MiniGrid：{areaSetting.Name}　({x}, {y}) は無効な座標です");
-            }
-        }
+        },"\ud83d\uddfa\ufe0fグリッド 初期化");
     }
 
     /// <summary>
