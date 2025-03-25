@@ -80,7 +80,7 @@ public class MiniCell
                 HandleInfectionSpread(agentsCount);
                 HandleCellActivation(agentsCount);
                 
-            }, $"\ud83d\udfe6セル(ID:{_id}) Quadtreeのステート集計速度");
+            }, $"\ud83d\udfe6セル(ID:{_id}) Cellのステート集計速度");
     }
 
     /// <summary>
