@@ -10,6 +10,7 @@ using Cysharp.Threading.Tasks;
 public class Area
 {
     // 基本情報
+    private readonly SectionEnum _section; // 名前
     private readonly int _citizenPopulation; // 一般市民人口
     private readonly int _infectionRate; // 感染成功率（%）
     private List<string> _specialFlags; // 特殊フラグ（条件）
@@ -27,10 +28,13 @@ public class Area
     /// </summary>
     public Area(AreaSettingsSO settings, bool infection)
     {
+        _section = settings.Name;
         _citizenPopulation = settings.CitizenPopulation * 1000;
         _infectionRate = settings.InfectionRate;
         _specialFlags = settings.SpecialFlags ?? new List<string>();
         _areaStateCount = new AgentStateCount();
+        
+        AreaStateCountRegister.Instance.RegisterArea(_section, _areaStateCount); // 辞書に登録
         
         InitializeCells(settings, infection);
     }

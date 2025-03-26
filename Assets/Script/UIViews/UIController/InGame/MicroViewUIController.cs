@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 /// <summary>
@@ -23,6 +24,7 @@ public class MicroViewUIController : UIControllerBase
     [SerializeField, HighlightIfNull] private Image _backgroundImage;
     [SerializeField, HighlightIfNull] private Text _nameText;
     [SerializeField, HighlightIfNull] private Text _explainText;
+    [FormerlySerializedAs("_infectionGaugeSlider")] [SerializeField, HighlightIfNull] private GridInfectionGaugeSlider gridInfectionGaugeSlider;
 
     [Header("開発中オンリー")] [SerializeField] private Text _day;
     
@@ -90,7 +92,7 @@ public class MicroViewUIController : UIControllerBase
     /// </summary>
     private async UniTask ChangeArea(int operation)
     {
-        float fadeDuration = 0.5f;
+        var fadeDuration = 0.5f;
         
         // フェードアウト処理
         _nameText.DOFade(0, fadeDuration);
