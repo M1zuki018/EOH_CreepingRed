@@ -14,9 +14,9 @@ public class InfectionCountText : ViewBase
     
     public override UniTask OnUIInitialize()
     {
-        _healthy.text = "";
-        _infected.text = "";
-        _nearDeath.text = "";
+        _healthy.text = Formatted(0);
+        _infected.text = Formatted(0);
+        _nearDeath.text = Formatted(0);
         
         return base.OnUIInitialize();
     }
@@ -34,8 +34,16 @@ public class InfectionCountText : ViewBase
     /// </summary>
     public void CountUpdate()
     {
-        _healthy.text = _stateCount.Healthy.ToString();
-        _infected.text = _stateCount.Infected.ToString();
-        _nearDeath.text = _stateCount.NearDeath.ToString();
+        _healthy.text = Formatted(_stateCount.Healthy);
+        _infected.text = Formatted(_stateCount.Infected);
+        _nearDeath.text = Formatted(_stateCount.NearDeath);
+    }
+
+    /// <summary>
+    /// 表示のフォーマットを整える
+    /// </summary>
+    private string Formatted(int num)
+    {
+        return num.ToString("00,000,000"); // 8桁になるようにゼロ埋めしつつカンマ区切り
     }
 }
