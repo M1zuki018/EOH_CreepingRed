@@ -35,7 +35,7 @@ public class Area
         _specialFlags = settings.SpecialFlags ?? new List<string>();
         _areaStateCount = new AgentStateCount();
         
-        AreaStateCountRegister.Instance.RegisterArea(_section, _areaStateCount, this); // 辞書に登録
+        AreaStateCountManager.Instance.RegisterArea(_section, _areaStateCount, this); // 辞書に登録
         InitializeCells(settings, infection);
     }
 

@@ -18,6 +18,17 @@ public class AreaInfectionText : ViewBase
         return base.OnUIInitialize();
     }
 
+    public override UniTask OnBind()
+    {
+        AreaStateCountManager.Instance.OnUpdate += CountUpdate;
+        return base.OnBind();
+    }
+    
+    private void OnDestroy()
+    {
+        AreaStateCountManager.Instance.OnUpdate -= CountUpdate;
+    }
+
     /// <summary>
     /// カウントをリセットする
     /// </summary>

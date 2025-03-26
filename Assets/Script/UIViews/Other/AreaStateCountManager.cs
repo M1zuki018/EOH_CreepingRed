@@ -4,16 +4,16 @@ using System.Collections.Generic;
 /// <summary>
 /// AreaStateCountクラスを収集/管理し、UIへデータを渡すためのクラス
 /// </summary>
-public class AreaStateCountRegister
+public class AreaStateCountManager
 {
-    private static AreaStateCountRegister _instance;
-    public static AreaStateCountRegister Instance => _instance ??= new AreaStateCountRegister();
+    private static AreaStateCountManager _instance;
+    public static AreaStateCountManager Instance => _instance ??= new AreaStateCountManager();
     
     // 各エリアのenumとカウントクラスのPairのディクショナリ
     private readonly Dictionary<SectionEnum, AgentStateCount> _stateCountDictionary = new Dictionary<SectionEnum, AgentStateCount>();
     public event Action OnUpdate; // 数値が変わったタイミングで発火するようにする
     
-    private AreaStateCountRegister() {} // 外部からのインスタンス化を防ぐ
+    private AreaStateCountManager() {} // 外部からのインスタンス化を防ぐ
 
     /// <summary>
     /// エリアの辞書を作成する

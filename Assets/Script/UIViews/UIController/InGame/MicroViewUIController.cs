@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using UnityEngine;
-using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 /// <summary>
@@ -38,8 +37,6 @@ public class MicroViewUIController : UIControllerBase
         _closeButton.onClick.AddListener(() => OnMacroView?.Invoke()); // 閉じるボタンを押したら全体ビューへ
         _nextButton.onClick.AddListener(() => ChangeArea(1).Forget());
         _backButton.onClick.AddListener(() => ChangeArea(-1).Forget());
-
-        AreaStateCountRegister.Instance.OnUpdate += StateCountUpdate;
     }
 
     protected override void UnregisterEvents()
@@ -47,8 +44,6 @@ public class MicroViewUIController : UIControllerBase
         _closeButton.onClick.RemoveListener(() => OnMacroView?.Invoke());
         _nextButton.onClick.RemoveListener(() => ChangeArea(1).Forget());
         _backButton.onClick.RemoveListener(() => ChangeArea(-1).Forget());
-        
-        AreaStateCountRegister.Instance.OnUpdate -= StateCountUpdate;
     }
 
     /// <summary>
@@ -69,7 +64,7 @@ public class MicroViewUIController : UIControllerBase
         var area = _areaSettings[index];
         
         // AgentStateCountを取得して、表示を変更する
-        if(AreaStateCountRegister.Instance.GetStateCount((SectionEnum)index, out AgentStateCount stateCount))
+        if(AreaStateCountManager.Instance.GetStateCount((SectionEnum)index, out AgentStateCount stateCount))
         {
             // 参照を渡す
             _areaInfectionText.SetAgentStateCount(stateCount); 
@@ -94,15 +89,6 @@ public class MicroViewUIController : UIControllerBase
         _explainText.DOFade(1, 0.5f);
         
         Show();
-    }
-
-    /// <summary>
-    /// 更新
-    /// </summary>
-    private void StateCountUpdate()
-    {
-        _areaInfectionText.CountUpdate();
-        _areaInfectionGauge.FillUpdate();
     }
     
     /// <summary>
