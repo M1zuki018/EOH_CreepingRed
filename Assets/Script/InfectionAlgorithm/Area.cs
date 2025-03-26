@@ -19,7 +19,7 @@ public class Area
     private int _infectionIndex = 0; // 感染が行われているセルのインデックス
     private readonly AgentStateCount _areaStateCount;
     public AgentStateCount AreaStateCount => _areaStateCount; // Areaクラスのエージェントの状態の集計結果
-    public static event Action<int, int, int> StateUpdated; // 健康, 感染, 仮死の数値を通知するイベント
+    public event Action<int, int, int> StateUpdated; // 健康, 感染, 仮死の数値を通知するイベント
     
     private List<UniTask> _tasks = new List<UniTask>(); // シミュレーション更新タスクのリスト
 
@@ -34,7 +34,7 @@ public class Area
         _specialFlags = settings.SpecialFlags ?? new List<string>();
         _areaStateCount = new AgentStateCount();
         
-        AreaStateCountRegister.Instance.RegisterArea(_section, _areaStateCount); // 辞書に登録
+        AreaStateCountRegister.Instance.RegisterArea(_section, _areaStateCount, this); // 辞書に登録
         
         InitializeCells(settings, infection);
     }

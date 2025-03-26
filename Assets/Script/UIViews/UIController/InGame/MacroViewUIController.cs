@@ -44,7 +44,7 @@ public class MacroViewUIController : UIControllerBase
             _areaButton[i].onClick.RemoveListener(() => OnArea?.Invoke(index));
         }
     }
-
+    
     /// <summary>
     /// 初期化処理
     /// </summary>

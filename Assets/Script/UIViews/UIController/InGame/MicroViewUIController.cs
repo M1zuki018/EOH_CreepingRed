@@ -24,8 +24,9 @@ public class MicroViewUIController : UIControllerBase
     [SerializeField, HighlightIfNull] private Image _backgroundImage;
     [SerializeField, HighlightIfNull] private Text _nameText;
     [SerializeField, HighlightIfNull] private Text _explainText;
-    [FormerlySerializedAs("_infectionGaugeSlider")] [SerializeField, HighlightIfNull] private GridInfectionGaugeSlider gridInfectionGaugeSlider;
-
+    [SerializeField, HighlightIfNull] private AreaInfectionGaugeSlider _areaInfectionGaugeSlider;
+    [SerializeField, HighlightIfNull] private InfectionCountText _infectionCountText;
+    
     [Header("開発中オンリー")] [SerializeField] private Text _day;
     
     private List<AreaViewSettingsSO> _areaSettings; // エリアデータの参照
@@ -37,6 +38,8 @@ public class MicroViewUIController : UIControllerBase
         _closeButton.onClick.AddListener(() => OnMacroView?.Invoke()); // 閉じるボタンを押したら全体ビューへ
         _nextButton.onClick.AddListener(() => ChangeArea(1).Forget());
         _backButton.onClick.AddListener(() => ChangeArea(-1).Forget());
+
+        AreaStateCountRegister.Instance.OnUpdate += StateCountUpdate;
     }
 
     protected override void UnregisterEvents()
@@ -44,6 +47,8 @@ public class MicroViewUIController : UIControllerBase
         _closeButton.onClick.RemoveListener(() => OnMacroView?.Invoke());
         _nextButton.onClick.RemoveListener(() => ChangeArea(1).Forget());
         _backButton.onClick.RemoveListener(() => ChangeArea(-1).Forget());
+        
+        AreaStateCountRegister.Instance.OnUpdate -= StateCountUpdate;
     }
 
     /// <summary>
@@ -59,9 +64,10 @@ public class MicroViewUIController : UIControllerBase
     /// </summary>
     public void ShowMicroView(int index)
     {
-        _selectedArea = index;
+        _selectedArea = index;  
         
         var area = _areaSettings[index];
+        var stateCount = AreaStateCountRegister.Instance.GetStateCount((SectionEnum)index);
         
         _nameText.text = ExtensionsUtility.SectionEnumToJapanese(area.Name); // エリア名
         _explainText.text = area.Explaination; // エリアの説明
@@ -72,11 +78,24 @@ public class MicroViewUIController : UIControllerBase
             Dev(area.Background); // TODO: あとで消す
         }
         
+        // AgentStateCountクラスを渡す
+        _infectionCountText.SetAgentStateCount(stateCount); 
+        _areaInfectionGaugeSlider.SetAgentStateCount(stateCount);
+        
         // アニメーション
         _nameText.DOFade(1, 0.5f);
         _explainText.DOFade(1, 0.5f);
         
         Show();
+    }
+
+    /// <summary>
+    /// 更新
+    /// </summary>
+    private void StateCountUpdate(int a, int b, int c)
+    {
+        _infectionCountText.CountUpdate();
+        _areaInfectionGaugeSlider.FillUpdate();
     }
     
     /// <summary>
