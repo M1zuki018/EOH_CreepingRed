@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 /// <summary>
-/// 感染スライダーを管理するクラス
+/// 都市全体の感染スライダーを管理するクラス（Gridクラスとセット）
 /// </summary>
 public class GridInfectionGaugeSlider : ViewBase
 {
@@ -13,14 +13,10 @@ public class GridInfectionGaugeSlider : ViewBase
 
     public override UniTask OnUIInitialize()
     {
-        // スライダーの初期化
-        _healthyGauge.fillAmount = 1;
-        _infectedGauge.fillAmount = 0;
-        _nearDeathGauge.fillAmount = 0;
-        
+        ResetGauge();　// スライダーの初期化
         return base.OnUIInitialize();
     }
-
+    
     public override UniTask OnBind()
     {
         Grid.StateUpdated += FillUpdate; // ステートカウントの更新イベントを登録
@@ -33,6 +29,16 @@ public class GridInfectionGaugeSlider : ViewBase
     }
 
     /// <summary>
+    /// 初期化処理
+    /// </summary>
+    private void ResetGauge()
+    {
+        _healthyGauge.fillAmount = 1;
+        _infectedGauge.fillAmount = 0;
+        _nearDeathGauge.fillAmount = 0;
+    }
+    
+    /// <summary>
     /// Fillを更新する
     /// </summary>
     private void FillUpdate(int healthy, int infected, int nearDeath)
@@ -41,20 +47,15 @@ public class GridInfectionGaugeSlider : ViewBase
      
         if (sum <= 0f)
         {
-            // すべて0の場合、ゲージをリセット
-            _healthyGauge.fillAmount = 1f;
-            _infectedGauge.fillAmount = 0f;
-            _nearDeathGauge.fillAmount = 0f;
+            ResetGauge(); // すべて0の場合、ゲージをリセット
             return;
         }
         
         // それぞれのFillの幅を計算
-        float healthyFill = (float)healthy / sum;
         float infectedFill = (float)infected / sum;
         float nearDeathFill = (float)nearDeath / sum;
 
-        // ゲージに反映する
-        _healthyGauge.fillAmount = Mathf.Clamp01(healthyFill + infectedFill + nearDeathFill);
+        // ゲージに反映する(Healthyは常に1のままにしておく)
         _infectedGauge.fillAmount = Mathf.Clamp01(infectedFill + nearDeathFill);
         _nearDeathGauge.fillAmount = Mathf.Clamp01(nearDeathFill);
     }
