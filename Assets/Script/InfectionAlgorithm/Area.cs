@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -17,6 +18,7 @@ public class Area
     private int _infectionIndex = 0; // 感染が行われているセルのインデックス
     private readonly AgentStateCount _areaStateCount;
     public AgentStateCount AreaStateCount => _areaStateCount; // Areaクラスのエージェントの状態の集計結果
+    public static event Action<int, int, int> StateUpdated; // 健康, 感染, 仮死の数値を通知するイベント
     
     private List<UniTask> _tasks = new List<UniTask>(); // シミュレーション更新タスクのリスト
 
@@ -116,8 +118,12 @@ public class Area
                 totalHealthy, totalInfected, totalNearDeath,
                 totalGhost, totalPerished
             );
+            
+            // 集計結果を通知（イベント発火）
+            StateUpdated?.Invoke(totalHealthy, totalInfected, totalNearDeath);
+            
         }, "\ud83c\udfde\ufe0fエリア 各セルのステートの集計速度");
-
+        
         // 感染フラグが立っていたら、次のセルに感染を広める
         if (_infectionIndex < _cells.Count && _cells[_infectionIndex].Spreading)
         {

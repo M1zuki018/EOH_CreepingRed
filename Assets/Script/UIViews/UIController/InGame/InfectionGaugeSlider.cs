@@ -21,10 +21,21 @@ public class InfectionGaugeSlider : ViewBase
         return base.OnUIInitialize();
     }
 
+    public override UniTask OnBind()
+    {
+        Area.StateUpdated += FillUpdate; // ステートカウントの更新イベントを登録
+        return base.OnBind();
+    }
+
+    private void OnDestroy()
+    {
+        Area.StateUpdated -= FillUpdate;
+    }
+
     /// <summary>
     /// Fillを更新する
     /// </summary>
-    public void FillUpdate(float healthy, float infected, float nearDeath)
+    private void FillUpdate(int healthy, int infected, int nearDeath)
     {
         var sum = healthy + infected + nearDeath; // 合計を求める
      
@@ -38,13 +49,13 @@ public class InfectionGaugeSlider : ViewBase
         }
         
         // それぞれのFillの幅を計算
-        float healthyFill = healthy / sum;
-        float infectedFill = infected / sum;
-        float nearDeathFill = nearDeath / sum;
+        float healthyFill = (float)healthy / sum;
+        float infectedFill = (float)infected / sum;
+        float nearDeathFill = (float)nearDeath / sum;
 
         // ゲージに反映する
-        _healthyGauge.fillAmount = Mathf.Clamp01(healthyFill);
-        _infectedGauge.fillAmount = Mathf.Clamp01(healthyFill + infectedFill);
-        _nearDeathGauge.fillAmount = Mathf.Clamp01(healthyFill + infectedFill + nearDeathFill);
+        _healthyGauge.fillAmount = Mathf.Clamp01(healthyFill + infectedFill + nearDeathFill);
+        _infectedGauge.fillAmount = Mathf.Clamp01(infectedFill + nearDeathFill);
+        _nearDeathGauge.fillAmount = Mathf.Clamp01(nearDeathFill);
     }
 }

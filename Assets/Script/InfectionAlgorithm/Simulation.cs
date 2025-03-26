@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using R3;
-using Debug = UnityEngine.Debug;
 
 /// <summary>
 /// 1日のサイクルを管理する
