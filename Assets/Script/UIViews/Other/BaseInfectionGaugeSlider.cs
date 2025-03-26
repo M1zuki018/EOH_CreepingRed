@@ -2,6 +2,9 @@ using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
 
+/// <summary>
+/// 感染状況を確認するスライダーを管理するクラスのベース
+/// </summary>
 public abstract class BaseInfectionGaugeSlider : ViewBase
 {
     [SerializeField, HighlightIfNull] private Image _healthyGauge;
