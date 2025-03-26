@@ -14,11 +14,18 @@ public class AreaInfectionText : ViewBase
     
     public override UniTask OnUIInitialize()
     {
+        ResetCount();
+        return base.OnUIInitialize();
+    }
+
+    /// <summary>
+    /// カウントをリセットする
+    /// </summary>
+    private void ResetCount()
+    {
         _healthy.text = Formatted(0);
         _infected.text = Formatted(0);
         _nearDeath.text = Formatted(0);
-        
-        return base.OnUIInitialize();
     }
 
     /// <summary>
@@ -34,12 +41,15 @@ public class AreaInfectionText : ViewBase
     /// </summary>
     public void CountUpdate()
     {
-        if (_stateCount != null)
+        if (_stateCount == null)
         {
-            _healthy.text = Formatted(_stateCount.Healthy);
-            _infected.text = Formatted(_stateCount.Infected);
-            _nearDeath.text = Formatted(_stateCount.NearDeath);
+            ResetCount();
+            return;
         }
+
+        _healthy.text = Formatted(_stateCount.Healthy);
+        _infected.text = Formatted(_stateCount.Infected);
+        _nearDeath.text = Formatted(_stateCount.NearDeath);
     }
 
     /// <summary>

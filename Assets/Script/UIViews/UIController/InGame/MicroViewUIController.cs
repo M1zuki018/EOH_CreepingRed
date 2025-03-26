@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 /// <summary>
@@ -23,8 +24,8 @@ public class MicroViewUIController : UIControllerBase
     [SerializeField, HighlightIfNull] private Image _backgroundImage;
     [SerializeField, HighlightIfNull] private Text _nameText;
     [SerializeField, HighlightIfNull] private Text _explainText;
-    [SerializeField, HighlightIfNull] private AreaInfectionGauge areaInfectionGauge;
-    [SerializeField, HighlightIfNull] private AreaInfectionText areaInfectionText;
+    [SerializeField, HighlightIfNull] private AreaInfectionGauge _areaInfectionGauge;
+    [SerializeField, HighlightIfNull] private AreaInfectionText _areaInfectionText;
     
     [Header("開発中オンリー")] [SerializeField] private Text _day;
     
@@ -66,7 +67,18 @@ public class MicroViewUIController : UIControllerBase
         _selectedArea = index;  
         
         var area = _areaSettings[index];
-        var stateCount = AreaStateCountRegister.Instance.GetStateCount((SectionEnum)index);
+        
+        // AgentStateCountを取得して、表示を変更する
+        if(AreaStateCountRegister.Instance.GetStateCount((SectionEnum)index, out AgentStateCount stateCount))
+        {
+            // 参照を渡す
+            _areaInfectionText.SetAgentStateCount(stateCount); 
+            _areaInfectionGauge.SetAgentStateCount(stateCount);
+            
+            // UIを更新
+            _areaInfectionText.CountUpdate();
+            _areaInfectionGauge.FillUpdate();
+        }
         
         _nameText.text = ExtensionsUtility.SectionEnumToJapanese(area.Name); // エリア名
         _explainText.text = area.Explaination; // エリアの説明
@@ -76,10 +88,6 @@ public class MicroViewUIController : UIControllerBase
             _backgroundImage.sprite = area.Background; // 背景変更
             Dev(area.Background); // TODO: あとで消す
         }
-        
-        // AgentStateCountクラスを渡す
-        areaInfectionText.SetAgentStateCount(stateCount); 
-        areaInfectionGauge.SetAgentStateCount(stateCount);
         
         // アニメーション
         _nameText.DOFade(1, 0.5f);
@@ -93,8 +101,8 @@ public class MicroViewUIController : UIControllerBase
     /// </summary>
     private void StateCountUpdate()
     {
-        areaInfectionText.CountUpdate();
-        areaInfectionGauge.FillUpdate();
+        _areaInfectionText.CountUpdate();
+        _areaInfectionGauge.FillUpdate();
     }
     
     /// <summary>

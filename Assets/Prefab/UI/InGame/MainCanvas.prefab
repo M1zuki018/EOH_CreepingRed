@@ -6023,8 +6023,8 @@ MonoBehaviour:
   _backgroundImage: {fileID: 4044560168440457125}
   _nameText: {fileID: 3637814342337174150}
   _explainText: {fileID: 4335937880762865074}
-  _areaInfectionGaugeSlider: {fileID: 8942652792337722301}
-  _infectionCountText: {fileID: 132966601935030710}
+  _areaInfectionGauge: {fileID: 8942652792337722301}
+  _areaInfectionText: {fileID: 132966601935030710}
   _day: {fileID: 998627303609083985}
 --- !u!1 &6219293143643444225
 GameObject:
