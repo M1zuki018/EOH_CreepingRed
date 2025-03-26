@@ -34,9 +34,12 @@ public class InfectionCountText : ViewBase
     /// </summary>
     public void CountUpdate()
     {
-        _healthy.text = Formatted(_stateCount.Healthy);
-        _infected.text = Formatted(_stateCount.Infected);
-        _nearDeath.text = Formatted(_stateCount.NearDeath);
+        if (_stateCount != null)
+        {
+            _healthy.text = Formatted(_stateCount.Healthy);
+            _infected.text = Formatted(_stateCount.Infected);
+            _nearDeath.text = Formatted(_stateCount.NearDeath);
+        }
     }
 
     /// <summary>

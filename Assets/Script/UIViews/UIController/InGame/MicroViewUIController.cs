@@ -92,7 +92,7 @@ public class MicroViewUIController : UIControllerBase
     /// <summary>
     /// 更新
     /// </summary>
-    private void StateCountUpdate(int a, int b, int c)
+    private void StateCountUpdate()
     {
         _infectionCountText.CountUpdate();
         _areaInfectionGaugeSlider.FillUpdate();

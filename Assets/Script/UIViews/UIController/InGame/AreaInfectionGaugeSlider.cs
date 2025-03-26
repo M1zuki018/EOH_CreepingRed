@@ -35,6 +35,8 @@ public class AreaInfectionGaugeSlider : ViewBase
     /// </summary>
     public void FillUpdate()
     {
+        if(_stateCount == null) return;
+        
         int healthy = _stateCount.Healthy;
         int infected = _stateCount.Infected;
         int nearDeath = _stateCount.NearDeath;

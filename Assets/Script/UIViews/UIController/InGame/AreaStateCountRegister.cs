@@ -11,7 +11,7 @@ public class AreaStateCountRegister
     private SectionEnum _currentSection;   
     private AreaStateCountRegister() {} // 外部からのインスタンス化を防ぐ
     
-    public event Action<int,int,int> OnUpdate; // 数値が変わったタイミングで発火するようにする
+    public event Action OnUpdate; // 数値が変わったタイミングで発火するようにする
 
     /// <summary>
     /// エリアの辞書を作成する
@@ -19,9 +19,11 @@ public class AreaStateCountRegister
     public void RegisterArea(SectionEnum section, AgentStateCount agentStateCount, Area area)
     {
         _stateCountDictionary[section] = agentStateCount;
-        area.StateUpdated += OnUpdate;
+        area.StateUpdated += HandleUpdate;
     }
 
+    private void HandleUpdate() => OnUpdate?.Invoke();
+    
     /// <summary>
     /// 引数に対応したAgentStateCountを返す
     /// </summary>
