@@ -1,11 +1,9 @@
 using Cysharp.Threading.Tasks;
-using UnityEngine;
-using UnityEngine.UI;
 
 /// <summary>
 /// 都市全体の感染スライダーを管理するクラス（Gridクラスとセット）
 /// </summary>
-public class GridInfectionGaugeSlider : BaseInfectionGaugeSlider
+public class CityInfectionGauge : InfectionGaugeSliderBase
 {
     public override UniTask OnBind()
     {

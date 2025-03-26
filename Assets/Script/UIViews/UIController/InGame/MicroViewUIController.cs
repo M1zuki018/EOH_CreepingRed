@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using UnityEngine;
-using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 /// <summary>
@@ -24,8 +23,8 @@ public class MicroViewUIController : UIControllerBase
     [SerializeField, HighlightIfNull] private Image _backgroundImage;
     [SerializeField, HighlightIfNull] private Text _nameText;
     [SerializeField, HighlightIfNull] private Text _explainText;
-    [SerializeField, HighlightIfNull] private AreaInfectionGaugeSlider _areaInfectionGaugeSlider;
-    [SerializeField, HighlightIfNull] private InfectionCountText _infectionCountText;
+    [SerializeField, HighlightIfNull] private AreaInfectionGauge areaInfectionGauge;
+    [SerializeField, HighlightIfNull] private AreaInfectionText areaInfectionText;
     
     [Header("開発中オンリー")] [SerializeField] private Text _day;
     
@@ -79,8 +78,8 @@ public class MicroViewUIController : UIControllerBase
         }
         
         // AgentStateCountクラスを渡す
-        _infectionCountText.SetAgentStateCount(stateCount); 
-        _areaInfectionGaugeSlider.SetAgentStateCount(stateCount);
+        areaInfectionText.SetAgentStateCount(stateCount); 
+        areaInfectionGauge.SetAgentStateCount(stateCount);
         
         // アニメーション
         _nameText.DOFade(1, 0.5f);
@@ -94,8 +93,8 @@ public class MicroViewUIController : UIControllerBase
     /// </summary>
     private void StateCountUpdate()
     {
-        _infectionCountText.CountUpdate();
-        _areaInfectionGaugeSlider.FillUpdate();
+        areaInfectionText.CountUpdate();
+        areaInfectionGauge.FillUpdate();
     }
     
     /// <summary>

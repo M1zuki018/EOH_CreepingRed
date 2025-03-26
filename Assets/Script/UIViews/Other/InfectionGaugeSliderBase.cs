@@ -5,7 +5,7 @@ using UnityEngine.UI;
 /// <summary>
 /// 感染状況を確認するスライダーを管理するクラスのベース
 /// </summary>
-public abstract class BaseInfectionGaugeSlider : ViewBase
+public abstract class InfectionGaugeSliderBase : ViewBase
 {
     [SerializeField, HighlightIfNull] private Image _healthyGauge;
     [SerializeField, HighlightIfNull] private Image _infectedGauge;

@@ -1,7 +1,7 @@
 /// <summary>
 /// エリアの感染スライダーを管理するクラス（Areaクラスとセット）
 /// </summary>
-public class AreaInfectionGaugeSlider : BaseInfectionGaugeSlider
+public class AreaInfectionGauge : InfectionGaugeSliderBase
 {
     private AgentStateCount _stateCount;
     

@@ -3,9 +3,9 @@ using UnityEngine;
 using UnityEngine.UI;
 
 /// <summary>
-/// 感染のテキストを管理するクラス
+/// エリアの感染状況を表すテキストを管理するクラス
 /// </summary>
-public class InfectionCountText : ViewBase
+public class AreaInfectionText : ViewBase
 {
     [SerializeField, HighlightIfNull] private Text _healthy;
     [SerializeField, HighlightIfNull] private Text _infected;
