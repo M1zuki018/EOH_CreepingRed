@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
@@ -10,6 +11,7 @@ public class Grid
     private readonly Area[,] _areas = new Area[5 ,4]; // エリアクラスの二次元配列
     private readonly AgentStateCount _totalStateCount; // ゲーム内に存在するエージェントの累計
     private readonly List<UniTask> _tasks = new List<UniTask>();
+    public static event Action<int, int, int> StateUpdated; // 健康, 感染, 仮死の数値を通知するイベント
 
     public Grid(List<AreaSettingsSO> areaSettings)
     {
@@ -104,6 +106,10 @@ public class Grid
 
             _totalStateCount.UpdateStateCount(
                 totalHealthy, totalInfected, totalNearDeath, totalGhost, totalPerished);
+            
+            // 集計結果を通知（イベント発火）
+            StateUpdated?.Invoke(totalHealthy, totalInfected, totalNearDeath);
+            
         }, "\ud83d\uddfa\ufe0fグリッド 全エージェントのステートの集計速度");
         
         // Gridの集計データをUIに反映

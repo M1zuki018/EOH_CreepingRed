@@ -23,13 +23,13 @@ public class InfectionGaugeSlider : ViewBase
 
     public override UniTask OnBind()
     {
-        Area.StateUpdated += FillUpdate; // ステートカウントの更新イベントを登録
+        Grid.StateUpdated += FillUpdate; // ステートカウントの更新イベントを登録
         return base.OnBind();
     }
 
     private void OnDestroy()
     {
-        Area.StateUpdated -= FillUpdate;
+        Grid.StateUpdated -= FillUpdate;
     }
 
     /// <summary>
