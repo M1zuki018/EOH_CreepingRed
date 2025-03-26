@@ -479,7 +479,7 @@ MonoBehaviour:
   _isLogFormatEnabled: 0
   _isLoggingEnabled: 0
   _prefabsToInstantiate:
-  - {fileID: 7941635128884738834, guid: 479374eee742c284f938e248ba4d99dd, type: 3}
+  - {fileID: 8967411188634785416, guid: 0a7a6a437a6e6f44db7616b68bf7988a, type: 3}
   - {fileID: 7459061100521286778, guid: 427f343d6e65f1546a247a99b992ab15, type: 3}
   - {fileID: 6164294547386205030, guid: 9be3aeb83ed4eac4db28af4840704b68, type: 3}
 --- !u!4 &2083794801
