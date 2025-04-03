@@ -8,11 +8,13 @@ using R3;
 public class Simulation : IDisposable
 {
     private readonly Grid _grid;
+    private readonly InfectionEventManager _eventManager;
     private readonly IDisposable _subscription;
 
     public Simulation(List<AreaSettingsSO> areaSettings, ITimeObservable timeManager)
     {
         _grid = new Grid(areaSettings); // グリッドを生成する
+        _eventManager = new InfectionEventManager(_grid); // 感染イベントを管理するクラス
         _subscription = timeManager.GameTimeProp.Subscribe(UpdateSimulation);
     }
     

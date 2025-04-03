@@ -9,6 +9,7 @@ using UnityEngine;
 public class Grid
 {
     private readonly Area[,] _areas = new Area[5 ,4]; // エリアクラスの二次元配列
+    public Area[,] Areas => _areas;
     private readonly AgentStateCount _totalStateCount; // ゲーム内に存在するエージェントの累計
     private readonly List<UniTask> _tasks = new List<UniTask>();
     public static event Action<int, int, int> StateUpdated; // 健康, 感染, 仮死の数値を通知するイベント

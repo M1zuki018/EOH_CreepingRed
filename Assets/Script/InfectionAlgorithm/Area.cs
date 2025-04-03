@@ -137,4 +137,18 @@ public class Area
             }
         }
     }
+
+    /// <summary>
+    /// イベント側から感染開始するためのメソッド
+    /// </summary>
+    public void Spread()
+    {
+        if (_infectionIndex == 0)
+        {
+            if (_infectionIndex < _cells.Count - 1) // 範囲を越えないようにする
+            {
+                _cells[++_infectionIndex].Infection(1);
+            }
+        }
+    }
 }
