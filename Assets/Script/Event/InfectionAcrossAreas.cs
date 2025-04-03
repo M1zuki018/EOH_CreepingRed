@@ -5,7 +5,7 @@ using Random = System.Random;
 /// <summary>
 /// エリアをまたぐ感染を管理するクラス
 /// </summary>
-public class Infection_AcrossAreas : IDisposable
+public class InfectionAcrossAreas : IDisposable
 {
     private readonly Grid _grid; // Area情報を取得するためのGridクラスの参照
     private readonly int _rows; // Area二次元配列のヨコの長さ
@@ -14,7 +14,7 @@ public class Infection_AcrossAreas : IDisposable
     private readonly Random _random;
     private readonly IDisposable _spreadEventObserver;
     
-    public Infection_AcrossAreas(Grid grid)
+    public InfectionAcrossAreas(Grid grid)
     {
         _grid = grid;
         _random = new Random();

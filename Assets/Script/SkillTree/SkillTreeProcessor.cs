@@ -27,7 +27,7 @@ public class SkillTreeProcessor
     {
         return !button.IsUnlocked && // 自身がアンロックされていない
                ArePrerequisiteSkillsUnlocked(button.SkillData.PrerequisiteSkillsEnum) && // 前提スキルが全て解除されている
-               GameEventParameters.Resource >= button.SkillData.Cost; // コストが足りている
+               GameEventParameters.Resource.Value >= button.SkillData.Cost; // コストが足りている
     }
 
     /// <summary>
@@ -52,7 +52,7 @@ public class SkillTreeProcessor
     public void UnlockSkill(SkillDataSO data)
     {
         ApplySkillEffects(data);
-        GameEventParameters.Resource -= data.Cost; // コストを消費
+        GameEventParameters.Resource.Value -= data.Cost; // コストを消費
     }
 
     /// <summary>

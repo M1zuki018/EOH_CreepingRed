@@ -3,10 +3,9 @@
 /// </summary>
 public class InfectionEventManager
 {
-    private Infection_AcrossAreas _acrossAreas; // エリアを跨ぐ感染を管理するクラス
-    
     public InfectionEventManager(Grid grid)
     {
-        _acrossAreas = new Infection_AcrossAreas(grid);
+        var acrossAreas = new InfectionAcrossAreas(grid); // イベントを跨ぐ感染を管理するクラス
+        var getCost = new GetCost(); // スキル獲得のためのコストを取得するクラス
     }
 }

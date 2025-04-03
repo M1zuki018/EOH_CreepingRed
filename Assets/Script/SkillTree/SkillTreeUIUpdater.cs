@@ -1,4 +1,5 @@
 using System;
+using R3;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -20,6 +21,7 @@ public class SkillTreeUIUpdater : ISkillTreeUIUpdater, IDisposable
     private readonly Slider _lethalitySlider; // 致死率スライダー
     
     public event Action OnUnlock;
+    private IDisposable _resourceSubscription;
 
     public SkillTreeUIUpdater(
         Text skillNameText, Text skillDescriptionText, Text unlockCostText, Button unlockButton,
@@ -35,6 +37,9 @@ public class SkillTreeUIUpdater : ISkillTreeUIUpdater, IDisposable
         _lethalitySlider = lethalitySlider;
         
         _unlockButton.onClick.AddListener(HandleUnlock); // スキルアンロック
+
+        _resourceSubscription = GameEventParameters.Resource.Subscribe(_ =>
+            _availablePointText.text = GameEventParameters.Resource.ToString());
         
         Initialize();
     }
@@ -76,7 +81,6 @@ public class SkillTreeUIUpdater : ISkillTreeUIUpdater, IDisposable
     /// </summary>
     public void UpdateParameterSliders()
     {
-        _availablePointText.text = GameEventParameters.Resource.ToString();
         _spreadSlider.value = InfectionParameters.BaseRate;
         _detectionSlider.value = GameEventParameters.DetectionRate;
         _lethalitySlider.value = InfectionParameters.LethalityRate;
@@ -95,6 +99,7 @@ public class SkillTreeUIUpdater : ISkillTreeUIUpdater, IDisposable
     public void Dispose()
     {
         _unlockButton.onClick.RemoveListener(HandleUnlock);
+        _resourceSubscription?.Dispose();
     }
     
     private void HandleUnlock() => OnUnlock?.Invoke();
