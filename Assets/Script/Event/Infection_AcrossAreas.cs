@@ -18,14 +18,12 @@ public class Infection_AcrossAreas
         // 二次元配列の長さを取得
         _rows = _grid.Areas.GetLength(0);
         _cols = _grid.Areas.GetLength(1);
-        
-        SpreadEvent();
     }
     
     /// <summary>
     /// 確率でエリアを跨いだ感染を発生させるクラス
     /// </summary>
-    private void SpreadEvent()
+    public void SpreadEvent()
     {
         int x = _random.Next(_rows);
         int y = _random.Next(_cols);

@@ -143,10 +143,10 @@ public class Area
     /// </summary>
     public void Spread()
     {
-        DebugLogHelper.LogTestOnly($"感染イベント対象：{_section.ToString()}");
+        Debug.Log($"感染イベント対象：{_section.ToString()}");
         if (_infectionIndex == 0) // まだ感染開始していない場合に処理を行う
         {
-            DebugLogHelper.LogTestOnly($"新規エリア 感染開始：{_section.ToString()}");
+            Debug.Log($"新規エリア 感染開始：{_section.ToString()}");
             if (_infectionIndex < _cells.Count - 1) // 範囲を越えないようにする
             {
                 _cells[++_infectionIndex].Infection(1);
